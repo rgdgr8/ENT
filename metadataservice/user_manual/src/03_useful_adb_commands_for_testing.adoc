@@ -1,0 +1,20 @@
+[[section-useful_adb_commands_for_testing]]
+== Useful ADB Commands for Testing
+
+In some cases the official releases or PREINT deliveries do not have the changes which needs to be tested because of the integration related problems and delays.
+In order to test MetadataService application, its DEV variant apk (including Demo App) file should be copied on the target.
+Additionally, testers sometimes need to copy officially released apk files from target to an external device.
+ADB commands are used in order to push/pull apk files to/from target. After application APK is pushed, re-installing it or restarting the target both works.
+
+=== ADB Commands
+
+* **adb devices**: Lists the attached devices
+* **adb connect <target IP>**: Connects to the target with the given IP
+* **adb root**: Connects as root user
+* **adb shell su 0**: Sends the command as a super user
+* **adb mount -o rw,remount /product**: Mounts to the product partition in read/write mode
+* **adb push <APK path>/<APK  name> <remote path>**: Pushes APK to the target under the given partition
+* **adb pull <APK partition>/<APK name> <local path>**: Copies APK file from the target under a local path
+* **adb pm install -r <APK partition>/<APK name>**: Re-installs the copied application on the target
+
+

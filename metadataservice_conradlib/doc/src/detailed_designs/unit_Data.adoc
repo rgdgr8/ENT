@@ -1,0 +1,1617 @@
+include::../config.adoc[]
+//imagesdir must be overwritten, it is already included in the config.adoc
+:imagesdir: ../../images
+:hash: #
+
+= image:ESO_Logo_Colour_positive_RGB.png[eso_icon,350,350,float="right",align="center"] Design metadataservice_conradlib - Unit Data
+:toc-title: Table of Contents
+
+'''
+
+// numbering from here on
+:numbered:
+:stem: latexmath
+
+[unit=Data,role=unit]
+== <<Unit>> Data
+
+This document specifies the design of the unit *Data*, it is part of the link:../../main.{type}[metadataservice_conradlib].
+
+This unit contains data transfer objects and helper functions for the overall software element.
+
+== Provided Interface (public methods and properties)
+
+=== AccountManagerConfig.class(serviceId: String, accountType: String, accountName: String, optionServiceId: String, optionOperationId: String): AccountManagerConfig
+
+This data class save the constructor parameter as public attributes.
+It saves the configuration how the account manager must be used.
+
+*Arguments*
+
+|===
+|name|value range |valid values | description
+
+|serviceId
+|String
+|String not empty
+|The service id of the application.
+
+|accountType
+|String
+|String not empty
+|The account type of the account that must be used.
+
+|accountName
+|String
+|String not empty
+|The account name that must be used.
+
+|optionServiceId
+|String
+|String not empty
+|The option key of the service id.
+
+|optionOperationId
+|String
+|String not empty
+|The option key of the operation id.
+|===
+
+=== ApiRequestObject.class(lookup: String, logo: String): ApiRequestObject
+
+This data class save the constructor parameter as public attributes.
+The class is used to convert instances into json by the Moshi parser library.
+
+*Arguments*
+
+|===
+|name|value range |valid values | description
+
+|lookup
+|String
+|String not empty
+|The lookup api version that is used by the client.
+
+|logo
+|String
+|String not empty
+|The logo api version that is used by the client.
+|===
+
+=== ApiResultObject.class(lookup: String, logo: String): ApiResultObject
+
+This data class save the constructor parameter as public attributes.
+The class is used to convert json into instances by the Moshi parser library.
+
+*Arguments*
+
+|===
+|name|value range |valid values | description
+
+|lookup
+|String
+|String not empty
+|The relative lookup url that must be used by the client.
+
+|logo
+|String
+|String not empty
+|The relative logo url that must be used by the client.
+|===
+
+=== CompleteStatus.class(retry: RetryBehavior, retryDelaySeconds: Long?): CompleteStatus
+
+This data class save the constructor parameter as public attributes.
+It is a data transfer object to give retry instruction to the callback.
+
+*Arguments*
+
+|===
+|name|value range |valid values |resolution |unit | description
+
+|retry
+|RetryBehavior
+|RetryBehavior
+|n/a
+|n/a
+|Instruction when the app should retry the bearer and how often.
+
+|retryDelaySeconds
+|Long?
+|Long bigger than zero or null
+|+-1
+|Seconds
+|Delay when the bearer should be retried.
+|===
+
+=== Config.class()
+
+This is an object class without constructor.
+
+=== Config.endpointConfig
+
+This lateinit variable of type EndpointConfig saves the result of the registration endpoint.
+
+=== Config.apiEndpoints
+
+This lateinit variable of type ApiResultObject saves the result of the registration endpoint.
+
+=== Config.requestConfig
+
+This variable of type EndpointConfig saves the result of the registration endpoint.
+
+It has to hold a default object with this settings:
+
+- batchSize: 20
+- batchDebounce: 0.5
+- batchMaxWait: 2
+- connectionKeepalive: null
+- sessionEnabled: false
+- sessionCookieName: null
+- maxRegistrationAge: 86400L
+- retryDelay: 30L,
+- statusCodeContentExpiry: mapOf(),
+- statusCodeRetryBehavior: mapOf(401 to RetryBehavior.EXPONENTIAL, 403 to RetryBehavior.EXPONENTIAL, 429 to RetryBehavior.EXPONENTIAL, 500 to RetryBehavior.EXPONENTIAL, 502 to RetryBehavior.EXPONENTIAL, 503 to RetryBehavior.EXPONENTIAL, 504 to RetryBehavior.EXPONENTIAL)
+
+=== Config.getBackendPreferredRetryBehavior(responseCode: Int): RetryBehavior
+
+Retrieves the backend preferred retry behavior for a given HTTP response code from the request configuration.
+If the response code is not found the method returns RetryBehavior.NONE as the default behavior.
+
+*Arguments*
+
+|===
+|name|value range |valid values | description
+
+|responseCode
+|Int
+|Int
+|An HTTP response code for which the retry behavior shall be retrieved.
+|===
+
+*Return*
+
+|===
+|Type|value range |valid values | description
+
+|RetryBehavior
+|RetryBehavior
+|RetryBehavior
+|The RetryBehavior for the given response code.
+|===
+
+=== Config.getBackendPreferredContentExpiry(responseCode: Int): Long?
+
+Retrieves the backend preferred content expiry for a given HTTP response code from the request configuration.
+If the response code is not found the method returns null as the default behavior.
+
+*Arguments*
+
+|===
+|name|value range |valid values | description
+
+|responseCode
+|Int
+|Int
+|An HTTP response code for which the content expiry shall be retrieved.
+|===
+
+*Return*
+
+|===
+|Type|value range |valid values | description
+
+|Long?
+|Long or null
+|Long or null
+|The content expiry for the given response code or null.
+|===
+
+=== ConfigObject.class(batchSize: Int, batchDebounce: Double, batchMaxWait: Int, connectionKeepalive: Long?, sessionEnabled: Boolean, sessionCookieName: String?, maxRegistrationAge: Long, retryDelay: Long, statusCodeContentExpiry: Map<Int, Long>, statusCodeRetryBehavior: Map<Int, RetryBehavior>): ConfigObject
+
+This data class save the constructor parameter as public attributes.
+The class is used to convert json into instances by the Moshi parser library.
+
+*Arguments*
+
+|===
+|name|value range |valid values|annotation|unit|default | description
+
+|batchSize
+|Int
+|1 or more
+|@Json(name = "batch_size")
+|n/a
+|n/a
+|Start the debounce job, if the LookupRequestContainer received the here configured amount of MediaRequestObject instances.
+
+|batchDebounce
+|Double
+|0 or more
+|@Json(name = "batch_debounce")
+|Seconds
+|n/a
+|Start the debounce job, if no new MediaRequestObject has arrived since the time period of the variable.
+
+|batchMaxWait
+|Int
+|0 or more
+|@Json(name = "batch_max_wait")
+|Seconds
+|n/a
+|Start the debounce job, if the age of the LookupRequestContainer since initialization is older than the time period of the variable.
+
+|connectionKeepalive
+|Long?
+|Long or null
+|@Json(name = "connection_keepalive")
+|Seconds
+|null
+|Keep alive that must be configured in the http client.
+
+|sessionEnabled
+|Boolean
+|true, false
+|@Json(name = "session_enabled")
+|n/a
+|true
+|Should the client listen to session cookies.
+
+|sessionCookieName
+|String
+|String or null
+|@Json(name = "session_cookie_name")
+|n/a
+|n/a
+|Use a cookie with this name as session cookie.
+
+|maxRegistrationAge
+|Long
+|Long
+|@Json(name = "max_registration_age")
+|Seconds
+|60L * 60L * 24L
+|If session cookies are deactivated, restart registration after this delay.
+
+|retryDelay
+|Long
+|Long
+|@Json(name = "retry_delay")
+|Seconds
+|30L
+|Delay in seconds after the bearer should be requested again by the metadata service, in case of an error or retry after and no other delay was specified by the server.
+
+|statusCodeContentExpiry
+|Map<Int, Long>
+|Map<Int, Long>
+|@Json(name = "cache_expirations")
+|n/a
+|n/a
+|This map contains the backend preferred content expires for specific HTTP response codes. Media should invalidate the result after this time expires.
+
+|statusCodeRetryBehavior
+|Map<Int, RetryBehavior>
+|Map<Int, RetryBehavior>
+|@Json(name = "retry_behaviors")
+|n/a
+|n/a
+|This map contains the backend preferred retry behaviors for specific HTTP response codes.
+|===
+
+=== Constants.DEBUG_STRING
+
+This is a constant with "%%DEBUG%%" as value, it is not inside a class.
+
+=== Constants.REGISTRATION_URL_PATH
+
+This is a constant with "/register" as value, it is not inside a class.
+
+=== Constants.DISPOSITION
+
+This is a constant with "content-disposition" as value, it is not inside a class.
+
+=== Constants.FILE_TYPE
+
+This is a constant with "content-type" as value, it is not inside a class.
+
+=== Constants.NO_CHANGES
+
+This is a constant with -1 as value, it is not inside a class.
+
+=== Constants.REQUEST_ID
+
+This is a constant with "X-REQUEST-ID" as value, it is not inside a class.
+
+=== Constants.REQUEST_BRAND
+
+This is a constant with "X-Brand" as value, it is not inside a class.
+
+=== Constants.REQUEST_PRODUCT
+
+This is a constant with "X-Product" as value, it is not inside a class.
+
+=== Constants.REQUEST_CLUSTER
+
+This is a constant with "X-Cluster" as value, it is not inside a class.
+
+=== Constants.LOOKUP_VERSION
+
+This is a constant with "2.1" as value, it is not inside a class.
+
+=== Constants.LOGO_VERSION
+
+This is a constant with "2.1" as value, it is not inside a class.
+
+=== Constants.REGISTRATION_VERSION
+
+This is a constant with "2.1" as value, it is not inside a class.
+
+=== DabBearer.class(mcc: String, ecc: String, eid: String, sid: String, scids: String): DabBearer
+
+This data class must implement the IBearer interface.
+The constructor parameter must be saved as public not-editable attributes.
+
+*Arguments*
+
+|===
+|name|value range |valid values | description
+
+|mcc
+|String
+|Number with 3 digits
+|The Mobile Country Code of the bearer.
+
+|ecc
+|String
+|Hex Number with 2 digits
+|The ecc of the bearer without gcc.
+
+|eid
+|String
+|Hex Number with 4 digits
+|The eid of the bearer.
+
+|sid
+|String
+|Hex Number with 4 digits
+|The sid of the bearer.
+
+|scids
+|String
+|Hex Number with 1 digit
+|The scids of the bearer.
+|===
+
+=== DabBearer.createFromString(mcc: String, bearerString: String): DabBearer?
+
+This static function is responsible to create DabBearer instances by MCC and bearer representation.
+It must return null on error.
+
+*Arguments*
+
+|===
+|name|value range |valid values | description
+
+|mcc
+|String
+|Number with 3 digits
+|The Mobile Country Code of the bearer.
+
+|bearerString
+|String
+|String
+|DAB bearer representation without "dab:" at the beginning.
+|===
+
+*Return*
+
+|===
+|Type|value range |valid values | description
+
+|Response
+|DabBearer?
+|DabBearer or null
+|Resolved DabBearer or null on error.
+|===
+
+=== DabBearer.getBearerString(): String
+
+This function is responsible to convert DabBearer instances to a string representation.
+It has to return this pattern: "dab:$ecc.$eid.$sid.$scids"
+
+*Arguments*
+
+None
+
+*Return*
+
+|===
+|Type|value range |valid values | description
+
+|Response
+|String
+|String
+|The representation of the dab bearer.
+|===
+
+=== DataObject.class(shortName: String?, mediumName: String?, longName: String?, description: String?, providers: List<ProviderObject>, bearers: List<String>?, streams: List<StreamObject>?, logo: Int?): DataObject
+
+This data class save the constructor parameter as public not-editable attributes.
+The class is used to convert json into instances by the Moshi parser library.
+
+*Arguments*
+
+|===
+|name|value range |valid values|annotations|default | description
+
+|shortName
+|String?
+|String?
+|@Json(name = "short_name")
+|n/a
+|The short name of the radio station.
+
+|mediumName
+|String?
+|String?
+|@Json(name = "medium_name")
+|n/a
+|The medium name of the radio station.
+
+|longName
+|String?
+|String?
+|@Json(name = "long_name")
+|n/a
+|The long name of the radio station.
+
+|description
+|String?
+|String?
+|n/a
+|n/a
+|The description name of the radio station.
+
+|providers
+|List<ProviderObject>
+|List<ProviderObject>
+|n/a
+|n/a
+|The provider that provided this information.
+
+|bearers
+|List<String>?
+|List<String>?
+|n/a
+|n/a
+|Alternative bearers for this radio station.
+
+|streams
+|List<StreamObject>?
+|List<StreamObject>?
+|n/a
+|n/a
+|The web streams for this radio station.
+
+|logo
+|Int?
+|Int?
+|n/a
+|NO_CHANGES (Constant)
+|The backend id of the logo radio station logo. Null if no logo available. Not set, if logo is unchanged.
+|===
+
+=== EndpointConfig.class(url: String, operationId: String): EndpointConfig
+
+This data class save the constructor parameter as public attributes.
+
+*Arguments*
+
+|===
+|name|value range |valid values | description
+
+|url
+|String
+|String that contains an url
+|Backend url for this endpoint.
+
+|operationId
+|String
+|String
+|Operation id for the account manager.
+|===
+
+=== ETagResult.class(metadataETag: String?, bearersETag: String?, streamsEtag: String?): ETagResult
+
+This data class save the constructor parameter as public not-editable attributes.
+The class is used to convert json into instances by the Moshi parser library.
+
+*Arguments*
+
+|===
+|name|value range |valid values|annotations | description
+
+|metadataETag
+|String?
+|String?
+|@Json(name = "metadata")
+|The short name of the radio station.
+
+|bearersETag
+|String?
+|String?
+|@Json(name = "bearers")
+|The medium name of the radio station.
+
+|streamsEtag
+|String?
+|String?
+|@Json(name = "streams")
+|The long name of the radio station.
+|===
+
+=== ETagRequest.class(metadataETag: String?, bearersETag: String?, streamsEtag: String?, logoEtag: String?, logoSmallETag: String?): ETagRequest
+
+This data class save the constructor parameter as public attributes.
+The class is used to convert json into instances by the Moshi parser library.
+
+*Arguments*
+
+|===
+|name|value range |valid values|attribute | description
+
+|metadataETag
+|String?
+|String or null
+|@Json(name = "bearers")
+|ETag that was received from the last backend request with the related bearer.
+
+|bearersETag
+|String?
+|String or null
+|@Json(name = "bearers")
+|ETag that was received from the last backend request with the related bearer.
+
+|streamsEtag
+|String?
+|String or null
+|@Json(name = "streams")
+|ETag that was received from the last backend request with the related bearer.
+
+|logoEtag
+|String?
+|String or null
+|@Json(name = "logo")
+|ETag that was received from the last backend request with the related bearer.
+
+|logoSmallETag
+|String?
+|String or null
+|@Json(name = "logo_small")
+|ETag that was received from the last backend request with the related bearer.
+|===
+
+=== ETagRequest.class(eTags: ETags): ETagRequest
+
+This constructor must call the primary contractor of this class by using the Strings in the given ETags object.
+
+*Arguments*
+
+|===
+|name|value range |valid values | description
+
+|eTags
+|ETags
+|ETags
+|ETags received from the app and should be converted to a request wrapper.
+|===
+
+=== ETags.class(metadataETag: String?, bearersETag: String?, streamsETag: String?, logoETag: String?, logoSmallETag: String?): ETags
+
+This data class save the constructor parameter as public attributes.
+
+*Arguments*
+
+|===
+|name|value range |valid values | description
+
+|metadataETag
+|String?
+|String or null
+|ETag that was received from the last backend request with the related bearer.
+
+|bearersETag
+|String?
+|String or null
+|ETag that was received from the last backend request with the related bearer.
+
+|streamsETag
+|String?
+|String or null
+|ETag that was received from the last backend request with the related bearer.
+
+|logoETag
+|String?
+|String or null
+|ETag that was received from the last backend request with the related bearer.
+
+|logoSmallETag
+|String?
+|String or null
+|ETag that was received from the last backend request with the related bearer.
+|===
+
+=== FmBearer.class(mcc: String, pi: String, frequency: String): FmBearer
+
+This data class must implement the IBearer interface.
+The constructor parameter must be saved as public not-editable attributes.
+
+*Arguments*
+
+|===
+|name|value range |valid values | description
+
+|mcc
+|String
+|Number with 3 digits
+|The Mobile Country Code of the bearer.
+
+|pi
+|String
+|Hex Number with 4 digits
+|The pi of the bearer.
+
+|frequency
+|String
+|Number with 5 digits
+|The frequency of the bearer.
+|===
+
+=== FmBearer.createFromString(mcc: String, bearerString: String): FmBearer?
+
+This static function is responsible to create FmBearer instances by MCC and bearer representation.
+It must return null on error.
+
+*Arguments*
+
+|===
+|name|value range |valid values | description
+
+|mcc
+|String
+|Number with 3 digits
+|The Mobile Country Code of the bearer.
+
+|bearerString
+|String
+|String
+|FM bearer representation without "fm:" at the beginning.
+|===
+
+*Return*
+
+|===
+|Type|value range |valid values | description
+
+|Response
+|FmBearer?
+|FmBearer or null
+|Resolved FmBearer or null on error.
+|===
+
+=== FmBearer.getBearerString(): String
+
+This function is responsible to convert FmBearer instances to a string representation.
+It has to return this pattern: "fm:?.$pi.$frequency"
+
+*Arguments*
+
+None
+
+*Return*
+
+|===
+|Type|value range |valid values | description
+
+|Response
+|String
+|String
+|The representation of the fm bearer.
+|===
+
+=== HdBearer.class(tx: String, cc: String, multicastId: String): HdBearer
+
+This data class must implement the IBearer interface.
+The constructor parameter must be saved as public not-editable attributes.
+
+*Arguments*
+
+|===
+|name|value range |valid values | description
+
+|tx
+|String
+|Number with 3 digits
+|The tx of the bearer.
+
+|cc
+|String
+|Hex Number with 5 digits
+|The cc of the bearer.
+
+|multicastId
+|String
+|Number with 1 digit
+|The multicastId of the bearer.
+|===
+
+=== HdBearer.createFromString(bearerString: String): HdBearer?
+
+This static function is responsible to create HdBearer instances by bearer representation.
+It must return null on error.
+
+*Arguments*
+
+|===
+|name|value range |valid values | description
+
+|bearerString
+|String
+|String
+|HD bearer representation without "hd:" at the beginning.
+|===
+
+*Return*
+
+|===
+|Type|value range |valid values | description
+
+|Response
+|HdBearer?
+|HdBearer or null
+|Resolved HdBearer or null on error.
+|===
+
+=== HdBearer.getBearerString(): String
+
+This function is responsible to convert HdBearer instances to a string representation.
+It has to return this pattern: "hd:$cc.$tx.$multicastId"
+
+*Arguments*
+
+None
+
+*Return*
+
+|===
+|Type|value range |valid values | description
+
+|Response
+|String
+|String
+|The representation of the hd bearer.
+|===
+
+=== HeadersObject.class(retryAfter: Long): HeaderObject
+
+This data class save the constructor parameter as public not-editable attributes.
+The class is used to convert json into instances by the Moshi parser library.
+Class required annotation of @JsonClass(generateAdapter = true).
+
+*Arguments*
+
+|===
+|name|value range |valid values|resolution|unit|annotations | description
+
+|retryAfter
+|Long
+|1 or more
+|+-1
+|Seconds
+|@Json(name = "Retry-After")
+|The bearer should be retried in the here given delay.
+|===
+
+=== IBearer.getBearerString(): String
+
+This is function of the IBearer interface should return, if implemented the string representation of the bearer.
+
+*Arguments*
+
+None
+
+*Return*
+
+|===
+|Type|value range |valid values | description
+
+|Response
+|String
+|String
+|The string implementation of the implemented bearer type.
+|===
+
+=== IBearer.createListFromBackendData(mcc: String, bearerList: List<String>): List<IBearer>
+
+This static function should map a list of bearer representations to IBearer implementation.
+If a bearer can not be resolved, it has to be ignored.
+The type of bearer has to be detected by the string part before the ":".
+
+*Arguments*
+
+|===
+|Type|value range |valid values | description
+
+|mcc
+|String
+|String
+|The mcc that was used to request the bearer metadata.
+
+|bearerList
+|List<String>
+|List<String>
+|List of bearer representations bearers.
+|===
+
+*Return*
+
+|===
+|Type|value range |valid values | description
+
+|Response
+|List<IBearer>
+|List<IBearer>
+|List of resolved bearers.
+|===
+
+=== LookupResult.class(status: Int,data: DataObject?, headers: HeadersObject?, eTags: ETagResult?): LookupResult
+
+This data class save the constructor parameter as public not-editable attributes.
+The class is used to convert json into instances by the Moshi parser library.
+
+*Arguments*
+
+|===
+|name|value range |valid values|resolution|annotations | description
+
+|status
+|Int
+|Http status codes
+|+-1
+|n/a
+|The http status code for this specific bearer.
+
+|data
+|DataObject?
+|DataObject?
+|n/a
+|n/a
+|The metadata of the requested bearer.
+
+|headers
+|HeadersObject?
+|HeadersObject?
+|n/a
+|n/a
+|More meta information about the request.
+
+|eTags
+|ETagResult?
+|ETagResult?
+|n/a
+|@Json(name = "etags")
+|The ETags of the requested metadata.
+|===
+
+=== MediaRequestObject.class(bearer: IBearer, eTags: ETags, callback: IRadioStationDataCallback): MediaRequestObject
+
+This data class save the constructor parameter as public attributes.
+This object includes all data received from the MetaDataService.
+
+*Arguments*
+
+|===
+|name|value range |valid values | description
+
+|bearer
+|IBearer
+|IBearer
+|Bearer that should be requested.
+
+|eTags
+|ETags
+|ETags
+|ETags of the data that is already in the cache.
+
+|callback
+|IRadioStationDataCallback
+|IRadioStationDataCallback
+|The callback that should receive the result.
+|===
+
+=== MediaRequestObject.mcc
+
+This String? variable is not editable and will always be returned through a getter that receives the MCC from the bearer.
+On HD Bearer or not known types, it should return null.
+
+=== Origin.class
+
+This is an enum class that holds following values:
+
+- RADIODNS
+- RADIOPLAYER
+- GRACENOTE
+
+=== ProviderIdentifier.class(origin: Origin, externalId: String): ProviderIdentifier
+
+This data class save the constructor parameter as public attributes.
+
+*Arguments*
+
+|===
+|name|value range |valid values | description
+
+|origin
+|Origin
+|Origin
+|The name of the data provider.
+
+|externalId
+|String
+|String not empty
+|External radio station id from the provider.
+|===
+
+=== ProviderIdentifier.createFromBackendData(providerObject: ProviderObject): ProviderIdentifier
+
+This function parses the given ProviderObject object into a ProviderIdentifier.
+This function has to be static.
+
+*Arguments*
+
+|===
+|name|value range |valid values | description
+
+|providerObject
+|ProviderObject
+|ProviderObject
+|The raw provider information from the backend.
+
+|===
+
+*Return*
+
+|===
+|Type|value range |valid values | description
+
+|Response
+|ProviderIdentifier?
+|ProviderIdentifier or null
+|The resolved provider information. Null if the provider name is unknown.
+|===
+
+*Exceptions*
+
+None
+
+=== ProviderIdentifier.createListFromBackendData(providers: List<ProviderObject>): List<ProviderIdentifier>
+
+Uses the ProviderIdentifier.createFromBackendData() function to parse all given providers.
+If a provider is unknown, it has to ignore it.
+This function has to be static.
+
+*Arguments*
+
+|===
+|name|value range |valid values | description
+
+|providers
+|List<ProviderObject>
+|List<ProviderObject>
+|The raw provider information from the backend.
+
+|===
+
+*Return*
+
+|===
+|Type|value range |valid values | description
+
+|Response
+|List<ProviderIdentifier>
+|List<ProviderIdentifier>
+|The resolved provider information.
+|===
+
+*Exceptions*
+
+None
+
+=== ProviderObject.class(name: String, id: String): ProviderObject
+
+This data class save the constructor parameter as public not-editable attributes.
+The class is used to convert json into instances by the Moshi parser library.
+
+*Arguments*
+
+|===
+|name|value range |valid values| description
+
+|name
+|String
+|String not empty
+|The name of the provider which provides this information.
+
+|data
+|String
+|String not empty
+|The provider id for the given station.
+|===
+
+=== RegistrationRequest.class(version: String, api: ApiRequestObject): RegistrationRequest
+
+This data class and save the constructor parameter as public attributes.
+The class is used to convert instances into json by the Moshi parser library.
+
+*Arguments*
+
+|===
+|name|value range |valid values| description
+
+|version
+|String
+|String not empty
+|Version of the client.
+
+|api
+|ApiRequestObject
+|ApiRequestObject
+|Api versions that are implemented in the client.
+|===
+
+=== RegistrationResult.class(config: ConfigObject, api: ApiResultObject): RegistrationResult
+
+This data class save the constructor parameter as public attributes.
+The class is used to convert json into instances by the Moshi parser library.
+
+*Arguments*
+
+|===
+|name|value range |valid values| description
+
+|config
+|ConfigObject
+|ConfigObject
+|Configuration for the client overall.
+
+|api
+|ApiRequestObject
+|ApiRequestObject
+|The relative urls to the endpoints.
+|===
+
+=== Request.getRequestID(): String?
+
+This is an extension function for the okhttp3.Request class, it has to read the request id header from the request.
+The name of the header is saved in the REQUEST_ID constant.
+
+*Arguments*
+
+None
+
+*Return*
+
+|===
+|Type|value range |valid values | description
+
+|Response
+|String?
+|String not empty or null
+|The request id or null if not set.
+|===
+
+=== RequestHeader.class(token: String, requestID: String): RequestHeader
+
+This data class save the constructor parameter as public not-editable attributes.
+
+*Arguments*
+
+|===
+|name|value range |valid values | description
+
+|token
+|String
+|String
+|Token that must be sent to the backend.
+
+|requestID
+|String
+|String
+|The request id of this request.
+|===
+
+=== RequestHeader.mcc
+
+This is an instance variable of type String? with the default of null.
+It is to save the Mobile Country Code as String.
+
+=== RequestHeader.accept
+
+This is an instance variable of type String? with the default of null.
+It is to save the accept header that should be sent to the backend.
+
+=== RequestHeader.ifNoneMatch
+
+This is an instance variable of type String? with the default of null.
+It is to save the If-None-Match header that should be sent to the backend.
+
+=== RequestHeader.secondsSinceLastRegistration
+
+This is an instance variable of type Long? with the default of null.
+It is to save the time since the last registration.
+
+=== RequestHeader.toHeaders(): okhttp3.Headers
+
+Generates a okhttp3.Headers instance by the information that was saved inside the instance.
+
+It has to add following headers, if the value is not null:
+
+|===
+|Header Name|Header Value
+
+|"Authorization"|"Bearer " + RequestHeader.token
+
+|REQUEST_ID|RequestHeader.requestID
+|REQUEST_BRAND|SystemPropertyReader.getBrand()
+|REQUEST_PRODUCT|SystemPropertyReader.getProduct()
+|REQUEST_CLUSTER|SystemPropertyReader.getCluster()
+
+|"X-Mcc"|RequestHeader.mcc
+|"Accept"|RequestHeader.accept
+|"If-None-Match"|RequestHeader.ifNoneMatch
+|"X-Registration-Age"|RequestHeader.secondsSinceLastRegistration.toString()
+
+|===
+
+*Arguments*
+
+None
+
+*Return*
+
+|===
+|Type|value range |valid values | description
+
+|Response
+|okhttp3.Headers
+|okhttp3.Headers
+|The OkHttp object that saves the headers, so they can be sent to the backend.
+|===
+
+=== Response.getRetryAfter(): Long?
+
+This is an extension function for the okhttp3.Response class, it has to read the "Retry-After" header from the response.
+
+*Arguments*
+
+None
+
+*Return*
+
+|===
+|Type|value range |valid values | description
+
+|Response
+|Long?
+|1 or more, null
+|The value of the header or null if not set.
+|===
+
+=== Response.getRequestID(): String?
+
+This is an extension function for the okhttp3.Response class, it has to read the request id header.
+To do this, call the getRequestID() extension function on the request instance.
+
+*Arguments*
+
+None
+
+*Return*
+
+|===
+|Type|value range |valid values | description
+
+|Response
+|String?
+|String not empty or null
+|The request id or null if not set.
+|===
+
+=== RetryBehavior.class
+
+This is an enum class that holds following values:
+
+- NONE
+- ONCE
+- DELAYED
+- EXPONENTIAL
+
+=== StationInformation.class(eTags: ETagRequest): StationInformation
+
+This data class save the constructor parameter as public not-editable attributes.
+The class is used to convert json into instances by the Moshi parser library.
+
+*Arguments*
+
+|===
+|name|value range |valid values|annotations | description
+
+|eTags
+|ETagRequest
+|ETagRequest
+|@Json(name = "etags")
+|The ETags of the cached data.
+|===
+
+=== StationLogo.class(imageData: ByteArray, fileName: String, fileExtension: String): StationLogo
+
+This data class save the constructor parameter as public not-editable attributes.
+
+*Arguments*
+
+|===
+|name|value range |valid values | description
+
+|imageData
+|ByteArray
+|ByteArray
+|The byte data of the image.
+
+|fileName
+|String
+|String
+|The filename without extension of the image on the backend.
+
+|fileExtension
+|String
+|String
+|The type of the image.
+|===
+
+=== StationLogo.createFromBackendData(body: ByteArray, disposition: String?, mimeType: String?): StationLogo?
+
+This static function has to create a StationLogo instance by the given attributes, it should return null if that is not possible.
+
+The function has to extract the filename without extension from the disposition header.
+The file extension enum can be generated by the mime type parameter.
+
+*Arguments*
+
+|===
+|name|value range |valid values | description
+
+|body
+|ByteArray
+|ByteArray
+|The response body data that contains the image byte data.
+
+|disposition
+|String?
+|String?
+|The content disposition header from the backend.
+
+|mimeType
+|String?
+|String?
+|The content type header from the backend.
+|===
+
+*Return*
+
+|===
+|Type|value range |valid values | description
+
+|Response
+|StationLogo?
+|StationLogo?
+|A station logo data wrapper or null on error.
+|===
+
+=== StationMetadata.class(providerIdentifiers: List<ProviderIdentifier>, shortName: String?, mediumName: String?, longName: String?, description: String?, genres: List<String>): StationMetadata
+
+This data class save the constructor parameter as public not-editable attributes.
+
+*Arguments*
+
+|===
+|name|value range |valid values | description
+
+|providerIdentifiers
+|List<ProviderIdentifier>
+|List<ProviderIdentifier>
+|The provider that provide this data.
+
+|shortName
+|String?
+|String?
+|The short name of the radio station.
+
+|mediumName
+|String?
+|String?
+|The medium name of the radio station.
+
+|longName
+|String?
+|String?
+|The long name of the radio station.
+
+|description
+|String?
+|String?
+|The description name of the radio station.
+
+|genres
+|List<String>
+|List<String>
+|List of radio station genres.
+|===
+
+=== StationMetadata.createFromBackendData(providerIdentifiers: List<ProviderIdentifier>, data: DataObject): StationMetadata
+
+This static function has to create a StationMetadata instance by the raw backend data.
+The genre list has to always be empty.
+
+*Arguments*
+
+|===
+|name|value range |valid values | description
+
+|providerIdentifiers
+|List<ProviderIdentifier>
+|List<ProviderIdentifier>
+|The provider that provide this radio station metadata.
+
+|data
+|DataObject
+|DataObject
+|The data object with the raw backend data.
+|===
+
+*Return*
+
+|===
+|Type|value range |valid values | description
+
+|Response
+|StationMetadata
+|StationMetadata
+|The parsed radio station data.
+|===
+
+=== StreamQuality.class
+
+This is an enum class that holds following values:
+
+- LOW
+- HIGH
+
+=== StreamObject.class(url: String, offset: Int?, quality: String): StreamObject
+
+This data class save the constructor parameter as public not-editable attributes.
+The class is used to convert json into instances by the Moshi parser library.
+
+*Arguments*
+
+|===
+|name|value range |valid values|resolution | description
+
+|url
+|String
+|String not empty
+|n/a
+|The url of the audio stream.
+
+|offset
+|Int?
+|0 or more, null
+|+-1
+|Offset that should be used to play the stream.
+
+|quality
+|String
+|high or low
+|n/a
+|The quality type of the stream.
+|===
+
+=== String.buildUrl(relativeUrl: String): okhttp3.HttpUrl
+
+This is an extension function that builds OkHttp url instances.
+The function must be called on the first part of the url, typically the domain.
+
+*Arguments*
+
+|===
+|name|value range |valid values | description
+
+|relativeUrl
+|String
+|String
+|The relative url after the domain. It should only use the characters after the first "/".
+|===
+
+*Return*
+
+|===
+|Type|value range |valid values | description
+
+|Response
+|okhttp3.HttpUrl
+|okhttp3.HttpUrl
+|Url object than can be used in OkHttp.
+|===
+
+*Exception*
+
+- IllegalArgumentException: If this is not a well-formed HTTP or HTTPS URL.
+
+=== String.replaceEsoUrlPlaceholder(search: String, replace: String): String
+
+This is an extension function that replaces placeholder in Strings.
+The placeholder format is "$(name)" where "name" is the search parameter.
+
+*Arguments*
+
+|===
+|name|value range |valid values | description
+
+|search
+|String
+|String
+|The name of the placeholder.
+
+|replace
+|String
+|String
+|The value that must be inserted into the string.
+|===
+
+*Return*
+
+|===
+|Type|value range |valid values | description
+
+|Response
+|String
+|String
+|The request id or null if not set.
+|===
+
+=== Throwable.toSimpleString(limit: Int): String
+
+This is an extension function that formats an exception to a readable string.
+It should not print function and line information, but it is required to log the exception causes recursively.
+
+*Example*
+
+----
+MyCustomException: Something failed
+Caused by InvalidArgumentException: Invalid string format
+Caused by InvalidArgumentException: A second exception message
+and more...
+----
+
+*Arguments*
+
+|===
+|name|value range |valid values|default | description
+
+|limit
+|Int
+|1 or more
+|16
+|Limit of caused by exception, this is a safety measure for infinite loops or very long strings.
+|===
+
+*Return*
+
+|===
+|Type|value range |valid values | description
+
+|Response
+|String
+|String
+|The simple readable exception string.
+|===
+
+=== WebStream.class(url: String, offsetMillis: Int?, streamQuality: StreamQuality): WebStream
+
+This data class save the constructor parameter as public not-editable attributes.
+
+*Arguments*
+
+|===
+|name|value range |valid values |resolution |unit | description
+
+|url
+|String
+|String
+|n/a
+|n/a
+|URL of the audio stream.
+
+|offsetMillis
+|Int?
+|Int or null
+|+-1
+|Milliseconds
+|Offset that should be used to play the stream.
+
+|streamQuality
+|StreamQuality
+|StreamQuality
+|n/a
+|n/a
+|The quality type of the stream.
+|===
+
+=== WebStream.createListFromBackendData(streamList: List<StreamObject>): List<WebStream>
+
+This static function has to create WebStream instances by the raw backend data.
+
+*Arguments*
+
+|===
+|name|value range |valid values | description
+
+|streamList
+|List<StreamObject>
+|List<StreamObject>
+|The streams received from the backend.
+|===
+
+*Return*
+
+|===
+|Type|value range |valid values | description
+
+|Response
+|List<WebStream>
+|List<WebStream>
+|The parsed streams of the radio station.
+|===
+
+== Dependencies (Used Units, methods and properties)
+
+No dependencies to other units.
+This unit only consists of data classes and helper functions.
+
+== Runtime View
+
+[dynamic_sequence=startup,unit=Data,role=dynamic_sequence]
+=== Startup
+
+No explicit specification required, because the classes are simply initialized without constructor logic.
+
+[dynamic_sequence=shutdown,unit=Data,role=dynamic_sequence]
+=== Shutdown
+
+The calling unit must simply remove all references to this instance, which causes the kotlin garbage collector to remove it from the heap.
+
+[dynamic_sequence=startup_after_s2r,unit=Data,role=dynamic_sequence]
+=== Suspend
+
+Since this is a kotlin class without android references, no suspend state needs to be considered.
+
+[dynamic_sequence=resume,unit=Data,role=dynamic_sequence]
+=== Resume
+
+Since this is a kotlin class without android references, no suspend state needs to be considered.
+
+[[section-design-decisions]]
+== Design Decisions
+
+No further design decisions were made for the implementation of this unit other than those already mentioned in link:../../main.{type}[metadataservice_conradlib].
+
+include::../about-arc42.adoc[]

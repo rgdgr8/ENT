@@ -1,0 +1,194 @@
+﻿include::../config.adoc[]
+//imagesdir must be overwritten, it is already included in the config.adoc
+:imagesdir: ../../images
+:hash: #
+
+= image:ESO_Logo_Colour_positive_RGB.png[eso_icon,350,350,float="right",align="center"] Design metadataservice_conradlib - Unit PausableThreadPoolExecutor
+:toc-title: Table of Contents
+
+'''
+
+// numbering from here on
+:numbered:
+:stem: latexmath
+
+
+[unit=PausableThreadPoolExecutor, role=unit]
+== <<Unit>> PausableThreadPoolExecutor
+This document specifies the design of the unit *PausableThreadPoolExecutor*, it is part of the link:../../main.{type}[metadataservice_conradlib].
+
+This class extends the java.util.concurrent.ThreadPoolExecutor and adds the functionality of pausing the job worker.
+
+== Provided Interface (public methods and properties)
+
+=== PausableThreadPoolExecutor.class(corePoolSize: Int, maximumPoolSize: Int, keepAliveTime: Long, unit: TimeUnit, blockingQueue: BlockingQueue<Runnable>): PausableThreadPoolExecutor
+
+The constructor should not be different to the parent class,
+so it should accept the same parameter as ThreadPoolExecutor.
+
+*Arguments*
+
+|===
+|name|value range |valid values |resolution |unit | description
+
+|corePoolSize
+|Int
+|0 or more
+|+-1
+|n/a
+|The number of threads to keep in the pool, even if they are idle.
+
+|maximumPoolSize
+|Int
+|1 or more
+|+-1
+|n/a
+|The maximum number of threads to allow in the pool.
+
+|keepAliveTime
+|Long
+|0 or more
+|+-1
+|Configured by the unit parameter.
+|When the number of threads is greater than the core, this is the maximum time that excess idle threads will wait for new tasks before terminating.
+
+|unit
+|TimeUnit
+|TimeUnit-Instance
+|n/a
+|n/a
+|The time unit for the keepAliveTime argument.
+
+|blockingQueue
+|BlockingQueue<Runnable>
+|BlockingQueue<Runnable>
+|n/a
+|n/a
+|The queue to use for holding tasks before they are executed. This queue will hold only the Runnable tasks submitted by the execute method.
+
+|===
+
+*Exceptions*
+
+- IllegalArgumentException
+* corePoolSize < 0
+* keepAliveTime < 0
+* maximumPoolSize <= 0
+* maximumPoolSize < corePoolSize
+
+=== PausableThreadPoolExecutor.pause()
+
+Stops the worker from beginning new jobs until resume() is called.
+
+*Arguments*
+
+None
+
+*Return*
+
+None
+
+*Exceptions*
+
+None
+
+*Special attributes*
+
+** async: This function should not block the caller thread.
+
+=== PausableThreadPoolExecutor.resume()
+
+Starts executing jobs on the worker, if it was stopped before by pause().
+
+*Arguments*
+
+None
+
+*Return*
+
+None
+
+*Exceptions*
+
+None
+
+*Special attributes*
+
+** async: This function should not block the caller thread.
+
+=== PausableThreadPoolExecutor.isPaused(): Boolean
+
+Checks if the executor is at the moment paused.
+
+*Arguments*
+
+None
+
+*Return*
+
+|===
+|Name|value range |valid values |resolution | description
+
+|Response
+|Boolean
+|Response instance
+|true, false
+|Returns true if the executor is paused and will not begin running jobs, otherwise false-
+|===
+
+*Exceptions*
+
+None
+
+== Dependencies (Used Units, methods and properties)
+
+There are no dependencies to other units of this software element.
+
+== Runtime View
+
+[dynamic_sequence=startup, unit=PausableThreadPoolExecutor, role=dynamic_sequence]
+=== Startup
+
+At initiation the constructor should pass the parameters to the constructor of the parent class.
+
+[dynamic_sequence=shutdown, unit=PausableThreadPoolExecutor, role=dynamic_sequence]
+=== Shutdown
+
+The calling unit must simply remove all references to this instance,
+which causes the kotlin garbage collector to remove it from the heap.
+
+[dynamic_sequence=startup_after_s2r, unit=PausableThreadPoolExecutor, role=dynamic_sequence]
+=== Suspend
+
+Since this is a kotlin class without android references, no suspend state needs to be considered.
+
+[dynamic_sequence=resume, unit=PausableThreadPoolExecutor, role=dynamic_sequence]
+=== Resume
+
+Since this is a kotlin class without android references, no suspend state needs to be considered.
+
+=== Start and Pause Executor
+
+[plantuml, title="Start and Pause Executor", format="svg", id="PausableThreadPoolExecutor-Use-Case"]
+----
+participant "Arbitrary Unit" as caller
+participant "PausableThreadPoolExecutor" as executor <<unit>>
+
+caller -> executor: pause()
+executor -> executor: Block the start of new jobs internally
+
+caller -> executor: isPaused()
+caller <- executor: true
+
+caller -> executor: resume()
+executor -> executor: Unblock the start of new jobs
+
+caller -> executor: isPaused()
+caller <- executor: false
+----
+
+== Design Decisions
+
+No further design decisions were made for the implementation of this unit other than those already mentioned in link:../../main.{type}[metadataservice_conradlib].
+
+include::../about-arc42.adoc[]

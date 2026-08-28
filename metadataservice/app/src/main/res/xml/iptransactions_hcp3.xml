@@ -1,0 +1,6 @@
+<?xml version="1.0" encoding="utf-8"?>
+<iptransactions>
+    <transaction>connectedradio_v2</transaction>
+    <transaction>gracenote_v1</transaction>
+    <transaction>gracenotelyrics_v1</transaction>
+</iptransactions>

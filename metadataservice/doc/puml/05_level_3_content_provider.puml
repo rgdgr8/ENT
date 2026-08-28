@@ -1,0 +1,16 @@
+@startuml
+
+skinparam componentStyle uml2
+
+interface "ContentProvider" as content_provider_if
+
+component "ContentProvider" <<component>> {
+    component "ImageProvider"" <<unit>> as image_provider
+
+    image_provider .up.> content_provider_if
+}
+
+interface "Local Filesystem" as filesystem
+image_provider .down.>filesystem
+
+@enduml

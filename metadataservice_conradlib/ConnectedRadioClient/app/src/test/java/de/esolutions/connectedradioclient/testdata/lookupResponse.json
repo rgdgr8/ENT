@@ -1,0 +1,112 @@
+{
+  "fm:?.d318.10110": {
+    "status": 304
+  },
+  "fm:?.d318.10570": {
+    "status": 204
+  },
+  "fm:?.d318.10130": {
+    "status": 200,
+    "data": {
+      "short_name": "ANTBAY",
+      "medium_name": "ANTENNE BAYERN",
+      "long_name": "Antenne Bayern - Nur die besten Musikhitzzz",
+      "description": "Bayerns bester Musikmix",
+      "providers": [
+        {
+          "name": "RadioDNS",
+          "id": "antenne.de_antenne"
+        },
+        {
+          "name": "Radioplayer",
+          "id": "276114"
+        }
+      ],
+      "bearers": [
+        "dab:de0.10a5.d318.0"
+      ],
+      "streams": [
+        {
+          "url": "https://stream.antenne.de/antenne/stream/aacp?aw_0_1st.playerid=radioplayer.de&maxvbr=2&minvbr=2",
+          "offset": 0,
+          "quality": "low"
+        }
+      ],
+      "logo": 232
+    },
+    "etags": {
+      "metadata": "::metadata_etag::",
+      "bearers": "::bearer_etag::",
+      "streams": "::stream_etag::"
+    }
+  },
+  "fm:?.d318.10135": {
+    "status": 200,
+    "data": {
+      "short_name": "ANTBAY",
+      "medium_name": "ANTENNE BAYERN",
+      "long_name": "Antenne Bayern - Nur die besten Musikhitzzz",
+      "description": "Bayerns bester Musikmix",
+      "providers": [
+        {
+          "name": "RadioDNS",
+          "id": "antenne.de_antenne"
+        },
+        {
+          "name": "Radioplayer",
+          "id": "276114"
+        }
+      ],
+      "bearers": [
+        "dab:de0.10a5.d318.0"
+      ],
+      "streams": [
+        {
+          "url": "https://stream.antenne.de/antenne/stream/aacp?aw_0_1st.playerid=radioplayer.de&maxvbr=2&minvbr=2",
+          "offset": 0,
+          "quality": "low"
+        }
+      ]
+    },
+    "etags": {
+      "metadata": "::metadata_etag::",
+      "bearers": "::bearer_etag::",
+      "streams": "::stream_etag::"
+    }
+  },
+  "fm:?.d318.10145": {
+    "status": 200,
+    "data": {
+      "short_name": "ANTBAY",
+      "medium_name": "ANTENNE BAYERN",
+      "long_name": "Antenne Bayern - Nur die besten Musikhitzzz",
+      "description": "Bayerns bester Musikmix",
+      "providers": [
+        {
+          "name": "RadioDNS",
+          "id": "antenne.de_antenne"
+        },
+        {
+          "name": "Radioplayer",
+          "id": "276114"
+        }
+      ],
+      "bearers": [
+        "dab:de0.10a5.d318.0"
+      ],
+      "streams": [
+        {
+          "url": "https://stream.antenne.de/antenne/stream/aacp?aw_0_1st.playerid=radioplayer.de&maxvbr=2&minvbr=2",
+          "offset": 0,
+          "quality": "low"
+        }
+      ],
+      "logo": null
+    },
+    "etags": {
+      "metadata": "::metadata_etag::",
+      "bearers": "::bearer_etag::",
+      "streams": "::stream_etag::"
+    }
+  }
+}

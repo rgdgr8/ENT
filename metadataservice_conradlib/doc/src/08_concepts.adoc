@@ -1,0 +1,70 @@
+[[section-concepts]]
+== Cross-cutting Concepts
+
+=== Gradle
+The build tool Gradle is used within the ConRadClient application to compile app resources and source code and package them into AAR that can be tested and integration into the MetadataService.
+Therefore the whole build process is automated and managed by Gradle, according to our custom build configurations.
+
+=== Testing
+Testing is planned to be done on three different levels:
+
+. The correct behavior of each unit - a class or a set of classes - will be ensured by unit tests. +
+The goal for unit tests is to be run on each developer's machine, to avoid unintended changes to the behavior of a unit either when adding or changing unrelated functionality, or during refactorings. The unit test suite should not rely on any external systems. Fast execution of the unit test suit is essential. Additionally these tests will also be run on the continuous integration server and constitute one of the quality gates a change to the source code is required to pass before it can be submitted to a release branch.
+
+. Integration test will be used to test the behavior of our external interface, including as many external dependencies as possible. This includes actually issuing requests to the ConRad backend, because of this the tests are not able to run automatically.
+
+. Testing at the MetaDataService Demo App on an Emulator or real device. +
+This is mostly used to verify implemented tasks, so also the integration and behavior in the real system will be tested.
+
+=== Jacoco
+
+The JaCoCo code coverage library is used for documenting the automated test results sorted by the code coverage. The weekly test results are filed in the public testing repository:
+
+T:\TestDatenIN\HCP3\QualityGates\main_metadataservice_conradlib
+
+=== Checkstyle
+Within the whole e.solutions, a default style of coding and formatting is defined in the form of a checkstyle configuration.
+
+Checkstyle is a development tool to help programmers write java and kotlin code that adheres to a coding standard. It automates the process of checking code to spare humans of this boring (but important) task. This makes it ideal for projects that want to enforce a coding standard.
+
+Further, detailed information can be found in:
+
+hcp3/metadataservice/metadataservice_conradlib/main_metadataservice_conradlib/ConnectedRadioClient/config/checkstyle/
+
+
+=== Jenkins
+The automation server Jenkins is used within several parts of the ConRadClient software development process, e.g. building, testing, deploying and continuous integration.
+The Jenkins server can be found as follows: +
+
+https://degamhu14.eso.local/jenkins/job/HCP3/job/online/job/ConRadLib_HCP3/
+
+=== Tracing
+For tracing the library provided by e.solutions Framework team will be used. This wraps Android's standard logging mechanism and additionally allows categorization of trace messages for filtering later on.
+
+Log messages should include all necessary information to retrace the internal control flow for both debugging during development and bug fixing in later stages of the product life cycle.
+
+Care must be taken that no sensitive data either related to a user or restricted by local laws of the respective sales market are included. Tracing must not be excessive both to avoid a high system and tracing a back-end load.
+
+=== IRC (Infotainment Recorder)
+The irc is included in the e.solutions tracing framework and is used to record errors in delivered cars without installing a trace logger in the customer's car.
+
+The irc storage space is limited, so only errors may be logged.
+In addition, the version number is saved in order to identify the state of the software.
+To be as efficient as possible, nearly no text messages are stored, only error codes.
+
+The messages are divided into several channels/entries in order to assign the messages to a specific processes (registration, lookup request, logo request).
+
+=== Threading
+We use structured concurrency to mitigate many common issues of multithreaded applications.
+The reactive interface we defined doesn't enforce a strictly sequential processing order of client requests.
+
+The library is designed to fully work async to the app it is integrated in,
+so it will not use the thread of the caller to execute tasks.
+In order to provide data as fast as possible, the OkHttp library works async on multiple threads.
+
+=== Logging Privacy Flags
+
+For Privacy reasons within the whole code logs have to be tagged with privacy flags. This is necessary to categorize traces after the given privacy requirements.
+
+In case of not tagging the logs, there wouldn't be any traces shown because not tagged traces will be filtered out per default to avoid security complications.
+This means that every online request has to be tagged with the according correct flag.

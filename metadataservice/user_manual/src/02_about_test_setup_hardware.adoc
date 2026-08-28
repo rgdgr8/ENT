@@ -1,0 +1,28 @@
+[[section-about_test_setup_hardware]]
+== About Test Setup Hardware
+
+In case a test case should be run a real target instead of emulator, some preconditions should be provided.
+Test setup hardware consists of:
+
+=== Standalone Setup
+
+* **HCP3 target**: Flashed with an official release or PREINT delivery
+* **USB2Ethernet-Adapter**: Online connection e.g. D-Link
+* **USB customer hub connected to the external MediaConnector**: Connecting USB devices
+* **Radio antenna**: Testing song recognition
+* **Screen**: Displaying the actual status
+* **Loud speakers/headset**: Hearing audio output
+
+=== Complete Setup
+
+* **HCP3 target**: Flashed with an official release or PREINT delivery
+* **SUSAN box**: Sending Clamp and Comfort-Ready signals
+* **ConMod**: Online connection e.g. APN1/APN2
+* **HCP5**: Online connection e.g. APN1/APN2
+* **Radio antenna**: Testing song recognition
+* **Screen**: Displaying the actual status
+* **Loud speakers/headset**: Hearing audio output
+
+For a more detailed overview about the setup please refer to the following document:
+
+https://sharepoint.esolutions.de/sites/team_flashsupport_und_roadtester/PublicDocLib/HCP3/Dokumentation%20HCP3%20Verkabelung_v2.2.pdf?d=we00e000721a2442b8dfdb3a74e44d31c

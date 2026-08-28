@@ -1,0 +1,97 @@
+== Assumptions
+In order to implement this concept, some preconditions needs to be provided:
+
+* CoreServices should implement ServiceListApi including APN configuration and network settings
+* ConnectivityManager SystemApi should be usable
+
+== APN1 Configuration
+Consumed data by the applications is fully paid by OEM. It is accessible to the app only when it is configured correctly.
+Initially, APN1 is configured for the MetadataService.
+
+=== Permissions
+
+MetadataService should have these permissions in its AndroidManifest.xml file:
+
+<uses-permission android:name=**"android.permission.CONNECTIVITY_USE_RESTRICTED_NETWORKS"**/> +
+<uses-permission android:name=**"android.permission.INTERNET"**/> +
+<uses-permission android:name=**"android.permission.ACCESS_NETWORK_STATE"**/> +
+<uses-permission android:name=**"android.permission.CHANGE_NETWORK_STATE"**/> +
+<uses-permission android:name=**"android.permission.CONNECTIVITY_INTERNAL"**/> +
+
+eso internally, framework.jar from Perforce is planned to be used by the apps in order to have access to **@SystemApi**:
+
+* to use ConnectivityManager object
+* to create request/callback objects and
+* to set capabilities to a request (like **NET_CAPABILITY_OEM_PAID** capability)
+
+== APN2 Configuration
+Customer pays the charge according to the used data volume.
+
+== Switching Between APN1/APN2
+MetadataService app already registers itself to CoreServices for registering itself and getting notifications from ServiceListApi and DisableReasonsApi callbacks.
+updateServiceList method has list of ServiceEntry objects including APN information and network connection specific data like url, Https operations etc.
+
+**Apn apn** in ServiceListEntry: APN_VENDOR or APN_CUSTOMER
+
+**APN_VENDOR:** OEM paid (APN1)
+
+**APN_CUSTOMER:** customer paid (APN2)
+
+MetadataService is responsible for:
+
+* evaluating APN status change per registered ServiceId (gracenote_v1 or hybridradiodata_v1)
+* providing necessary data to GracenoteService and ConRadClient to access to the internet
+    - GracenoteService needs APN enum per request
+    - ConRadClient needs configData after every APN status change
+* creating network interfaces for APN1/2 for the usage of its back-ends
+
+**configData: ** APN enum, url ..etc to switch between different network configurations dynamically
+
+GracenoteService and ConRadClient are responsible for:
+
+* creating their network requests
+* fetching the responses
+
+=== GracenoteService Dynamic Behaviour
+
+
+{nbsp} +
+
+[plantuml, sequence_diagram_gracenoteservice, png, align="center"]
+....
+
+include::sequence_diagram_gracenoteservice.puml[]
+....
+
+{nbsp} +
+
+GracenoteService needs APN status per request in a fine-grained way. It switches between different network interfaces internally according to the set network configuration.
+
+{nbsp} +
+
+=== ConRadClient Dynamic Behaviour
+
+{nbsp} +
+
+[plantuml, sequence_diagram_conradclient, png, align="center"]
+....
+
+include::sequence_diagram_conradclient.puml[]
+....
+
+{nbsp} +
+
+ConRadClient handles its requests according to the actual network configuration.
+When a configuration change happens, ConRadClient continues to finish its ongoing requests with previously set network configuration.
+
+== Risks
+These risks can be addressed in the future based on this concept design:
+
+* Emulator does not support to work with socket implementation, so real hardware should be used and this can cause delays during implementation phases
+* CoreServices and ConRadClient components plan to work on related features in PI11, this can cause delays for MetadataService implementation during PI10
+* A PoC is not done for ConnectivityManager implementation, so some problems during the usage of this API and network interface creation can cause changes on this concept and delays on the real implementation
+
+== References
+
+* Howto_ConnectivityManager_20201126_v0.4.pdf
+* 2020-10-08_CSO_HCP3_MDS_connect.pptx

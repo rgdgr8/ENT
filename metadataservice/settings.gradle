@@ -1,0 +1,28 @@
+rootProject.name='mds_metadataservice'
+include ':app'
+include ':conradlib'
+
+def mdsProfile = (gradle.startParameter.projectProperties['mds.profile'] ?: '').toLowerCase()
+def conradlibVariant
+if (mdsProfile) {
+	if (mdsProfile == 'emu' || mdsProfile == 'icc' || mdsProfile == 'no-gn') {
+		conradlibVariant = 'default'
+	} else {
+		throw new RuntimeException("Unsupported mds.profile='$mdsProfile'. Use 'emu', 'icc' or 'no-gn'.")
+	}
+} else {
+	conradlibVariant = (gradle.startParameter.projectProperties['conradlib.variant'] ?: 'default').toLowerCase()
+}
+def conradlibProjectDir
+
+if (conradlibVariant == 'default') {
+	conradlibProjectDir = '../metadataservice_conradlib/ConnectedRadioClient/app'
+} else {
+	throw new RuntimeException("Unsupported conradlib.variant='$conradlibVariant'. Use 'default'.")
+}
+
+project(':conradlib').projectDir = new File(conradlibProjectDir)
+
+include ':clientinterface'
+// Build metadataservice client interface from source instead of using metadataservice.aar
+project(':clientinterface').projectDir = new File('../metadataservice_clientinterface/lib')

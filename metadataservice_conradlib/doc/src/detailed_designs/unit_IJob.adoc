@@ -1,0 +1,68 @@
+﻿include::../config.adoc[]
+//imagesdir must be overwritten, it is already included in the config.adoc
+:imagesdir: ../../images
+:hash: #
+
+= image:ESO_Logo_Colour_positive_RGB.png[eso_icon,350,350,float="right",align="center"] Design metadataservice_conradlib - Unit IJob
+:toc-title: Table of Contents
+
+'''
+
+// numbering from here on
+:numbered:
+:stem: latexmath
+
+
+[unit=IJob, role=unit]
+== <<Unit>> IJob
+This document specifies the design of the unit *IJob*, it is part of the link:../../main.{type}[metadataservice_conradlib].
+
+This interface has the purpose of implementing different jobs that can be queued and executed by the link:unit_ExecutorWorker.adoc[ExecutorWorker].
+
+The kotlin interface implementation should inherit from java.lang.Runnable.
+
+== Provided Interface (public methods and properties)
+
+=== IJob.run()
+
+This function is called by the ExecutorWorker and should execute the purpose of the implementation class.
+
+*Arguments*
+
+None
+
+*Return*
+
+None
+
+== Dependencies (Used Units, methods and properties)
+
+There are no dependencies to other units of this software element.
+
+== Runtime View
+
+[dynamic_sequence=startup, unit=IJob, role=dynamic_sequence]
+=== Startup
+
+This is only a kotlin interface without any logic.
+
+[dynamic_sequence=shutdown, unit=IJob, role=dynamic_sequence]
+=== Shutdown
+
+This is only a kotlin interface without any logic.
+
+[dynamic_sequence=startup_after_s2r, unit=IJob, role=dynamic_sequence]
+=== Suspend
+
+This is only a kotlin interface without any logic.
+
+[dynamic_sequence=resume, unit=IJob, role=dynamic_sequence]
+=== Resume
+
+This is only a kotlin interface without any logic.
+
+== Design Decisions
+
+No further design decisions were made for the implementation of this unit other than those already mentioned in link:../../main.{type}[metadataservice_conradlib].
+
+include::../about-arc42.adoc[]

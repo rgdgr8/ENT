@@ -1,0 +1,31 @@
+@startuml
+
+participant Service as service
+participant Domain as domain
+participant Repository as repo
+participant Data as data
+participant GracenoteService as gracenote
+participant AudioDevice as audio_device
+
+service -> domain: start song recognition
+domain -> repo: start song recognition
+repo -> data: start song recognition
+data -> gracenote: register song info callback
+gracenote ->data: update status RUNNING
+data -> audio_device: configure audio device
+
+loop recognition ongoing
+    data -> audio_device: read audio data
+    audio_device -> data: audio data
+    data -> gracenote: write audio data
+
+    opt new song/silence recognized
+        gracenote --> data: song recognized
+        data --> repo:  song info
+        repo --> domain:  song info
+        domain --> service: song info
+     end
+
+end
+
+@enduml

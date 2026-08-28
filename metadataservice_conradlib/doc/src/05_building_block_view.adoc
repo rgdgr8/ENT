@@ -1,0 +1,179 @@
+include::config.adoc[]
+
+[[overall]]
+== Build block view
+
+=== ConRadClient Overall
+
+[plantuml, chapter-5-overall, png]
+----
+include::{pumldir}/chapter-5-overall.puml[]
+----
+
+=== ConRadClient HCP3
+
+[plantuml, chapter-5-hcp3, png]
+----
+include::{pumldir}/chapter-5-hcp3.puml[]
+----
+
+=== ConRadClient OI@A
+
+[plantuml, chapter-5-oia, png]
+----
+include::{pumldir}/chapter-5-oia.puml[]
+----
+
+=== ConradClient Units
+
+We create packages from units which a similar work focuses.
+The first diagram show the relation between these packages.
+The following diagrams show the relation of the different units within these packages.
+[plantuml, chapter-5-units, png]
+----
+include::{pumldir}/chapter-5-units.puml[]
+----
+
+[plantuml, chapter-5-media, png]
+----
+include::{pumldir}/chapter-5-media.puml[]
+----
+
+[plantuml, chapter-5-api, png]
+----
+include::{pumldir}/chapter-5-api.puml[]
+----
+
+Almost all units within the backend package use the Data, TokenHandler, IRC and Logger unit.
+[plantuml, chapter-5-backend, png]
+----
+include::{pumldir}/chapter-5-backend.puml[]
+----
+In the following subchapters, the units will be described in detail.
+For every unit exists a separate detail description which is linked within the individual chapters,
+because it would be too much for one document.
+
+[unit=GenericMoshiParser, role=unit]
+==== <<Unit>> GenericMoshiParser
+
+link:./src/detailed_designs/unit_GenericMoshiParser.{type}[Detailed Design for Unit GenericMoshiParser]
+
+[unit=Http, role=unit]
+==== <<Unit>> Http
+
+link:./src/detailed_designs/unit_Http.{type}[Detailed Design for Unit Http]
+
+[unit=SystemPropertyReader, role=unit]
+==== <<Unit>> SystemPropertyReader
+
+link:./src/detailed_designs/unit_SystemPropertyReader.{type}[Detailed Design for Unit SystemPropertyReader]
+
+[unit=Data, role=unit]
+==== <<Unit>> Data
+
+link:./src/detailed_designs/unit_Data.{type}[Detailed Design for Unit Data]
+
+[unit=Debug, role=unit]
+==== <<Unit>> Debug
+
+link:./src/detailed_designs/unit_Debug.{type}[Detailed Design for Unit Debug]
+
+[unit=LogoCallback, role=unit]
+==== <<Unit>> LogoCallback
+
+link:./src/detailed_designs/unit_LogoCallback.{type}[Detailed Design for Unit LogoCallback]
+
+[unit=LookupCallback, role=unit]
+==== <<Unit>> LookupCallback
+
+link:./src/detailed_designs/unit_LookupCallback.{type}[Detailed Design for Unit LookupCallback]
+
+[unit=IController, role=unit]
+==== <<Unit>> IController
+
+link:./src/detailed_designs/unit_IController.{type}[Detailed Design for Unit IController]
+
+[unit=RequestController, role=unit]
+==== <<Unit>> RequestController
+
+link:./src/detailed_designs/unit_RequestController.{type}[Detailed Design for Unit RequestController]
+
+[unit=RegistrationFailureException, role=unit]
+==== <<Unit>> RegistrationFailureException
+
+link:./src/detailed_designs/unit_RegistrationFailureException.{type}[Detailed Design for Unit RegistrationFailureException]
+
+[unit=ExecutorWorker, role=unit]
+==== <<Unit>> ExecutorWorker
+
+link:./src/detailed_designs/unit_ExecutorWorker.{type}[Detailed Design for Unit ExecutorWorker]
+
+[unit=PausableThreadPoolExecutor, role=unit]
+==== <<Unit>> PausableThreadPoolExecutor
+
+link:./src/detailed_designs/unit_PausableThreadPoolExecutor.{type}[Detailed Design for Unit PausableThreadPoolExecutor]
+
+[unit=IJob, role=unit]
+==== <<Unit>> IJob
+
+link:./src/detailed_designs/unit_IJob.{type}[Detailed Design for Unit IJob]
+
+[unit=LogoRequestJob, role=unit]
+==== <<Unit>> LogoRequestJob
+
+link:./src/detailed_designs/unit_LogoRequestJob.{type}[Detailed Design for Unit LogoRequestJob]
+
+[unit=LookupRequestJob, role=unit]
+==== <<Unit>> LookupRequestJob
+
+link:./src/detailed_designs/unit_LookupRequestJob.{type}[Detailed Design for Unit LookupRequestJob]
+
+[unit=RegistrationRequestJob, role=unit]
+==== <<Unit>> RegistrationRequestJob
+
+link:./src/detailed_designs/unit_RegistrationRequestJob.{type}[Detailed Design for Unit RegistrationRequestJob]
+
+[unit=HandleRegistration, role=unit]
+==== <<Unit>> HandleRegistration
+
+link:./src/detailed_designs/unit_HandleRegistration.{type}[Detailed Design for Unit HandleRegistration]
+
+[unit=ServerDowntimeHandler, role=unit]
+==== <<Unit>> ServerDowntimeHandler
+
+link:./src/detailed_designs/unit_ServerDowntimeHandler.{type}[Detailed Design for Unit ServerDowntimeHandler]
+
+[unit=LookupRequestContainer, role=unit]
+==== <<Unit>> LookupRequestContainer
+
+link:./src/detailed_designs/unit_LookupRequestContainer.{type}[Detailed Design for Unit LookupRequestContainer]
+
+[unit=TokenHandler, role=unit]
+==== <<Unit>> TokenHandler
+
+link:./src/detailed_designs/unit_TokenHandler.{type}[Detailed Design for Unit TokenHandler]
+
+[unit=ConRadClient, role=unit]
+==== <<Unit>> ConRadClient
+
+link:./src/detailed_designs/unit_ConRadClient.{type}[Detailed Design for Unit ConRadClient]
+
+[interface=IRadioStationDataCallback module=perforce-swarm.eso.local:8443/files/hcp3/metadataservice/metadataservice_conradlib, role=swe_interface]
+==== <<Interface>> IRadioStationDataCallback
+
+link:./src/detailed_designs/unit_IRadioStationDataCallback.{type}[Detailed Design for Unit IRadioStationDataCallback]
+
+[unit=SendToMedia, role=unit]
+==== <<Unit>> SendToMedia
+
+link:./src/detailed_designs/unit_SendToMedia.{type}[Detailed Design for Unit SendToMedia]
+
+[unit=IRC, role=unit]
+==== <<Unit>> IRC
+
+link:./src/detailed_designs/unit_IRC.{type}[Detailed Design for Unit IRC]
+
+[unit=Logger, role=unit]
+==== <<Unit>> Logger
+
+link:./src/detailed_designs/unit_Logger.{type}[Detailed Design for Unit Logger]

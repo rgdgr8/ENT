@@ -1,0 +1,60 @@
+== Introduction and Goals
+
+The Connected Radio Client is one of the major parts of the MetaDataService software element.
+The Client serves as the connecting part between the MetaDataService and the Connected Radio backend.
+This means that several data which is transferred between the backend and the MetaDataService application is prepared and processed by the Connected Radio Client.
+The connected radio client is an important background service which is not visible directly for the user.
+The only goal of the connected radio client is to get and provide new data to the MetaDataService application from the backend e.g. logos of radio channels or other information about the radio channels.
+
+=== Requirements Overview
+
+All relevant requirements can be found in Polarion by filtering for the software element metadataservice_conradlib.
+
+=== Quality Goals
+
+The Connected Radio Client is only used from the MetadataService App and is connected to our self developed and hosted backend systems. +
+In this case it is necessary to achieve the following quality goals:
+
+* *Secure Connection* +
+Use modern technologies to ensure the connection to the backend is safe for external intervention
+
+* *Save data volume* +
+Reduce the size of the send data to and from the backend to us as little data volume as possible
+
+* *Reduce number of requests* +
+Use mechanism ro avoid the backend from to many requests and for to big requests at once.
+
+* *Retry failed requests in a controlled way* +
+Find a way to retry failed requests with the minimum of delay for the customer but enough time for the backend to be ready for the next request.
+
+=== Stakeholders
+
+The stakeholder group within this software element consists of internal as well as external parties.
+While the technical side is covered from employees of E.Solutions GmbH,
+the business side is covered by function owners of CARIAD SE.
+In the following chart you can see the summary of all stakeholders
+who are involved in the Development of the Connected Radio Client:
+
+[cols="20%,40%,40%"]
+|===
+|Role/Name|Contact|Expectations
+| _Manager_ | _Stefan Loibl +
+(stefan.loibl@esolutions.de)_ | _Responsible for the project_
+| _Team Lead_ | _Stefan Braun +
+(stefan.braun@esolutions.de)_ | _Technical lead of the project_
+| _Developer Team_ |
+_Lukas Urlasberger (lukas.urlasberger@esolutions.de)_ +
+_Hartmut Glücker (hartmut.gluecker@esolutions.de)_ +
+_Nico Fischer (nico.fischer@esolutions.de)_
+| _Responsible for maintenance of the source code and development_
+| _Function Owner_ |
+_Christian Winter  +
+(christian.winter@audi.de)_
+| _Business lead of the project_
+|===
+
+
+
+
+
+

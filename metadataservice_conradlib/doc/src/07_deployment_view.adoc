@@ -1,0 +1,15 @@
+include::config.adoc[]
+
+[[section-deployment-view]]
+== Deployment View
+
+The ConRadClient is part of the MetadataService which is pre-installed in the priv-app folder of the Android IVI vendor partition.
+Updates may be delivered sometime via system or app update.
+
+For more information about the MetadataService, see their documentation.
+
+
+[plantuml, deploymentView, png]
+----
+include::{pumldir}/chapter-7-deploymentView.puml[]
+----

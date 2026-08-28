@@ -1,0 +1,55 @@
+// Top-level build file where you can add configuration options common to all sub-projects/modules.
+// LOCAL BUILD VERSION - No eso.local dependencies
+
+buildscript {
+    ext.kotlin_version = '1.9.21'
+    // ext.media_common_version = '12.1.1' // Removed for local build
+
+    // NDK version - use environment variable or default
+    ext.ndk_version = System.env['NDK_VERSION'] ?: '26.1.10909125'
+
+    ext.framework_jar_version = 'RQ3A.210605.005'
+    // 'SQ1A.220105.002' for Android 12
+
+    repositories {
+        google()
+        mavenCentral()
+        gradlePluginPortal()
+    }
+    dependencies {
+        classpath "com.android.tools.build:gradle:8.2.0"
+        classpath "org.jetbrains.kotlin:kotlin-gradle-plugin:$kotlin_version"
+
+        classpath "com.google.devtools.ksp:com.google.devtools.ksp.gradle.plugin:$kotlin_version-1.0.15"
+
+        // Removed: classpath "de.esolutions.media-common:media-common-gradle-plugin:$media_common_version"
+
+        // NOTE: Do not place your application dependencies here; they belong
+        // in the individual module build.gradle files
+    }
+}
+
+allprojects {
+    repositories {
+        google()
+        mavenCentral()
+        gradlePluginPortal()
+
+        flatDir {
+            dirs "${rootProject.projectDir}/libs",
+                 "${rootProject.projectDir}/../libs_from_Cariad",
+                 "${rootProject.projectDir}/../libs_from_Cariad/ivi-online-MagicAdapter/ESOSDK",
+                 "${rootProject.projectDir}/../libs_from_Cariad/ivi-online-MagicAdapter/IVI/product/vendor/magicadapter"
+        }
+    }
+
+    //invalidate SNAPSHOT dependencies for every build
+    configurations.all {
+        resolutionStrategy.cacheDynamicVersionsFor 0, 'seconds'
+        resolutionStrategy.cacheChangingModulesFor 0, 'seconds'
+    }
+}
+
+task clean(type: Delete) {
+    delete rootProject.buildDir
+}

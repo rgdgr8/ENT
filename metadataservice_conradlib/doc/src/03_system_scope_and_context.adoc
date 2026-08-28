@@ -1,0 +1,44 @@
+include::config.adoc[]
+
+[[section-system-scope-and-context]]
+== System Scope and Context
+
+=== Business Context
+
+[plantuml, chapter-3-business-context, png]
+----
+include::{pumldir}/chapter-3-business-context.puml[]
+----
+
+[cols="30,70%"]
+|===
+|External Component|Description
+
+| Customer | The Customer is the owner of the vehicle. Therefore he is able to operate the Infotainment System of the vehicle.
+| Vehicle | The vehicle used in the context is a model of one of the brands of the Volkswagen group, whose infotainment software was developed by the e.solutions GmbH.
+| metadataservice_app | MetaDataService provides logos and metadata from various sources for songs and radio stations.
+| Tuner/Radio App | Android apps special developed for the Volkswagen group. Those apps contain brand specific UI and the business logic can access brand specific interfaces. The customer can open and use these applications to listen to music.
+| Server: ConnectedRadio_Backend | The ConRad Backend provide information (such as logos, metadata and streams) fo radio stations.
+| Android Account Manager | The CoreServices or Magic makes it possible for the OEM to configure and control various services in the vehicle via the MBConnect backend. These applications will provide JWT tokens for the backend over the android account manager.
+
+|===
+
+
+=== Technical Context
+
+[plantuml, chapter-3-technical-context, png]
+----
+include::{pumldir}/chapter-3-technical-context.puml[]
+----
+
+[cols="30,70%"]
+|===
+|External Component|Description
+
+| Account Manager | In order to securely access an online service, users need to authenticate the service—they need to provide proof of their identity. For an application that accesses a third-party service, the security problem is even more complicated. Not only does the user need to be authenticated to access the service, but the application also needs to be authorized to act on the user’s behalf.
+| Magic | App developed by CARIAD and is integrated into OI@A to provide JWT tokens and other features.
+| CoreServices | App developed by e.solutions and is integrated into HCP3 to provide JWT tokens and other features.
+| metadataservice_conradlib | The CoreServices enable the OEM to configure and control various services in the vehicle via the MBConnect backend. There would be no online connection without the usage of the CoreServices.
+| Server ConnectedRadio_Backend | The ConRad Backend provide information (such as logos, metadata and streams) fo radio stations.
+|===
+

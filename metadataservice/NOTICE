@@ -1,0 +1,28 @@
+MetadataService Application
+===========================
+
+Original Development:
+---------------------
+Copyright (c) 2019-2025 e.solutions GmbH
+Developed under contract for Volkswagen Group / Cariad SE
+
+Current Maintenance:
+--------------------
+Copyright (c) 2026 Cariad SE
+All rights reserved.
+
+This software was originally developed by e.solutions GmbH under contract
+for Cariad SE (formerly Volkswagen Group Software). Ownership and all 
+intellectual property rights belong to Cariad SE.
+
+Current development and maintenance is performed by Cariad SE.
+
+Maintainers:
+- Christian Winter (T2-CH), Volkswagen Group / Cariad SE
+
+Modifications since transfer of maintenance (2026):
+- Removed dependencies on eso.local/eso.fw frameworks
+- Enabled local build without internal Artifactory access
+- Replaced e.solutions tracing with Android native logging
+- Added stub implementations for ASI/Storage APIs
+- Integrated ConRadLib as source module

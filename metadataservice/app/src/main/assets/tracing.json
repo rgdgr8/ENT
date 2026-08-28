@@ -1,0 +1,13 @@
+{
+  "client": {
+    "default": {
+      "enabled": true,
+      "backends": {
+        "TraceBackendAndroid": {
+          "enabled": true,
+          "enableBackchannel": true
+        }
+      }
+    }
+  }
+}

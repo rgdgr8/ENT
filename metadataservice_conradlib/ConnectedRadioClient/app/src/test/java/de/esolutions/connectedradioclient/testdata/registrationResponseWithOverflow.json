@@ -1,0 +1,31 @@
+{
+  "config": {
+    "batch_size": 20,
+    "batch_debounce": 0.5,
+    "batch_max_wait": 2,
+    "connection_keepalive": 300,
+    "session_enabled": true,
+    "session_cookie_name": "testCookie",
+    "max_registration_age": 86400,
+    "cache_expirations": {
+      "200": 86400,
+      "204": 86400,
+      "304": 86400,
+      "400": 999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999
+    },
+    "retry_behaviors": {
+      "202": "DELAYED",
+      "401": "EXPONENTIAL",
+      "403": "EXPONENTIAL",
+      "429": "EXPONENTIAL",
+      "500": "ONCE",
+      "502": "ONCE",
+      "503": "EXPONENTIAL",
+      "504": "ONCE"
+    }
+  },
+  "api": {
+    "lookup": "url/to/lookup",
+    "logo": "url/to/logo"
+  }
+}

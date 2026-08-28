@@ -1,0 +1,390 @@
+include::config.adoc[]
+
+[[section-building-block-view]]
+== Building Block View
+
+This chapter describes the basic building blocks of the MetadataService.
+Components marked as _extern_ are not part of the scope and have their own respective documentation. +
+For details about the MetadataService component please refer to the MetadataService documentation.
+Currently this chapter focuses mostly on the functional aspects of the application, leaving yet to be clarified non functional requirements, such as a GEM or custom factory reset out of the picture.
+
+=== Whitebox MetadataService App
+
+The software element "metadataservice_app" consists of the high-level components shown in the figure below.
+These components are further broken down and described in the subsequent sections of this chapter.
+
+Some high-level components are trivial enough to not require any further breakdown before reaching the detailed design at unit level described in section <<Building Blocks - Level 3>>.
+
+[plantuml, 05_level_1, png, align="center"]
+.White box building blocks
+....
+include::{pumldir}/05_level_1.puml[]
+....
+
+Note that some relations have been omitted for the sake of clarity:
+The block box `Common` contains code implementing cross cutting concerns, that is used by all other components.
+
+*Rational*
+
+The general design philosophy behind this application follows Robert C. Martin's Clean Architecture as described on his own blog footnote:[https://blog.cleancoder.com/uncle-bob/2012/08/13/the-clean-architecture.html].
+At it's core the most important aspects of this design are the clear separation between the different levels of abstraction and the direction in which dependencies are allowed to point.
+The further inwards an element is located, the higher its level of abstraction.
+Dependencies are only allowed to point inwards, meaning source code in a envisioned inner circle must never depend on or reference any code conceptually located on any of its surrounding circles. +
+This design is followed within the vertical core stack starting at the `Service` down to the `Data` component.
+
+As indicated by the `_\<<dev>>_` stereotype `View`, `Model` and `Util` are not part of production software.
+The source code is separated using different Gradle build flavors and source sets, ensuring no code only intended for testing during development leaks into production builds.
+
+*Contained Blackboxes*
+
+[cols="1,2" options="header"]
+|===
+| **Name**         | **Responsibilities**
+| Service          | handles client requests including authentication
+| ContentProvider  | provides image files to clients
+| Domain           | defines core interfaces, data types and business rules
+| Repository       | coordinates application data fetching and caching
+| Data             | contains online and offline data sources/sinks for application data
+| Common           | contains non functional external (cross cutting) interface implementations and utility classes/functions
+| View             | UI for demo client of the MetadataService - not included in production
+| Model            | model for demo client of the MetadataService - not included in production
+| Util             | helper classes/functions for demo client - not included in production
+| GracenoteService | C++ library with JNI interface providing music and radio metadata via the GracenoteSDK/web services
+|===
+
+The code for each blackbox is contained within the corresponding Kotlin package `technology.cariad.entertainment.metadataservice.<blackbox_name>`.
+
+*Interfaces*
+
+[cols="1,2" options="header"]
+|===
+| **Interface**            | **Description**
+| usage via user interface | testers can issue service calls and observe the results through the development user interface
+| IMetadataServiceAidl     | AIDL interface defining functions to retrieve radio/media metadata
+| ExtendedStorageManager   | Java library providing storage paths for app/domain specific data partitions
+| ContentProvider          | Android Framework mechanism to provide data and files addressable by URIs
+| ServiceListApi           | AIDL interface over which general service configuration is published
+| DisableReasonsApi        | AIDL interface over which general service status is published
+| IPositionInformation     | AIDL interface over which geolocation data is published
+| Persistence              | AIDL interface over which vehicle coding values are published
+| INetworkAccess           | AIDL interface over which information about the current mobile network is published
+| GracenoteSDK             | C/C++ library providing music metadata
+| ConnectedRadioClient     | Kotlin library providing hybrid radio metadata via the connected radio back-end
+| Local Filesystem         | used to cache metadata and share image files via the ContentProvider/ContentResolver
+| Audio Device             | device from which media and radio audio data is read for the song recognition
+|===
+
+=== Building Blocks - Level 2
+
+==== Data (Whitebox)
+
+[plantuml, 05_level_2_data, png, align="center"]
+.Data building blocks
+....
+include::{pumldir}/05_level_2_data.puml[]
+....
+
+*Contained Blackboxes*
+
+[cols="1,2" options="header"]
+|===
+| **Name**   | **Responsibilities**
+| Provider   | implementations of online data providers
+| Database   | implementations of data stores, including the underlying database used for caching app data
+| Filesystem | implementation of file storage for image files
+| Mapper     | mapping functionality from external to internal data types
+|===
+
+// Gracenote Service
+
+[plantuml, building_block_level_1, png, align="center"]
+....
+
+include::{pumldir}/05_level_2_gracenoteservice.puml[]
+....
+
+==== GnService
+
+GnService is the main component of the GracenoteService. On the very first received request it initializes all necessary components and modules used within gnsdk, such as the language and region settings as well as list, locale, logging and encryption settings for the communication of the gnsdk with the online gracenote backends, checks the gracenote license and sets up user registration with the gracenote online servers. Once all this is done it receives and processes all requests from MetadataService, creates the corresponding Request component and receives the results of those requests via callback functionality implementing the corresponding callback interface for each request.
+
+==== Request
+
+Request is the general request where all other specific requests are derived from. It sets up and initializes the necessary and commone components for all requests. All requests have in common a setup procedure and the actual execute procedure where the request task is executed in a seperate worker thread.
+
+==== CoverArt
+
+CoverArt Request is used for retrieving cover art for a specific song by using metadata such as artist name, album name and optionally title name as an input. The image is then presented in its own callback to the GnService which then forwards it to the MetadataService via a JNI call. Once the result is received and forwarded, the request is ended, meaning the worker thread is finished.
+
+==== SongRecognition
+
+The SongRecognition Request is started by the MetadataService given a file handle which is used for reading audio data. Once the request is started, it is reading audio data from this file handle in a loop and feeding this data into the gnsdk waiting for any callbacks triggered by the gnsdk when either some song was recognized or on any other event. It then collects all metadata and also imagery and providing the results in its own callback to the GnService which then forwards the results to the MetadataService through a JNI call. This is the only request that keeps running until it is specifically stopped via a call by the MetadataService.
+
+==== RadiostationData
+
+This Request uses a country code, broadcast band (AM/FM), broadcast frequency and GPS data as an input in order to query radio station name and logo. On the very first request of this kind, also the result db for radiostations is initialized for caching purposes of radio station infos. The funtionality for this database is provided by the gnsdk and there are only gnsdk apis being used. It is fully embedded within the gnsdk.
+The request checks first, if the resultdb already contains all available radiostations for the requested frequency in this country. In case it does not, or in case there is new data available, the gnsdk will download a set of all newly available data and store it in the local cache database (result db). The request will then perform a query against this cache and provide its result again in its own callback to the GnService which then forwards the result to the MetadataService through a JNI call. Once the result is received and forwarded to the MetadataService the request is ended, meaning the worker thread is finished.
+
+
+=== Building Blocks - Level 3
+
+==== Service (Whitebox)
+
+[plantuml, 05_level_3_service, png, align="center"]
+.Service building blocks
+....
+include::{pumldir}/05_level_3_service.puml[]
+....
+
+The Service component implements the main part of the external interface towards Client Apps.
+Requests from clients are authorized and the associated data is initially validated.
+Valid requests are handed off to the Domain component.
+
+[unit=MetadataService, role=unit]
+===== <<Unit>> MetadataService
+Android service implementation of the MetadataService ClientInterface AIDL interface.
+
+[unit=MetadataServiceDI, role=unit]
+===== <<Unit>> MetadataServiceDI
+Dependency injection configuration including the Apps object graph.
+
+==== ContentProvider (Whitebox)
+
+[plantuml, 05_level_3_content_provider, png, align="center"]
+.ContentProvider building blocks
+....
+include::{pumldir}/05_level_3_content_provider.puml[]
+....
+
+The ContentProvider component implements the secondary part of the external interface towards Client Apps.
+Clients are able to resolve URIs previously obtained as response to an AIDL request.
+Resolving a URI returns a file descriptor to an image file (e.g. cover art/radio station logo).
+
+[unit=ImageProvider, role=unit]
+===== <<Unit>> ImageProvider
+Android ContentProvider implementation used to resolve URIs from responses over the AIDL interface.
+
+==== Domain (Whitebox)
+
+[plantuml, 05_level_3_domain, png, align="center"]
+.Domain building blocks
+....
+include::{pumldir}/05_level_3_domain.puml[]
+....
+
+Within the Domain component use cases, domain interfaces and entities are defined.
+Use cases correspond to the offered client requests.
+The interfaces describe the operations needed to fulfill the use cases and are implemented on the less abstract outer layers.
+Lastly the entities constitute the core business rules and data structures.
+
+[unit=CommonDomain, role=unit]
+===== <<Unit>> CommonDomain
+It defines functionality and data types used by other domain units.
+
+[unit=RadioStationDomain, role=unit]
+===== <<Unit>> RadioStationDomain
+It defines radio station specific data types and use cases.
+
+[unit=RadioStationAsiaDomain, role=unit]
+===== <<Unit>> RadioStationAsiaDomain
+It defines radio station asia specific data types and use cases.
+
+[unit=SongInfoDomain, role=unit]
+===== <<Unit>> SongInfoDomain
+It defines song info specific data types and use cases.
+
+[unit=SongLyricsDomain, role=unit]
+===== <<Unit>> SongLyricsDomain
+It defines song lyric specific data types and use cases.
+
+[unit=CoverArtLookupDomain, role=unit]
+===== <<Unit>> CoverArtLookupDomain
+It defines cover art lookup specific data types and use cases.
+
+[unit=MusicMetadataDomain, role=unit]
+===== <<Unit>> MusicMetadataDomain
+It defines music metadata specific data types and use cases.
+
+==== Repository (Whitebox)
+
+[plantuml, 05_level_3_repository, png, align="center"]
+.Repository building blocks
+....
+include::{pumldir}/05_level_3_repository.puml[]
+....
+
+Repositories encapsulate the different data sources and provide an abstraction over them.
+Specifically the `Domain` should not care whether the requested data is coming from a local cache or is newly fetched from an online data provider.
+
+[unit=CommonRepository, role=unit]
+===== <<Unit>> CommonRepository
+It defines functionality and data types used by other repositories.
+
+[unit=RadioStationDataRepository, role=unit]
+===== <<Unit>> RadioStationDataRepository
+link:./detailed_designs/unit_RadioStationDataRepository.pdf[Detailed Design of RadioStationDataRepository - pdf]
+
+[unit=RadioStationDataAsiaRepository, role=unit]
+===== <<Unit>> RadioStationDataAsiaRepository
+It coordinates fetching and temporary caching of asia radio station data.
+
+[unit=SongInfoRepository, role=unit]
+===== <<Unit>> SongInfoRepository
+It coordinates fetching and temporary caching of song info.
+
+[unit=SongLyricsRepository, role=unit]
+===== <<Unit>> SongLyricsRepository
+It coordinates fetching and temporary caching of song lyrics.
+
+[unit=CoverArtRepository, role=unit]
+===== <<Unit>> CoverArtRepository
+It coordinates fetching, caching and updating of cover arts.
+
+===== <<Unit>> MusicMetadataRepository
+It coordinates fetching and temporary caching of music metadata.
+
+==== Provider (Whitebox)
+
+[plantuml, 05_level_3_providers, png, align="center"]
+.Provider building blocks
+....
+include::{pumldir}/05_level_3_providers.puml[]
+....
+
+Providers are responsible to serve data from external data sources.
+
+[unit=CommonProvider, role=unit]
+===== <<Unit>> CommonProvider
+It defines functionality and data types used by other providers.
+
+[unit=RadioStationDataProvider, role=unit]
+===== <<Unit>> RadioStationDataProvider
+Implementation of the online data provider for radio station data.
+
+[unit=RadioStationDataAsiaProvider, role=unit]
+===== <<Unit>> RadioStationDataAsiaProvider
+Implementation of the online data provider for asia radio station data
+
+[unit=CoverArtProvider, role=unit]
+===== <<Unit>> CoverArtProvider
+Implementation of the online data provider for cover art.
+
+[unit=SongInfoProvider, role=unit]
+===== <<Unit>> SongInfoProvider
+Implementation of the online data provider for song info / song recognition.
+
+[unit=SongLyricsProvider, role=unit]
+===== <<Unit>> SongLyricsProvider
+Implementation of the online data provider for song lyrics.
+
+[unit=MusicMetadataProvider, role=unit]
+===== <<Unit>> MusicMetadataProvider
+Implementation of the online data provider for music metadata.
+
+[unit=GracenoteService, role=unit]
+===== <<Unit>> GracenoteService
+Kotlin wrapper around the native Gracenote service/JNI.
+
+[unit=TimeProvider, role=unit]
+===== <<Unit>> TimeProvider
+It encapsulates getting the current system time.
+
+[unit=ConfigurationProvider, role=unit]
+===== <<Unit>> ConfigurationProvider
+It holds the main application configuration.
+
+[unit=OnlineStateProvider, role=unit]
+===== <<Unit>> OnlineStateProvider
+It holds the current state if online data retrieval is allowed and possible.
+
+==== Database (Whitebox)
+
+[plantuml, 05_level_3_database, png, align="center"]
+.Database building blocks
+....
+include::{pumldir}/05_level_3_database.puml[]
+....
+
+The Database constitutes the main part of the persistent metadata cache.
+
+[unit=CommonDataStore, role=unit]
+===== <<Unit>> CommonDataStore
+It defines functionality and data types used by other data stores.
+
+[unit=RadioStationDataStore, role=unit]
+===== <<Unit>> RadioStationDataStore
+It contains data store and database implementation for radio station data.
+
+[unit=CoverArtDataStore, role=unit]
+===== <<Unit>> CoverArtDataStore
+It contains data store and database implementation for cover art requests.
+
+==== Filesystem (Whitebox)
+
+[plantuml, 05_level_3_filesystem, png, align="center"]
+.Filesystem building blocks
+....
+include::{pumldir}/05_level_3_filesystem.puml[]
+....
+
+Data that isn't suitable to be stored in a database is placed on the file system.
+This component implements the file storage for images (e.g. cover arts/radio station logos).
+
+[unit=ImageDataStore, role=unit]
+===== <<Unit>> ImageDataStore
+It defines data stores managing image files.
+
+==== Common
+
+[unit=CommonUtility, role=unit]
+===== <<Unit>> CommonUtility
+It contains classes implementing cross cutting concepts.
+
+==== Demo
+
+[plantuml, 05_level_3_demo, png, align="center"]
+.Demo building blocks
+....
+include::{pumldir}/05_level_3_demo.puml[]
+....
+
+The Demo/Test component is not part of production builds and contains code needed for testing or demonstration purposes.
+To keep it as simple as possible, all classes are grouped into a single unit, resulting in it spanning across multiple packages/components.
+
+[unit=Demo, role=unit]
+===== <<Unit>> Demo
+It contains the implementation of the demo mode including the user interface.
+
+==== Test
+
+[unit=CommonTest, role=unit]
+===== <<Unit>> CommonTest
+It contains mocks and test data used across the different types of module tests (unit tests/instrumented tests).
+
+// Gracenote Service units
+
+#TODO Describe all units#
+
+[unit=Event, role=unit]
+==== <<Unit>> Event
+
+[unit=Helper, role=unit]
+==== <<Unit>> Helper
+
+[unit=RadioResultDataBase, role=unit]
+==== <<Unit>> RadioResultDataBase
+
+[unit=ResultDataBase, role=unit]
+==== <<Unit>> ResultDataBase
+
+[unit=Requests, role=unit]
+==== <<Unit>> Requests
+
+[unit=User, role=unit]
+==== <<Unit>> User
+
+[unit=Service, role=unit]
+==== <<Unit>> Service
+
+[unit=JNI-Interface,, role=unit]
+==== <<Unit>> JNI-Interface
+

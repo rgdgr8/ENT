@@ -1,0 +1,264 @@
+include::config.adoc[]
+
+[[section-runtime-view]]
+== Runtime View
+
+For this service there are two different ways how we communicate with clients, depending on the functionality they use.
+For normal metadata - radio and media player related - a client issues a request and will receive a response containing the retrieved result data.
+Mainly for audio stream fingerprinting a client will start the song recognition and register for updates.
+Whenever a change of the playing content is detected, he receives an update containing the latest track information.
+The communication sequences between client and service are described in more detail in the next chapter <<Runtime View,Runtime View>>.
+
+=== Basic AIDL request
+
+Below diagram shows the most common communication sequences between the different components of MetadataService.
+It is for now kept as generic as possible to be valid for radio station data, radio station logos, media metadata and cover art requests.
+
+[plantuml, common_request, png, align="center"]
+....
+include::{pumldir}/06_common_request.puml[]
+....
+. The client calls one of the functions defined in the AIDL interface on MetadataService.
+. The service internally hands the request over to the business layer, that implements the functionality.
+. As necessary the business logic will ask one or more repositories for the data requested by the client.
+. Internally the repository will first check if data to fulfill the request is already cached from previous requests
+. The persistence layer answers with whatever data it has currently stored.
+This may be an empty result.
+If no data is available or the repository realizes the data is no longer valid continue with 6. otherwise with 8.
+. As the required data is not cached issue a request to the respective provider back-end via the client side metadata provider implementation.
+. Once the back-end side processing is completed, a result is returned to the repository.
+Continue with 13.
+. If there is valid data in the cache, return it to the business layer immediately.
+. The business layer forwards it to the service layer.
+. And from there it goes out to the client via the callback defined in the AIDL interface
+. Basically simultaneously the repository will check with the provider back-end via the metadata provider if the cached data is still up-to-date.
+. Depending on the response, the request is either completed, unless the back-end returns a more recent result.
+. Update the cache with the most recent data.
+. The new back-end result is again forwarded to the business layer.
+. The business layer forwards it to the service layer.
+. From there it goes out to the client via AIDL callback.
+
+=== Song Recognition
+
+The song recognition can identify songs by analyzing their raw audio signal while they are being played back.
+Once a song has been identified, the matching metadata and cover is provided if available within Gracenote's online database.
+
+[plantuml, observe_song_recognition, png, align="center"]
+....
+include::{pumldir}/06_observe_song_recognition.puml[]
+....
+
+The raw byte data is continually forwarded to the GracenoteService, which then feeds it into the GracenoteSDK.
+Results from the GracenoteSDK are sent back to the MetadataService and from there to the requesting ClientApps.
+
+Audio data is read from a dedicated audio bus ("bus9_gnt_in"), purely created/configured within the AndroidOS for this purpose by Harman.
+The audio signal of media content played through the e.solutions RadioApp or the Harman MediaCoreServices is made available there.
+
+The audio data on this bus is provided in the following format:
+
+[cols="1,1",options="header"]
+.Table Audio Format
+|===
+|Parameter  |Value
+
+|Encoding   |PCM
+|SampleSize |16bit
+|SampleRate |48kHz
+|ByteOrder  |LE (HCP3 platform default)
+|Channels   |Stereo (2)
+|===
+
+The input audio signal always contains two channels.
+Any other configuration of the entertainment audio output is mapped to the stereo channels of the Gracenote input bus as follows:
+
+[cols="1,1",options="header"]
+.Table Audio Channel Mapping
+|===
+|ENT Output Channels        | GNT Input Channels
+
+|Stereo                     |Stereo (Front-left, Front-right)
+|Multi-channel (8 CH) audio |Stereo (Front-left, Front-right)
+|Mono                       |Stereo (Front-left, 0)
+|===
+
+=== Data lifecycle
+
+==== Radio station data lifecycle
+
+The MetadataService acts as a persistent cache for station data required by clients and requested from back-ends over the internet.
+Any data is only retrieved on demand when a client asks for it, to avoid unnecessary network traffic and load on the back-end servers. +
+The basic lifecycle of a station's data is shown in the diagram below.
+
+[plantuml,station_data_lifecycle,png,align="center"]
+....
+include::{pumldir}/station_data_lifecycle.puml[]
+....
+
+When the data of a station is requested for the very first time, it is not present in the cache.
+This is denoted by the initial state _Missing_.
+Assuming that online requests are allowed to be made (tbd.), the service attempts to fetch the latest available set of data from the back-end utilizing the included ConnectedRadioClient-Library (CRC).
+The state _Updating_ is left when a backend request was answered successfully including all currently available information.
+Note this could also mean, that no data is currently available. +
+Either way a transition to _Complete_ is performed.
+This state should be maintained as long as feasible and only left for two reasons: Either the back-end provided expiration date associated with the station data expired and attempts have to be made to update the data again, or the cache runs full and old entries have to be evicted, in order to free up space for newly requested stations.
+As mentioned at the beginning of the section, even transitioning from _Complete_ to _Updating_ is only done after a client explicitly asked for this data again. +
+Alternatively from state _Updating_, should something go wrong with a request or the back-end doesn't have all data readily available, state _Incomplete_ is reached.
+Here it might become necessary to request the station data again within a relatively short time frame.
+The back-end notifies the service about the period of time that it should wait before attempting to request the station data again.
+Depending on the duration of the retry delay, this may either be attempted actively while the client is still waiting for any result, or for longer periods a new attempt is only performed the next time the station is requested.
+Therefore it can also be possible for a not yet completely cached station, to get evicted from the cache.
+
+==== Lifecycle - Update
+
+Translating the simple lifecycle state machine into concrete values exchanged between service and back-end or stored as part of each station, leads to the following parameters affecting when a station's data is updated.
+
+[cols="1,5",options="header"]
+.Table Update parameters
+|===
+|Name |Description
+
+|expiration date| Earliest time at which a regular update for a station's data should be attempted.
+|last modified| Time at which the last successful update of a station's data was received. Transmitted to the back-end as part of the next update request, to allow incremental updates.
+|complete | Indicates that a previous update had been successful and no further attempts should be made before the data's expiration date passes.
+|===
+
+To allow incremental updates, a station's data is split into parts that can be updated independently from each other.
+To keep the complexity manageable, the granularity is kept at a sensible level.
+Currently a station is decomposed to these parts:
+
+* Alternative bearers
+* Text based metadata including genres
+* Station logo
+* Small station logo
+* Web streams
+
+In case some or all data for a station is deleted on the back-end side, this can be indicated to the service by passing no value for any or all of the different parts.
+If a part is not affected by an incremental update, it is simply not mentioned in the response at all.
+
+==== Lifecycle - Retry
+
+The retry behavior in case of a failure or incomplete data is affected by these parameters:
+
+[cols="1,5",options="header"]
+.Table Retry paramters
+|===
+|Name |Description
+
+|retry behavior| Depending on the condition necessitating a retry, the CRC-library or back-end can choose different strategies for potential retries.
+|retry delay| Minimum amount of time the service has to wait until another retry may be performed. The interpretation of this value depends on the retry behavior.
+|retry after| Earliest time at which a retry may be performed again. Derived on the service side from retry behavior and delay.
+|retry count| Counter for the already performed retries. Reset upon successful completion or potentially if the retry behavior changes between two retries (tbd.).
+|===
+
+==== Lifecycle - Cleanup
+
+The service only has a limited amount of memory available to persist station data.
+Whenever the cache runs full and space to store new data becomes scarce, a decision has to be made which data to keep and what can be removed.
+The cache cleanup is affected by the following:
+
+[cols="1,5",options="header"]
+.Table Update Parameters
+|===
+|Name |Description
+
+|#stations stored| Number of stations in the cache.
+|available space| Amount of free memory.
+|last requested| Time at which the data was last retrieved by a client. Used to implement a least-recently-used caching strategy.
+|===
+
+The current goal is to store data for 500 stations including up to two logos each.
+While the estimations for the cache sizes should leave enough buffer to generally reach this number, the available storage space may still be exhausted prematurely under exceptional circumstances.
+Therefore both limits have to be checked regularly and enforced.
+The thresholds triggering a cleanup and the number of stations or amount of memory aimed to be freed has to be clarified later on.
+
+Generally cache invalidation is an unsolvable problem, as it requires knowledge about future usage.
+The MetadataService utilizes a relatively simple and straight forward least-recently-used strategy to free cache space.
+This strategy is based on the assumption, that data that had not been used for a long time, probably also will not be used anymore in the future.
+
+=== Cover art lookup lifecycle
+
+The MetadataService also persists cover art lookup data in the cache to prevent unnecessary network load on the back-end.
+Whenever a client requires a cover art, cover art lookup cache is checked and if it does not exist, it is requested from the back-end.
+The lifecycle of a cover art lookup is shown in the diagram below.
+
+[plantuml,cover_art_lookup_lifecycle,png,align="center"]
+....
+include::{pumldir}/cover_art_lookup_lifecycle.puml[]
+....
+
+The current goal is to store 1000 cover art lookup records in the cache including the corresponding cover art images.
+If this limit is reached and client requests for a new cover art which does not exist in the cache, the least recently used cover art lookup record and its cover art image are deleted from the cache database and the storage.
+After clean up is completed, new cover art lookup data is recorded to the cache and cover art image is saved in the storage.
+
+== Gracenote Service
+
+
+Below diagrams shows the three currently implemented requests and their communication sequences between the different components of GracenoteService.
+
+=== RequestCoverartByMetadata
+
+[plantuml, runtime_coverart, png, align="center"]
+....
+include::{pumldir}/06_runtime_coverart.puml[]
+....
+
+. MetadataService call the JNI function doTextLookupForAlbum available in the jni library for gracenoteservice
+. The JNI Library then calls requestCoverArtFromMetadata on the GnService object.
+. GnService creates the request called RequestCoverArtByMetadata
+. RequestCoverArtByMetadata queries the gnsdk, using the given metadata (album, artist, optionally title name)
+. The gnsdk then querys the Gracenote backend online for a result
+. The Gracenote backend then provides a result as an album object to the gnsdk
+. The gnsdk forwards the found album object to the request
+. The request then queries the metadata by using specific gnsdk api calls
+. Gnsdk provides metadata, including image uri for a cover art to the request
+. Request queries the gnsdk for the image data using the given uri
+. Gnsdk queries the Gracenote backend for the image data using the given uri
+. Gracenote backend provides the image data to the gnsdk
+. Gndsk forwards the image data to the request
+. Request forwards metadata and image data to the GnService
+. GnService forwards metadata and image data for the queried album to the MetadataService using JNI calls
+
+=== RequestSongRecognition
+
+[plantuml, runtime_songrecog, png, align="center"]
+....
+include::{pumldir}/06_runtime_songrecog.puml[]
+....
+
+. MetadataService starts SongRecognition by calling the JNI function startSongRecognition provided by the jni library for gracenoteservice and providing a file descriptor
+. The JNI library then calls startSongRecognition on the GnService object
+. GnService then creates the request GnRequestSongRecognition forwarding the file descriptor to this request.
+. The request starts a loop in which it continuously reads audio data from the given file descriptor and feeding it into the gnsdk and receiving callbacks from the gnsdk
+. Gnsdk creates fingerprints from the audio data and queries those fingerprints online against the Gracenote backends
+. The gracenote backend provides a result in form of a song object to the gnsdk.
+. Gnsdk presents the song object (title) to the request in a callback.
+. The request queries the gnsdk for metadata and an image uri for a coverart
+. Gnsdk provides metadata and an image uri to the request
+. The request then queries gnsdk for image data using the provided uri
+. Gnsdk queries the Gracenote backend for an image using the given uri
+. Backend provides the image data to the gnsdk
+. Gnsdk provides the image data to the request
+. The request forwards the retrieved metadata and the cover art to the GnService
+. GnService forwards metadata and image data for the recognized song to the MetadataService using JNI call
+. This request is only stopped by MetadataService specifically calling stopSongRecognition on the jni library for gracenoteservice
+
+[plantuml, runtime_radiodata, png, align="center"]
+....
+include::{pumldir}/06_runtime_radiodata.puml[]
+....
+
+. MetadataService calls the JNI function requestRadioStationData on the jni library for gracenoteservice
+. The JNI library then calls requestRadioStationData on the GnService object
+. GnService (on the very first call of this request) initializes the resultdb for caching radiostation data
+. GnService creates request GnRequestRadioStationData
+. Request calls gnsdk to check if an update for the radiostation data stored in the resultdb is needed
+. If an update for the resultdb data is necessary or if no data at all is available in the resultdb the gnsdk updates the resultdb with data retrieved from the Gracenote backend
+. The request then queries the gnsdk for metadata of the radiostation given with country code (mcc, mobile country code), broadcast band, broadcast frequency and GPS data
+. Gnsdk provides the metadata retrieved from the data in the resultdb to the request including an uri for a radiostation logo
+. Request queries the gnsdk for the logo image data locally, if there is an image available, gnsdk will provided it to the request
+. If there is no image available in the resultdb, request queries the gnsdk again but this time to check if a logo is available online
+. Gracenote backend provides logo image data to the gnsdk
+. Gnsdk provides logo image data to the request.
+. Request stores logo image data in the result db.
+. Request forwards the retrieved metadata and logo image data to GnService using internal an internal callback
+. GnService forwards metadata and logo image data for the requested radiostation to the MetadataService using JNI call

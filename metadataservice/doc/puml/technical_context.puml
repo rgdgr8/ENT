@@ -1,0 +1,61 @@
+@startuml
+
+skinparam componentStyle uml2
+
+interface "AIDL/Binder" as aidl_clients
+interface "Java/Kotlin library" as conrad_interface
+interface "Java/Kotlin library" as gmd_interface
+interface "ContentProvider/\nFileSystem" as file_system
+interface "C/C++ library" as library
+interface "ServiceListApi\nAIDL/Binder" as coreservices_servicelist
+interface "DisableReasonsApi\nAIDL/Binder" as coreservices_disablereasons
+interface "IPositionInformation\nAIDL/Binder" as navigation_positioninformation
+
+component MetadataService as service
+
+node "Client Apps" <<extern>> as client_apps {
+}
+
+note "e.g. e.solutions Radio App, Harman MediaCoreService" as clients_note
+clients_note .right. client_apps
+
+node CoreServices <<extern>> as coreservices {
+}
+
+node Navigation <<extern>> as navi {
+}
+
+node GracenoteSDK <<extern>> as gracenote {
+}
+
+node ConnectedRadioClient <<extern>> as conrad {
+}
+node GlobalMusicDataClient <<extern>> as gmd {
+}
+
+service -up- file_system
+client_apps ..> file_system
+
+service -up- aidl_clients
+client_apps ..> aidl_clients
+
+service ..> coreservices_servicelist
+coreservices_servicelist - coreservices
+
+service .> coreservices_disablereasons
+coreservices_disablereasons -- coreservices
+
+service .left.> navigation_positioninformation
+navigation_positioninformation -left- navi:\t
+
+conrad -up- conrad_interface
+service ..> conrad_interface
+
+gmd -up- gmd_interface
+service ..> gmd_interface
+
+
+gracenote -up- library
+service ..> library
+
+@enduml

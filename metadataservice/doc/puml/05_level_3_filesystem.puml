@@ -1,0 +1,12 @@
+@startuml
+
+skinparam componentStyle uml2
+
+component "Filesystem" <<component>> {
+    component "ImageDataStore" <<unit>>
+}
+
+interface "Local Filesystem" as filesystem
+ImageDataStore ..> filesystem
+
+@enduml

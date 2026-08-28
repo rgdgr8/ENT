@@ -1,0 +1,858 @@
+{
+  "formatVersion": 1,
+  "database": {
+    "version": 11,
+    "identityHash": "70e7551636080298a9244e3e26afe7ca",
+    "entities": [
+      {
+        "tableName": "album",
+        "createSql": "CREATE TABLE IF NOT EXISTS `${TABLE_NAME}` (`album_id` INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL, `album_name` TEXT NOT NULL)",
+        "fields": [
+          {
+            "fieldPath": "albumId",
+            "columnName": "album_id",
+            "affinity": "INTEGER",
+            "notNull": true
+          },
+          {
+            "fieldPath": "albumName",
+            "columnName": "album_name",
+            "affinity": "TEXT",
+            "notNull": true
+          }
+        ],
+        "primaryKey": {
+          "columnNames": [
+            "album_id"
+          ],
+          "autoGenerate": true
+        },
+        "indices": [
+          {
+            "name": "index_album_name",
+            "unique": true,
+            "columnNames": [
+              "album_name"
+            ],
+            "createSql": "CREATE UNIQUE INDEX IF NOT EXISTS `index_album_name` ON `${TABLE_NAME}` (`album_name`)"
+          }
+        ],
+        "foreignKeys": []
+      },
+      {
+        "tableName": "artist",
+        "createSql": "CREATE TABLE IF NOT EXISTS `${TABLE_NAME}` (`artist_id` INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL, `artist_name` TEXT NOT NULL)",
+        "fields": [
+          {
+            "fieldPath": "artistId",
+            "columnName": "artist_id",
+            "affinity": "INTEGER",
+            "notNull": true
+          },
+          {
+            "fieldPath": "artistName",
+            "columnName": "artist_name",
+            "affinity": "TEXT",
+            "notNull": true
+          }
+        ],
+        "primaryKey": {
+          "columnNames": [
+            "artist_id"
+          ],
+          "autoGenerate": true
+        },
+        "indices": [
+          {
+            "name": "index_artist_name",
+            "unique": true,
+            "columnNames": [
+              "artist_name"
+            ],
+            "createSql": "CREATE UNIQUE INDEX IF NOT EXISTS `index_artist_name` ON `${TABLE_NAME}` (`artist_name`)"
+          }
+        ],
+        "foreignKeys": []
+      },
+      {
+        "tableName": "bearer",
+        "createSql": "CREATE TABLE IF NOT EXISTS `${TABLE_NAME}` (`bearer_id` INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL, `station_id` INTEGER NOT NULL, `uri` TEXT NOT NULL, FOREIGN KEY(`station_id`) REFERENCES `station`(`station_id`) ON UPDATE NO ACTION ON DELETE NO ACTION )",
+        "fields": [
+          {
+            "fieldPath": "bearerId",
+            "columnName": "bearer_id",
+            "affinity": "INTEGER",
+            "notNull": true
+          },
+          {
+            "fieldPath": "stationId",
+            "columnName": "station_id",
+            "affinity": "INTEGER",
+            "notNull": true
+          },
+          {
+            "fieldPath": "uri",
+            "columnName": "uri",
+            "affinity": "TEXT",
+            "notNull": true
+          }
+        ],
+        "primaryKey": {
+          "columnNames": [
+            "bearer_id"
+          ],
+          "autoGenerate": true
+        },
+        "indices": [
+          {
+            "name": "index_bearer_station_id",
+            "unique": false,
+            "columnNames": [
+              "station_id"
+            ],
+            "createSql": "CREATE INDEX IF NOT EXISTS `index_bearer_station_id` ON `${TABLE_NAME}` (`station_id`)"
+          },
+          {
+            "name": "index_bearer_uri",
+            "unique": true,
+            "columnNames": [
+              "uri"
+            ],
+            "createSql": "CREATE UNIQUE INDEX IF NOT EXISTS `index_bearer_uri` ON `${TABLE_NAME}` (`uri`)"
+          }
+        ],
+        "foreignKeys": [
+          {
+            "table": "station",
+            "onDelete": "NO ACTION",
+            "onUpdate": "NO ACTION",
+            "columns": [
+              "station_id"
+            ],
+            "referencedColumns": [
+              "station_id"
+            ]
+          }
+        ]
+      },
+      {
+        "tableName": "cover_art_lookup",
+        "createSql": "CREATE TABLE IF NOT EXISTS `${TABLE_NAME}` (`cover_art_lookup_id` INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL, `album_id` INTEGER, `artist_id` INTEGER, `track_name` TEXT, `image_id` INTEGER, `life_cycle_data_id` INTEGER NOT NULL, FOREIGN KEY(`album_id`) REFERENCES `album`(`album_id`) ON UPDATE NO ACTION ON DELETE NO ACTION , FOREIGN KEY(`image_id`) REFERENCES `image`(`image_id`) ON UPDATE NO ACTION ON DELETE NO ACTION , FOREIGN KEY(`artist_id`) REFERENCES `artist`(`artist_id`) ON UPDATE NO ACTION ON DELETE NO ACTION , FOREIGN KEY(`life_cycle_data_id`) REFERENCES `life_cycle_data`(`life_cycle_data_id`) ON UPDATE NO ACTION ON DELETE NO ACTION )",
+        "fields": [
+          {
+            "fieldPath": "coverArtLookupId",
+            "columnName": "cover_art_lookup_id",
+            "affinity": "INTEGER",
+            "notNull": true
+          },
+          {
+            "fieldPath": "albumId",
+            "columnName": "album_id",
+            "affinity": "INTEGER",
+            "notNull": false
+          },
+          {
+            "fieldPath": "artistId",
+            "columnName": "artist_id",
+            "affinity": "INTEGER",
+            "notNull": false
+          },
+          {
+            "fieldPath": "trackName",
+            "columnName": "track_name",
+            "affinity": "TEXT",
+            "notNull": false
+          },
+          {
+            "fieldPath": "imageId",
+            "columnName": "image_id",
+            "affinity": "INTEGER",
+            "notNull": false
+          },
+          {
+            "fieldPath": "lifeCycleDataId",
+            "columnName": "life_cycle_data_id",
+            "affinity": "INTEGER",
+            "notNull": true
+          }
+        ],
+        "primaryKey": {
+          "columnNames": [
+            "cover_art_lookup_id"
+          ],
+          "autoGenerate": true
+        },
+        "indices": [
+          {
+            "name": "index_cover_art_lookup_album_id",
+            "unique": false,
+            "columnNames": [
+              "album_id"
+            ],
+            "createSql": "CREATE INDEX IF NOT EXISTS `index_cover_art_lookup_album_id` ON `${TABLE_NAME}` (`album_id`)"
+          },
+          {
+            "name": "index_cover_art_lookup_artist_id",
+            "unique": false,
+            "columnNames": [
+              "artist_id"
+            ],
+            "createSql": "CREATE INDEX IF NOT EXISTS `index_cover_art_lookup_artist_id` ON `${TABLE_NAME}` (`artist_id`)"
+          },
+          {
+            "name": "index_cover_art_lookup_image_id",
+            "unique": true,
+            "columnNames": [
+              "image_id"
+            ],
+            "createSql": "CREATE UNIQUE INDEX IF NOT EXISTS `index_cover_art_lookup_image_id` ON `${TABLE_NAME}` (`image_id`)"
+          },
+          {
+            "name": "index_cover_art_lookup_life_cycle_data_id",
+            "unique": true,
+            "columnNames": [
+              "life_cycle_data_id"
+            ],
+            "createSql": "CREATE UNIQUE INDEX IF NOT EXISTS `index_cover_art_lookup_life_cycle_data_id` ON `${TABLE_NAME}` (`life_cycle_data_id`)"
+          }
+        ],
+        "foreignKeys": [
+          {
+            "table": "album",
+            "onDelete": "NO ACTION",
+            "onUpdate": "NO ACTION",
+            "columns": [
+              "album_id"
+            ],
+            "referencedColumns": [
+              "album_id"
+            ]
+          },
+          {
+            "table": "image",
+            "onDelete": "NO ACTION",
+            "onUpdate": "NO ACTION",
+            "columns": [
+              "image_id"
+            ],
+            "referencedColumns": [
+              "image_id"
+            ]
+          },
+          {
+            "table": "artist",
+            "onDelete": "NO ACTION",
+            "onUpdate": "NO ACTION",
+            "columns": [
+              "artist_id"
+            ],
+            "referencedColumns": [
+              "artist_id"
+            ]
+          },
+          {
+            "table": "life_cycle_data",
+            "onDelete": "NO ACTION",
+            "onUpdate": "NO ACTION",
+            "columns": [
+              "life_cycle_data_id"
+            ],
+            "referencedColumns": [
+              "life_cycle_data_id"
+            ]
+          }
+        ]
+      },
+      {
+        "tableName": "genre",
+        "createSql": "CREATE TABLE IF NOT EXISTS `${TABLE_NAME}` (`genre_id` INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL, `name` TEXT NOT NULL)",
+        "fields": [
+          {
+            "fieldPath": "genreId",
+            "columnName": "genre_id",
+            "affinity": "INTEGER",
+            "notNull": true
+          },
+          {
+            "fieldPath": "name",
+            "columnName": "name",
+            "affinity": "TEXT",
+            "notNull": true
+          }
+        ],
+        "primaryKey": {
+          "columnNames": [
+            "genre_id"
+          ],
+          "autoGenerate": true
+        },
+        "indices": [
+          {
+            "name": "index_genre_name",
+            "unique": true,
+            "columnNames": [
+              "name"
+            ],
+            "createSql": "CREATE UNIQUE INDEX IF NOT EXISTS `index_genre_name` ON `${TABLE_NAME}` (`name`)"
+          }
+        ],
+        "foreignKeys": []
+      },
+      {
+        "tableName": "image",
+        "createSql": "CREATE TABLE IF NOT EXISTS `${TABLE_NAME}` (`image_id` INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL, `image_type` INTEGER NOT NULL, `file_name` TEXT NOT NULL)",
+        "fields": [
+          {
+            "fieldPath": "imageId",
+            "columnName": "image_id",
+            "affinity": "INTEGER",
+            "notNull": true
+          },
+          {
+            "fieldPath": "imageType",
+            "columnName": "image_type",
+            "affinity": "INTEGER",
+            "notNull": true
+          },
+          {
+            "fieldPath": "fileName",
+            "columnName": "file_name",
+            "affinity": "TEXT",
+            "notNull": true
+          }
+        ],
+        "primaryKey": {
+          "columnNames": [
+            "image_id"
+          ],
+          "autoGenerate": true
+        },
+        "indices": [],
+        "foreignKeys": []
+      },
+      {
+        "tableName": "provider_identifier",
+        "createSql": "CREATE TABLE IF NOT EXISTS `${TABLE_NAME}` (`provider_id` INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL, `origin` INTEGER NOT NULL, `external_id` TEXT NOT NULL)",
+        "fields": [
+          {
+            "fieldPath": "providerId",
+            "columnName": "provider_id",
+            "affinity": "INTEGER",
+            "notNull": true
+          },
+          {
+            "fieldPath": "origin",
+            "columnName": "origin",
+            "affinity": "INTEGER",
+            "notNull": true
+          },
+          {
+            "fieldPath": "externalId",
+            "columnName": "external_id",
+            "affinity": "TEXT",
+            "notNull": true
+          }
+        ],
+        "primaryKey": {
+          "columnNames": [
+            "provider_id"
+          ],
+          "autoGenerate": true
+        },
+        "indices": [
+          {
+            "name": "index_provider_identifier_origin_external_id",
+            "unique": true,
+            "columnNames": [
+              "origin",
+              "external_id"
+            ],
+            "createSql": "CREATE UNIQUE INDEX IF NOT EXISTS `index_provider_identifier_origin_external_id` ON `${TABLE_NAME}` (`origin`, `external_id`)"
+          }
+        ],
+        "foreignKeys": []
+      },
+      {
+        "tableName": "station",
+        "createSql": "CREATE TABLE IF NOT EXISTS `${TABLE_NAME}` (`station_id` INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL, `life_cycle_data_id` INTEGER, FOREIGN KEY(`life_cycle_data_id`) REFERENCES `life_cycle_data`(`life_cycle_data_id`) ON UPDATE NO ACTION ON DELETE NO ACTION )",
+        "fields": [
+          {
+            "fieldPath": "stationId",
+            "columnName": "station_id",
+            "affinity": "INTEGER",
+            "notNull": true
+          },
+          {
+            "fieldPath": "lifeCycleDataId",
+            "columnName": "life_cycle_data_id",
+            "affinity": "INTEGER",
+            "notNull": false
+          }
+        ],
+        "primaryKey": {
+          "columnNames": [
+            "station_id"
+          ],
+          "autoGenerate": true
+        },
+        "indices": [
+          {
+            "name": "index_station_data_life_cycle_data_id",
+            "unique": true,
+            "columnNames": [
+              "life_cycle_data_id"
+            ],
+            "createSql": "CREATE UNIQUE INDEX IF NOT EXISTS `index_station_data_life_cycle_data_id` ON `${TABLE_NAME}` (`life_cycle_data_id`)"
+          }
+        ],
+        "foreignKeys": [
+          {
+            "table": "life_cycle_data",
+            "onDelete": "NO ACTION",
+            "onUpdate": "NO ACTION",
+            "columns": [
+              "life_cycle_data_id"
+            ],
+            "referencedColumns": [
+              "life_cycle_data_id"
+            ]
+          }
+        ]
+      },
+      {
+        "tableName": "station_metadata",
+        "createSql": "CREATE TABLE IF NOT EXISTS `${TABLE_NAME}` (`metadata_id` INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL, `station_id` INTEGER NOT NULL, `short_name` TEXT, `medium_name` TEXT, `long_name` TEXT, `description` TEXT, FOREIGN KEY(`station_id`) REFERENCES `station`(`station_id`) ON UPDATE NO ACTION ON DELETE NO ACTION )",
+        "fields": [
+          {
+            "fieldPath": "metadataId",
+            "columnName": "metadata_id",
+            "affinity": "INTEGER",
+            "notNull": true
+          },
+          {
+            "fieldPath": "stationId",
+            "columnName": "station_id",
+            "affinity": "INTEGER",
+            "notNull": true
+          },
+          {
+            "fieldPath": "shortName",
+            "columnName": "short_name",
+            "affinity": "TEXT",
+            "notNull": false
+          },
+          {
+            "fieldPath": "mediumName",
+            "columnName": "medium_name",
+            "affinity": "TEXT",
+            "notNull": false
+          },
+          {
+            "fieldPath": "longName",
+            "columnName": "long_name",
+            "affinity": "TEXT",
+            "notNull": false
+          },
+          {
+            "fieldPath": "description",
+            "columnName": "description",
+            "affinity": "TEXT",
+            "notNull": false
+          }
+        ],
+        "primaryKey": {
+          "columnNames": [
+            "metadata_id"
+          ],
+          "autoGenerate": true
+        },
+        "indices": [
+          {
+            "name": "index_station_metadata_station_id",
+            "unique": true,
+            "columnNames": [
+              "station_id"
+            ],
+            "createSql": "CREATE UNIQUE INDEX IF NOT EXISTS `index_station_metadata_station_id` ON `${TABLE_NAME}` (`station_id`)"
+          }
+        ],
+        "foreignKeys": [
+          {
+            "table": "station",
+            "onDelete": "NO ACTION",
+            "onUpdate": "NO ACTION",
+            "columns": [
+              "station_id"
+            ],
+            "referencedColumns": [
+              "station_id"
+            ]
+          }
+        ]
+      },
+      {
+        "tableName": "station_genre_rank",
+        "createSql": "CREATE TABLE IF NOT EXISTS `${TABLE_NAME}` (`station_id` INTEGER NOT NULL, `genre_id` INTEGER NOT NULL, `position` INTEGER NOT NULL, PRIMARY KEY(`station_id`, `genre_id`), FOREIGN KEY(`genre_id`) REFERENCES `genre`(`genre_id`) ON UPDATE NO ACTION ON DELETE NO ACTION , FOREIGN KEY(`station_id`) REFERENCES `station`(`station_id`) ON UPDATE NO ACTION ON DELETE NO ACTION )",
+        "fields": [
+          {
+            "fieldPath": "stationId",
+            "columnName": "station_id",
+            "affinity": "INTEGER",
+            "notNull": true
+          },
+          {
+            "fieldPath": "genreId",
+            "columnName": "genre_id",
+            "affinity": "INTEGER",
+            "notNull": true
+          },
+          {
+            "fieldPath": "position",
+            "columnName": "position",
+            "affinity": "INTEGER",
+            "notNull": true
+          }
+        ],
+        "primaryKey": {
+          "columnNames": [
+            "station_id",
+            "genre_id"
+          ],
+          "autoGenerate": false
+        },
+        "indices": [
+          {
+            "name": "index_station_genre_rank_genre_id",
+            "unique": false,
+            "columnNames": [
+              "genre_id"
+            ],
+            "createSql": "CREATE INDEX IF NOT EXISTS `index_station_genre_rank_genre_id` ON `${TABLE_NAME}` (`genre_id`)"
+          },
+          {
+            "name": "index_station_genre_rank_station_id",
+            "unique": false,
+            "columnNames": [
+              "station_id"
+            ],
+            "createSql": "CREATE INDEX IF NOT EXISTS `index_station_genre_rank_station_id` ON `${TABLE_NAME}` (`station_id`)"
+          }
+        ],
+        "foreignKeys": [
+          {
+            "table": "genre",
+            "onDelete": "NO ACTION",
+            "onUpdate": "NO ACTION",
+            "columns": [
+              "genre_id"
+            ],
+            "referencedColumns": [
+              "genre_id"
+            ]
+          },
+          {
+            "table": "station",
+            "onDelete": "NO ACTION",
+            "onUpdate": "NO ACTION",
+            "columns": [
+              "station_id"
+            ],
+            "referencedColumns": [
+              "station_id"
+            ]
+          }
+        ]
+      },
+      {
+        "tableName": "station_image",
+        "createSql": "CREATE TABLE IF NOT EXISTS `${TABLE_NAME}` (`image_id` INTEGER NOT NULL, `station_id` INTEGER NOT NULL, PRIMARY KEY(`station_id`, `image_id`), FOREIGN KEY(`image_id`) REFERENCES `image`(`image_id`) ON UPDATE NO ACTION ON DELETE NO ACTION , FOREIGN KEY(`station_id`) REFERENCES `station`(`station_id`) ON UPDATE NO ACTION ON DELETE NO ACTION )",
+        "fields": [
+          {
+            "fieldPath": "imageId",
+            "columnName": "image_id",
+            "affinity": "INTEGER",
+            "notNull": true
+          },
+          {
+            "fieldPath": "stationId",
+            "columnName": "station_id",
+            "affinity": "INTEGER",
+            "notNull": true
+          }
+        ],
+        "primaryKey": {
+          "columnNames": [
+            "station_id",
+            "image_id"
+          ],
+          "autoGenerate": false
+        },
+        "indices": [
+          {
+            "name": "index_station_image_image_id",
+            "unique": false,
+            "columnNames": [
+              "image_id"
+            ],
+            "createSql": "CREATE INDEX IF NOT EXISTS `index_station_image_image_id` ON `${TABLE_NAME}` (`image_id`)"
+          },
+          {
+            "name": "index_station_image_station_id",
+            "unique": false,
+            "columnNames": [
+              "station_id"
+            ],
+            "createSql": "CREATE INDEX IF NOT EXISTS `index_station_image_station_id` ON `${TABLE_NAME}` (`station_id`)"
+          }
+        ],
+        "foreignKeys": [
+          {
+            "table": "image",
+            "onDelete": "NO ACTION",
+            "onUpdate": "NO ACTION",
+            "columns": [
+              "image_id"
+            ],
+            "referencedColumns": [
+              "image_id"
+            ]
+          },
+          {
+            "table": "station",
+            "onDelete": "NO ACTION",
+            "onUpdate": "NO ACTION",
+            "columns": [
+              "station_id"
+            ],
+            "referencedColumns": [
+              "station_id"
+            ]
+          }
+        ]
+      },
+      {
+        "tableName": "station_provider_identifier",
+        "createSql": "CREATE TABLE IF NOT EXISTS `${TABLE_NAME}` (`station_id` INTEGER NOT NULL, `provider_id` INTEGER NOT NULL, PRIMARY KEY(`station_id`, `provider_id`), FOREIGN KEY(`station_id`) REFERENCES `station`(`station_id`) ON UPDATE NO ACTION ON DELETE NO ACTION , FOREIGN KEY(`provider_id`) REFERENCES `provider_identifier`(`provider_id`) ON UPDATE NO ACTION ON DELETE NO ACTION )",
+        "fields": [
+          {
+            "fieldPath": "stationId",
+            "columnName": "station_id",
+            "affinity": "INTEGER",
+            "notNull": true
+          },
+          {
+            "fieldPath": "providerId",
+            "columnName": "provider_id",
+            "affinity": "INTEGER",
+            "notNull": true
+          }
+        ],
+        "primaryKey": {
+          "columnNames": [
+            "station_id",
+            "provider_id"
+          ],
+          "autoGenerate": false
+        },
+        "indices": [
+          {
+            "name": "index_station_provider_identifier_station_id",
+            "unique": false,
+            "columnNames": [
+              "station_id"
+            ],
+            "createSql": "CREATE INDEX IF NOT EXISTS `index_station_provider_identifier_station_id` ON `${TABLE_NAME}` (`station_id`)"
+          },
+          {
+            "name": "index_station_provider_identifier_provider_id",
+            "unique": false,
+            "columnNames": [
+              "provider_id"
+            ],
+            "createSql": "CREATE INDEX IF NOT EXISTS `index_station_provider_identifier_provider_id` ON `${TABLE_NAME}` (`provider_id`)"
+          }
+        ],
+        "foreignKeys": [
+          {
+            "table": "station",
+            "onDelete": "NO ACTION",
+            "onUpdate": "NO ACTION",
+            "columns": [
+              "station_id"
+            ],
+            "referencedColumns": [
+              "station_id"
+            ]
+          },
+          {
+            "table": "provider_identifier",
+            "onDelete": "NO ACTION",
+            "onUpdate": "NO ACTION",
+            "columns": [
+              "provider_id"
+            ],
+            "referencedColumns": [
+              "provider_id"
+            ]
+          }
+        ]
+      },
+      {
+        "tableName": "stream",
+        "createSql": "CREATE TABLE IF NOT EXISTS `${TABLE_NAME}` (`stream_id` INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL, `station_id` INTEGER NOT NULL, `position` INTEGER NOT NULL, `url` TEXT NOT NULL, `offset_ms` INTEGER, `quality` INTEGER NOT NULL, FOREIGN KEY(`station_id`) REFERENCES `station`(`station_id`) ON UPDATE NO ACTION ON DELETE NO ACTION )",
+        "fields": [
+          {
+            "fieldPath": "streamId",
+            "columnName": "stream_id",
+            "affinity": "INTEGER",
+            "notNull": true
+          },
+          {
+            "fieldPath": "stationId",
+            "columnName": "station_id",
+            "affinity": "INTEGER",
+            "notNull": true
+          },
+          {
+            "fieldPath": "position",
+            "columnName": "position",
+            "affinity": "INTEGER",
+            "notNull": true
+          },
+          {
+            "fieldPath": "url",
+            "columnName": "url",
+            "affinity": "TEXT",
+            "notNull": true
+          },
+          {
+            "fieldPath": "offsetMs",
+            "columnName": "offset_ms",
+            "affinity": "INTEGER",
+            "notNull": false
+          },
+          {
+            "fieldPath": "quality",
+            "columnName": "quality",
+            "affinity": "INTEGER",
+            "notNull": true
+          }
+        ],
+        "primaryKey": {
+          "columnNames": [
+            "stream_id"
+          ],
+          "autoGenerate": true
+        },
+        "indices": [
+          {
+            "name": "index_stream_station_id",
+            "unique": false,
+            "columnNames": [
+              "station_id"
+            ],
+            "createSql": "CREATE INDEX IF NOT EXISTS `index_stream_station_id` ON `${TABLE_NAME}` (`station_id`)"
+          },
+          {
+            "name": "index_stream_station_id_position",
+            "unique": true,
+            "columnNames": [
+              "station_id",
+              "position"
+            ],
+            "createSql": "CREATE UNIQUE INDEX IF NOT EXISTS `index_stream_station_id_position` ON `${TABLE_NAME}` (`station_id`, `position`)"
+          }
+        ],
+        "foreignKeys": [
+          {
+            "table": "station",
+            "onDelete": "NO ACTION",
+            "onUpdate": "NO ACTION",
+            "columns": [
+              "station_id"
+            ],
+            "referencedColumns": [
+              "station_id"
+            ]
+          }
+        ]
+      },
+      {
+        "tableName": "life_cycle_data",
+        "createSql": "CREATE TABLE IF NOT EXISTS `${TABLE_NAME}` (`life_cycle_data_id` INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL, `last_requested` INTEGER NOT NULL, `last_modified` INTEGER, `valid_until` INTEGER, `last_retry_status` INTEGER, `next_retry` INTEGER, `retry_delay` INTEGER, `retry_count` INTEGER)",
+        "fields": [
+          {
+            "fieldPath": "lifeCycleDataId",
+            "columnName": "life_cycle_data_id",
+            "affinity": "INTEGER",
+            "notNull": true
+          },
+          {
+            "fieldPath": "lastRequested",
+            "columnName": "last_requested",
+            "affinity": "INTEGER",
+            "notNull": true
+          },
+          {
+            "fieldPath": "lastModified",
+            "columnName": "last_modified",
+            "affinity": "INTEGER",
+            "notNull": false
+          },
+          {
+            "fieldPath": "validUntil",
+            "columnName": "valid_until",
+            "affinity": "INTEGER",
+            "notNull": false
+          },
+          {
+            "fieldPath": "lastRetryStatus",
+            "columnName": "last_retry_status",
+            "affinity": "INTEGER",
+            "notNull": false
+          },
+          {
+            "fieldPath": "nextRetry",
+            "columnName": "next_retry",
+            "affinity": "INTEGER",
+            "notNull": false
+          },
+          {
+            "fieldPath": "retryDelay",
+            "columnName": "retry_delay",
+            "affinity": "INTEGER",
+            "notNull": false
+          },
+          {
+            "fieldPath": "retryCount",
+            "columnName": "retry_count",
+            "affinity": "INTEGER",
+            "notNull": false
+          }
+        ],
+        "primaryKey": {
+          "columnNames": [
+            "life_cycle_data_id"
+          ],
+          "autoGenerate": true
+        },
+        "indices": [
+          {
+            "name": "index_life_cycle_data_last_requested",
+            "unique": false,
+            "columnNames": [
+              "last_requested"
+            ],
+            "createSql": "CREATE INDEX IF NOT EXISTS `index_life_cycle_data_last_requested` ON `${TABLE_NAME}` (`last_requested`)"
+          }
+        ],
+        "foreignKeys": []
+      }
+    ],
+    "views": [],
+    "setupQueries": [
+      "CREATE TABLE IF NOT EXISTS room_master_table (id INTEGER PRIMARY KEY,identity_hash TEXT)",
+      "INSERT OR REPLACE INTO room_master_table (id,identity_hash) VALUES(42, '70e7551636080298a9244e3e26afe7ca')"
+    ]
+  }
+}

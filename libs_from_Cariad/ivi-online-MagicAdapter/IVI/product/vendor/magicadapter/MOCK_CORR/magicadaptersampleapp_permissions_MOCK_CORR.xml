@@ -1,0 +1,8 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- Copyright (c) 1999-2017 Redbend. All Rights Reserved. -->
+<permissions>
+    <privapp-permissions package="de.esolutions.magicadaptersampleapp.OI_MOCK_CORR">
+        <permission name="android.permission.GET_ACCOUNTS_PRIVILEGED"/>
+		<permission name="technology.cariad.magic.service.permission.ALL"/>
+    </privapp-permissions>
+</permissions>

@@ -1,0 +1,389 @@
+include::../config.adoc[]
+//imagesdir must be overwritten, it is already included in the config.adoc
+:imagesdir: ../../images
+:hash: #
+
+= image:ESO_Logo_Colour_positive_RGB.png[eso_icon,350,350,float="right",align="center"] Design metadataservice_conradlib - Unit HandleRegistration
+:toc-title: Table of Contents
+
+'''
+
+// numbering from here on
+:numbered:
+:stem: latexmath
+
+
+[unit=HandleRegistration, role=unit]
+== <<Unit>> HandleRegistration
+This document specifies the design of the unit *HandleRegistration*, it is part of the link:../../main.{type}[metadataservice_conradlib].
+
+This class is responsible to check if a backend registration is required.
+Also, it has to save when the last successful registration occurred.
+
+== Provided Interface (public methods and properties)
+
+=== HandleRegistration.timeLastRegistrationRequest
+
+This property saves the timestamp of the last successful registration request in milliseconds as Long.
+The variable is nullable and null by default, this means that no registration request was performed ye.
+
+[,kotlin]
+----
+var timeLastRegistrationRequest: Long? = null
+----
+
+=== HandleRegistration.class(tokenHandler: TokenHandler): HandleRegistration
+
+The constructor of this class receives the token handler used to create jobs.
+
+|===
+|name|value range |valid values | description
+
+|tokenHandler
+|TokenHandler
+|TokenHandler-Instance
+|The handler that should be used to generate link:unit_RegistrationRequestJob.adoc[RegistrationRequestJob] instances.
+
+|===
+
+=== HandleRegistration.ensureRegistration()
+
+This instance function uses isCookiePresentAndValid() to check if the registration must be done.
+If the cookie is not valid, it should run link:unit_RegistrationRequestJob.adoc[RegistrationRequestJob] synchronously.
+
+*Arguments*
+
+None
+
+*Return*
+
+None
+
+*Exceptions*
+
+* link:unit_RegistrationFailureException.adoc[RegistrationFailureException]: If RegistrationRequestJob failed.
+
+=== HandleRegistration.isCookiePresentAndValid(): Boolean
+
+This static function checks if a registration was successful and a registration cookie is valid.
+
+The function should behave as follows, sorted by priority:
+
+- timeLastRegistrationRequest is null => false
+- Session disabled
+* timeLastRegistrationRequest is older than maxRegistrationAge => false
+* else => true
+- Session enabled
+* sessionCookieName is null => false
+* Session cookie not exist => false
+* Session cookie is expired => false
+* else => true
+
+*Arguments*
+
+None
+
+*Return*
+
+|===
+|Type|value range |valid values  | description
+
+|Response
+|Boolean
+|true, false
+|True if registration and cookie are valid, otherwise false.
+|===
+
+*Exceptions*
+
+None
+
+=== HandleRegistration.setRegistrationResult(api: ApiResultObject, requestConfig: ConfigObject)
+
+After successful registration set the received configs by this function.
+It should write the parameter values into the Config class.
+timeLastRegistrationRequest must be set to now.
+If requestConfig contains a connection keepalive value, it should configure the HTTP client by the value.
+
+*Arguments*
+
+|===
+|name|value range |valid values | description
+
+|api
+|ApiResultObject
+|ApiResultObject-Instance
+|The api result that should be saved into the global config.
+
+|requestConfig
+|ConfigObject
+|ConfigObject-Instance
+|The config result that should be saved into the global config.
+|===
+
+*Return*
+
+None
+
+*Exceptions*
+
+None
+
+== Dependencies (Used Units, methods and properties)
+
+|===
+|Destination unit|Destination method/property |comment
+
+|link:unit_TokenHandler.adoc[TokenHandler]
+|TokenHandler.class
+|Receives a TokenHandler instance by the constructor to initialize RegistrationRequestJob.
+
+|link:unit_RegistrationRequestJob.adoc[RegistrationRequestJob]
+|RegistrationRequestJob.class
+|Use this job to run registration requests.
+
+|link:unit_RegistrationRequestJob.adoc[RegistrationRequestJob]
+|RegistrationRequestJob.run()
+|Run the registration job synchronously.
+
+|link:unit_RegistrationRequestJob.adoc[RegistrationRequestJob]
+|RegistrationRequestJob.successful
+|Check if the registration result was successful.
+
+|link:unit_RegistrationRequestJob.adoc[RegistrationRequestJob]
+|RegistrationRequestJob.retryAfterResponse and RegistrationRequestJob.responseCode
+|Check if the registration backend returned a retry after header.
+
+|link:unit_Data.adoc[Data]
+|Config.requestConfig.sessionEnabled
+|Check if session cookies are enabled.
+
+|link:unit_Data.adoc[Data]
+|Config.requestConfig.maxRegistrationAge
+|The maximum age of registrations, rerun a registration if this age is expired and session cookies are disabled.
+
+|link:unit_Data.adoc[Data]
+|Config.requestConfig.sessionCookieName
+|Name of the session cookie.
+
+|link:unit_Data.adoc[Data]
+|Config.apiEndpoints
+|Save the ApiResultObject to this variable.
+
+|link:unit_Data.adoc[Data]
+|Config.requestConfig
+|Save the ConfigObject to this variable.
+
+|link:unit_Data.adoc[Data]
+|Config.requestConfig.connectionKeepalive
+|Read the keep alive value from the registration request config.
+
+|link:unit_Http.adoc[Http]
+|Http.setKeepAlive()
+|Configure the keep alive value for the http client.
+
+|===
+
+== Runtime View
+
+[dynamic_sequence=startup, unit=HandleRegistration, role=dynamic_sequence]
+=== Startup
+
+The constructor should save the given TokenHandler internally to use it later.
+
+[dynamic_sequence=shutdown, unit=HandleRegistration, role=dynamic_sequence]
+=== Shutdown
+
+The calling unit must simply remove all references to this instance,
+which causes the kotlin garbage collector to remove it from the heap.
+
+[dynamic_sequence=startup_after_s2r, unit=HandleRegistration, role=dynamic_sequence]
+=== Suspend
+
+Since this is a kotlin class without deep android references, no suspend state needs to be considered.
+
+[dynamic_sequence=resume, unit=HandleRegistration, role=dynamic_sequence]
+=== Resume
+
+Since this is a kotlin class without deep android references, no suspend state needs to be considered.
+
+=== Check cookie - Registration not performed
+
+[plantuml, title="isCookiePresentAndValid - Registration not performed", format="svg", id="HandleRegistration-Not-Performed"]
+----
+participant "Arbitrary Unit" as caller
+participant "HandleRegistration" as handler <<unit>>
+
+caller -> handler: isCookiePresentAndValid()
+activate handler
+
+handler -> handler: timeLastRegistrationRequest == null
+
+caller <- handler: false
+deactivate handler
+----
+
+=== Check cookie - Cookie disabled
+
+[plantuml, title="isCookiePresentAndValid - Cookie disabled", format="svg", id="HandleRegistration-Cookie-Disabled"]
+----
+participant "Arbitrary Unit" as caller
+participant "HandleRegistration" as handler <<unit>>
+
+caller -> handler: isCookiePresentAndValid()
+activate handler
+handler -> handler: timeLastRegistrationRequest != null
+handler -> handler: Session disabled
+handler -> handler: Max registration age not expired
+caller <- handler: true
+deactivate handler
+
+caller -> handler: isCookiePresentAndValid()
+activate handler
+handler -> handler: timeLastRegistrationRequest != null
+handler -> handler: Session disabled
+handler -> handler: Max registration age expired
+caller <- handler: false
+deactivate handler
+----
+
+=== Check cookie - Cookie enabled
+
+[plantuml, title="isCookiePresentAndValid - Cookie enabled", format="svg", id="HandleRegistration-Cookie-Enabled"]
+----
+participant "Arbitrary Unit" as caller
+participant "HandleRegistration" as handler <<unit>>
+
+caller -> handler: isCookiePresentAndValid()
+activate handler
+handler -> handler: timeLastRegistrationRequest != null
+handler -> handler: Session enabled
+handler -> handler: Session cookie name not defined
+caller <- handler: false
+deactivate handler
+
+caller -> handler: isCookiePresentAndValid()
+activate handler
+handler -> handler: timeLastRegistrationRequest != null
+handler -> handler: Session enabled
+handler -> handler: Session cookie name defined
+handler -> handler: Session cookie not exists
+caller <- handler: false
+deactivate handler
+
+caller -> handler: isCookiePresentAndValid()
+activate handler
+handler -> handler: timeLastRegistrationRequest != null
+handler -> handler: Session enabled
+handler -> handler: Session cookie name defined
+handler -> handler: Session cookie exists
+handler -> handler: Session cookie still valid
+caller <- handler: true
+deactivate handler
+
+caller -> handler: isCookiePresentAndValid()
+activate handler
+handler -> handler: timeLastRegistrationRequest != null
+handler -> handler: Session enabled
+handler -> handler: Session cookie name defined
+handler -> handler: Session cookie exists
+handler -> handler: Session cookie expired
+caller <- handler: false
+deactivate handler
+----
+
+=== Set RegistrationResult
+
+[plantuml, title="setRegistrationResult", format="svg", id="HandleRegistration-Set-Result"]
+----
+participant "Arbitrary Unit" as caller
+participant "HandleRegistration" as handler <<unit>>
+participant "Config" as config
+participant "HTTP" as http
+
+caller -> handler: setRegistrationResult()
+activate handler
+
+handler -> config: Set apiEndpoints
+handler -> config: Set requestConfig
+handler -> handler: Set timeLastRegistrationRequest to current timestamp
+
+alt If connectionKeepalive of the config is set to non-null
+handler -> http: Http.setKeepAlive
+end
+
+deactivate handler
+----
+
+=== Ensure Registration is done
+
+[plantuml, title="ensureRegistration", format="svg", id="HandleRegistration-Ensure"]
+----
+participant "Arbitrary Unit" as caller
+participant "HandleRegistration" as handler <<unit>>
+participant "RegistrationRequestJob" as job
+
+caller -> handler: ensureRegistration()
+activate handler
+handler -> handler: isCookiePresentAndValid() = true
+deactivate handler
+
+caller -> handler: ensureRegistration()
+activate handler
+handler -> handler: isCookiePresentAndValid() = false
+handler <-> job: Initialize
+handler -> job: run()
+handler <-> job: successful = true
+deactivate handler
+----
+
+=== Registration job error
+
+[plantuml, title="Registration job error", format="svg", id="HandleRegistration-Error-Registration"]
+----
+participant "Arbitrary Unit" as caller
+participant "HandleRegistration" as handler <<unit>>
+participant "RegistrationRequestJob" as job
+
+caller -> handler: ensureRegistration()
+activate handler
+handler -> handler: isCookiePresentAndValid() = false
+
+handler <-> job: Initialize
+handler -> job: run()
+handler <-> job: successful = false
+
+caller <- handler: throw RegistrationFailureException
+deactivate handler
+----
+
+[[section-design-decisions]]
+== Design Decisions
+
+=== Middleware vs integrate in job
+
+A decision had to be made if we use a middleware or a separate job for the registration check.
+
+==== Option 1: Middleware
+
+A middleware can check in multiple jobs that the registration is up-to-date.
+
+==== Option 2: Integrate in every job
+
+Integrate the relevant mechanism in every job so that they can check individual the current registration and cookie status.
+
+==== Option 3: Integrate in separate job
+
+Use the RegistrationRequestJob and start it before the current job is executed to check the registration and cookie status.
+
+==== Conclusion:
+
+That every job check the status may cause to problems if we have to change something in the conditions.
+Also, every job has to know all the conditions how to handle different registration errors. +
+If we integrate the check within the RegistrationRequestJob, this job must be initialized for every other job.
+This can slow down the request and need more resources for only a short check. +
+With the middleware we can quickly check the current registration and cookie status in every job without implement the logic in every job.
+And we can start the RegistrationRequestJob only if we need a new registration. In all other cases the current job is running his normal way. +
+With all this information we decided to use the middleware to generate a light way check mechanism.
+
+include::../about-arc42.adoc[]

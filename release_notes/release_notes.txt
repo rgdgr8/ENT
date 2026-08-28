@@ -1,0 +1,1940 @@
+===============================================================================
+e.solutions MetadataService - Release Notes
+===============================================================================
+
+Copyright (c) e.solutions GmbH
+All rights reserved
+
+
+App Version: 1.4.1-MAIN - 2025-01-15
+Clientinterface Version: 11.1.0-MAIN - 2024-04-12
+
+
+Contents:
+  1.0  Integrated 1st-Party
+  2.0  Integrated 3rd-Party
+  3.0  History
+  4.0  Known Issues
+
+===============================================================================
+1.0 Integrated 1st-Party
+===============================================================================
+
+e.solutions ConradLib:     OI_2025-10-28-113620
+e.solutions GMDLib:        2025_10_28-125437-OI-MAIN
+e.solutions MagicAdapter:  2024_06_21-122217
+
+===============================================================================
+2.0 Integrated 3rd-Party
+===============================================================================
+
+GNSDK for Automotive 3.18.19.14264, dated 2025-07-29 is approved and integrated.
+Gracenote backend certificate file, dated 2024-09-17 is approved and integrated.
+sSOA manifest 24w15.4 is approved and integrated
+
+===============================================================================
+3.0 History
+===============================================================================
+
+App Version: 1.4.1-MAIN - 2025-01-15
+Clientinterface Version: 11.1.0-MAIN - 2024-04-12
+
+  * OIG-94599 - [metadataservice_app] Prevent download of "gracenote_truststore" for brands having no gracenote license
+
+  * e.solutions ConradLib: OI_2025-10-28-113620
+  * e.solutions GMDLib:    2025_10_28-125437-OI-MAIN
+  * e.solutions MagicAdapter: 2024_06_21-122217
+  * GNSDK for Automotive: 3.18.19.14264 (2.6.19.14264)
+  * sSOA manifest: 24w15.4
+  * JDK version: openjdk 17.0.14
+  * Android SDK version: 34.0.0
+  * Android NDK version: 27.3.13750724
+
+-------------------------------------------------------------------------------
+
+App Version: 1.4.0-MAIN - 2025-12-06
+Clientinterface Version: 11.1.0-MAIN - 2024-04-12
+
+  * OIG-93507 - [metadataservice_app] Integration of ConRadLib "OI_2025-10-28-113620" and GMDLib "2025_10_28-125437-OI-MAIN"
+
+  * e.solutions ConradLib: OI_2025-10-28-113620
+  * e.solutions GMDLib:    2025_10_28-125437-OI-MAIN
+  * e.solutions MagicAdapter: 2024_06_21-122217
+  * GNSDK for Automotive: 3.18.19.14264 (2.6.19.14264)
+  * sSOA manifest: 24w15.4
+  * JDK version: openjdk 17.0.14
+  * Android SDK version: 34.0.0
+  * Android NDK version: 27.3.13750724
+
+-------------------------------------------------------------------------------
+
+App Version: 1.3.1-MAIN - 2025-11-19
+Clientinterface Version: 11.1.0-MAIN - 2024-04-12
+
+  * OIG-91819 - [MAIN][metadataservice_app][PIPE25.4] - Build pipeline, infrastructure and Q-Gate related tasks
+        - Updated mediacommongradleplugin to version 12.1.1
+
+  * e.solutions ConradLib: OI_2025-01-16-142010
+  * e.solutions GMDLib:    2024_10_28-093808-OI-MAIN
+  * e.solutions MagicAdapter: 2024_06_21-122217
+  * GNSDK for Automotive: 3.18.19.14264 (2.6.19.14264)
+  * sSOA manifest: 24w15.4
+  * JDK version: openjdk 17.0.14
+  * Android SDK version: 34.0.0
+  * Android NDK version: 27.3.13750724
+
+-------------------------------------------------------------------------------
+
+App Version: 1.3.0-MAIN - 2025-10-18
+Clientinterface Version: 11.1.0-MAIN - 2024-04-12
+
+  * OIG-91845 - [metadataservice_app][PIPE25.4] - Integration from CLU53T branch (Android T) to MAIN branch (Android U, HCP3 Backport)
+        - CL 63448631 / OIG-88200
+            + Fixes : getCoverArtSubscribe by sending requests with the same album name and different artists names response the same coverart
+        - CL 63814507 / OIG-85663
+            + [metadataservice_app] Implementation of "Removal of ConRad-Library" for China variant
+            + Import all new variants config files from "media_common" via stream.json
+            + target.json: Used the newly added variant config yml files incl. missing / correction of simplified handling  in CLU53T
+            + buildruns.yml: Adding all necessary changes (not necessary in CLU53T due to Android.mk file)
+        - CL 64348406
+            + OIG-87167 - [CLU53TVR2][metadataservice_app][PIPE25.2] - Build pipeline, infrastructure and Q-Gate related tasks
+            + OIG-88788 - [MDS] Fixes : [OI@A][CLU53TVR2] Truststore-handling not activated in Prod-Releases
+            + OIG-87206 - [metadataservice_app][PIPE25.2] - Integration from CLU53TVR2 branch (Android T) to CLU53T branch (Android T)
+            + OIG-88156 - Fixes : [NAR] [SXM] Audio stuttering when tuned to SXM [10405560]
+        - CL 64352293 / OIG-89130
+            + Fixes : [OI@A][CLU53T] IRC-Tracing not activated for Kotlin part
+        - CL: 66069961 / OIG-90020
+            + Fixes : [MDS] Database is not working properly after corruption of "metadata_cache.db"
+        - CL 66830669 / OIG-89267
+            + [CLU53T][metadataservice_app][PIPE25.3] - Build pipeline, infrastructure and Q-Gate related tasks
+        - CL 67002908 / OIG-90053
+            + Fixes : [OI@A][MDS] Usage of VHAL properties for MCC not active
+        - CL 68046519 / OIG-90227
+            + [metadataservice_app] [MDS] Integration of Gracenote-SDK "2.6.19.14264"
+        - CL 69575155 / OIG-92691
+            + [metadataservice_app] Enable eso-FW Callback handling and adding callbacks necessary for TLS tests
+        - CLs 69623066, 70190187 / OIG-91820
+            + [CLU53T][metadataservice_app][PIPE25.4] - Build pipeline, infrastructure and Q-Gate related tasks
+                # Correction of IRC-Version retrieval
+                # Check-in of corrected SBOM provided from Gracenote
+        - CL 70779329 / OIG-93143
+            + Fixes : [MDS] [CLU53] App replaces backup certificate with the one from TrustStore
+
+  * e.solutions ConradLib: OI_2025-01-16-142010
+  * e.solutions GMDLib:    2024_10_28-093808-OI-MAIN
+  * e.solutions MagicAdapter: 2024_06_21-122217
+  * GNSDK for Automotive: 3.18.19.14264 (2.6.19.14264)
+  * sSOA manifest: 24w15.4
+  * JDK version: openjdk 17.0.14
+  * Android SDK version: 34.0.0
+  * Android NDK version: 27.3.13750724
+
+-------------------------------------------------------------------------------
+
+App Version: 1.2.17-MAIN - 2025-10-07
+Clientinterface Version: 11.1.0-MAIN - 2024-04-12
+
+  * OIG-91819 - [MAIN][metadataservice_app][PIPE25.4] - Build pipeline, infrastructure and Q-Gate related tasks
+                Integrate media common gradle plugin Version: 12.1.0
+                Add SBOM configs
+
+  * e.solutions ConradLib: OI_2025-01-16-142010
+  * e.solutions GMDLib:    2024_10_28-093808-OI-MAIN
+  * e.solutions MagicAdapter: 2024_06_21-122217
+  * GNSDK for Automotive: 3.18.18.14228 (2.6.18.14228)
+  * sSOA manifest: 24w15.4
+  * JDK version: openjdk 17.0.11
+  * Android SDK version: 34.0.2
+  * Android NDK version: 26.2.11394342
+
+-------------------------------------------------------------------------------
+
+App Version: 1.2.16-MAIN - 2025-10-07
+Clientinterface Version: 11.1.0-MAIN - 2024-04-12
+
+  * OIG-91819 - [MAIN][metadataservice_app][PIPE25.4] - Build pipeline, infrastructure and Q-Gate related tasks
+                Integrate Clientinterface Version: 11.1.0-MAIN
+
+  * e.solutions ConradLib: OI_2025-01-16-142010
+  * e.solutions GMDLib:    2024_10_28-093808-OI-MAIN
+  * e.solutions MagicAdapter: 2024_06_21-122217
+  * GNSDK for Automotive: 3.18.18.14228 (2.6.18.14228)
+  * sSOA manifest: 24w15.4
+  * JDK version: openjdk 17.0.11
+  * Android SDK version: 34.0.2
+  * Android NDK version: 26.2.11394342
+
+-------------------------------------------------------------------------------
+
+App Version: 1.2.15-MAIN - 2025-08-06
+Clientinterface Version: 11.1.0-CLU51 - 2024-04-12
+
+
+  * OIG-89969 - [metadataservice_app] Update Media Common Gradle Plugin for CLU53T branch to version "2.0.5" and MAIN branch to version "10.1.6"
+  * OIG-89842 - [metadataservice_app] Configuration "detekt" error as build breaker in build pipeline
+  * OIG-89267 - [CLU53T][metadataservice_app][PIPE25.3] - Build pipeline, infrastructure and Q-Gate related tasks
+
+  * e.solutions ConradLib: OI_2025-01-16-142010
+  * e.solutions GMDLib:    2024_10_28-093808-OI-MAIN
+  * e.solutions MagicAdapter: 2024_06_21-122217
+  * GNSDK for Automotive: 3.18.18.14228 (2.6.18.14228)
+  * sSOA manifest: 24w15.4
+  * JDK version: openjdk 17.0.11
+  * Android SDK version: 34.0.2
+  * Android NDK version: 26.2.11394342
+
+-------------------------------------------------------------------------------
+
+App Version: 1.2.14-MAIN - 2025-07-21
+Clientinterface Version: 11.1.0-CLU51 - 2024-04-12
+
+
+  * OIG-89731 -  [metadataservice_app] [MDS] Integration of Gracenote-SDK
+                "2.6.18.14228"
+
+  * e.solutions ConradLib: OI_2025-01-16-142010
+  * e.solutions GMDLib:    2024_10_28-093808-OI-MAIN
+  * e.solutions MagicAdapter: 2024_06_21-122217
+  * GNSDK for Automotive: 3.18.18.14228 (2.6.18.14228)
+  * sSOA manifest: 24w15.4
+  * JDK version: openjdk 17.0.11
+  * Android SDK version: 34.0.2
+  * Android NDK version: 26.2.11394342
+
+-------------------------------------------------------------------------------
+
+  * OIG-87226 - [metadataservice_app][PIPE25.2] - Integration from CLU53T branch (Android T)
+    to MAIN branch (Android U, HCP3 Backport)
+    - CL 63143361/OIG-87166 - Q-Gate/corrected "build.gradle" to handle Gracenote license 
+      per variant
+
+  * e.solutions ConradLib: OI_2025-01-16-142010
+  * e.solutions GMDLib:    2024_10_28-093808-OI-MAIN
+  * e.solutions MagicAdapter: 2024_06_21-122217
+  * GNSDK for Automotive: 3.18.16.14079 (2.6.16.14079)
+  * sSOA manifest: 24w15.4
+  * JDK version: openjdk 17.0.11
+  * Android SDK version: 34.0.2
+  * Android NDK version: 26.2.11394342
+
+-------------------------------------------------------------------------------
+
+App Version: 1.2.12-MAIN - 2025-04-29
+Clientinterface Version: 11.1.0-CLU51 - 2024-04-12
+
+  * OIG-87226 - [metadataservice_app][PIPE25.2] - Integration from CLU53T branch (Android T)
+    to MAIN branch (Android U, HCP3 Backport)
+    - CL 62314330 from CLU53T containing the following CLs from CLU53TVR2
+        + CL 62279320/OIG-87780 - Fixes : [OI@A][CLU51 VR2.2] Offline cache of Gracenote-DBs
+          not fully working
+        + CL 61765386/OIG-76314: [metadataservice_app][PIPE25.1] - Integration from HCP3 CLU46
+          to OI@A CLU53TVR2 branch (Android T)
+        + CL 58903272: HCPG-292155 - Send empty lyrics string whenever song recognition receives
+          status "Clear Match"
+        + CL 60691281: HCPG-293787 - [metadataservice_app] [MDS] Fixes : Radio stationlogos will 
+          not be reloaded [10297186]
+        + CL 61629679: HCPG-294027 - Fixes : [Korea] Station Logo and name is not available 
+          [10320338]
+        + CL 61258381/OIG-75498: [metadataservice_app] Use framework defined compile/linker flags
+        + CL 60921227/OIG-85592: Fixes : [MDS] resultDB has wrong group id
+        + CL 60767165/OIG-82474: [metadataservice_app] [MDS] Integration of Gracenote-SDK 
+          "2.6.16.14079"
+        + CL 60370079/OIG-80758: [metadataservice_app] Migration of stability measure from ticket 
+          HCP3KPM-92353 from CLU46 to CLU53TVR2
+        + CL 60239058/OIG-80705: [metadataservice_app] Fix: [Korea] [ICC] Station logo is not 
+          provided [10285401]
+
+  * e.solutions ConradLib: OI_2025-01-16-142010
+  * e.solutions GMDLib:    2024_10_28-093808-OI-MAIN
+  * e.solutions MagicAdapter: 2024_06_21-122217
+  * GNSDK for Automotive: 3.18.16.14079 (2.6.16.14079)
+  * sSOA manifest: 24w15.4
+  * JDK version: openjdk 17.0.11
+  * Android SDK version: 34.0.2
+  * Android NDK version: 26.2.11394342
+
+-------------------------------------------------------------------------------
+
+App Version: 1.2.11-MAIN - 2025-04-25
+Clientinterface Version: 11.1.0-CLU51 - 2024-04-12
+
+  * OIG-87804 - [metadataservice_app] Conrad token handling for  RadioStationDataProvider
+
+  * e.solutions ConradLib: OI_2025-01-16-142010
+  * e.solutions GMDLib:    2024_10_28-093808-OI-MAIN
+  * e.solutions MagicAdapter: 2024_06_21-122217
+  * GNSDK for Automotive: 3.18.15.13847 (2.6.15.13847)
+  * sSOA manifest: 24w15.4
+  * JDK version: openjdk 17.0.11
+  * Android SDK version: 34.0.2
+  * Android NDK version: 26.2.11394342
+
+-------------------------------------------------------------------------------
+
+App Version: 1.2.10-MAIN - 2025-04-15
+Clientinterface Version: 11.1.0-CLU51 - 2024-04-12
+
+  * OIG-87226 - [metadataservice_app][PIPE25.2] - Integration from CLU53T branch (Android T)
+    to MAIN branch (Android U, HCP3 Backport)
+    - CL 58246482/OIG-73595 - [metadataservice_app] [MDS] Integration of Gracenote-SDK
+      "2.6.15.13847"
+    - CL 58834896/OIG-72669 - [metadataservice_app][Lyrics] Evaluation of MDS/GNSDK
+      Improvements for Client App
+    - CL 60513331/OIG-76263 - [CLU53T][metadataservice_app][PIPE25.1] - Build pipeline,
+      infrastructure and Q-Gate related tasks
+    - CL 60197385/OIG-76291 - [metadataservice_app][PIPE25.1] - Integration from CLU53TVR2
+      branch (Android T) to CLU53T branch (Android T)
+
+  * e.solutions ConradLib: OI_2025-01-16-142010
+  * e.solutions GMDLib:    2024_10_28-093808-OI-MAIN
+  * e.solutions MagicAdapter: 2024_06_21-122217
+  * GNSDK for Automotive: 3.18.15.13847 (2.6.15.13847)
+  * sSOA manifest: 24w15.4
+  * JDK version: openjdk 17.0.11
+  * Android SDK version: 34.0.2
+  * Android NDK version: 26.2.11394342
+
+-------------------------------------------------------------------------------
+
+App Version: 1.2.9-MAIN - 2025-04-04
+Clientinterface Version: 11.1.0-CLU51 - 2024-04-12
+
+  * OIG-58471 - [metadataservice_app][MDS] Android 14 - Android.mk to Android.bp migration
+
+  * e.solutions ConradLib: OI_2025-01-16-142010
+  * e.solutions GMDLib:    2024_10_28-093808-OI-MAIN
+  * e.solutions MagicAdapter: 2024_06_21-122217
+  * GNSDK for Automotive: 3.18.14.13624 (2.6.14.13625)
+  * sSOA manifest: 24w15.4
+  * JDK version: openjdk 17.0.11
+  * Android SDK version: 34.0.2
+  * Android NDK version: 26.2.11394342
+
+-------------------------------------------------------------------------------
+
+App Version: 1.2.8-MAIN - 2025-03-11
+Clientinterface Version: 11.1.0-CLU51 - 2024-04-12
+
+  * OIG-85594 - [MDS] Fix: [ATS] GtsPermissionTestCasesForAts 
+                testPreloadedAppsTargetSdkVersion - technology.cariad.entertainment.metadataservice
+                - targetSdk changed to 34, miminimalSdk to 33
+
+  * e.solutions ConradLib: OI_2025-01-16-142010
+  * e.solutions GMDLib:    2024_10_28-093808-OI-MAIN
+  * e.solutions MagicAdapter: 2024_06_21-122217
+  * GNSDK for Automotive: 3.18.14.13624 (2.6.14.13625)
+  * sSOA manifest: 24w15.4
+  * JDK version: openjdk 17.0.11
+  * Android SDK version: 34.0.2
+  * Android NDK version: 26.2.11394342
+
+-------------------------------------------------------------------------------
+
+App Version: 1.2.7-MAIN - 2025-03-07
+Clientinterface Version: 11.1.0-CLU51 - 2024-04-12
+
+  * OIG-76262 - [MAIN][metadataservice_app][PIPE25.1] - Build pipeline, 
+                infrastructure and Q-Gate related tasks:
+                - media common plugin version updated to 10.1.5
+
+  * e.solutions ConradLib: OI_2025-01-16-142010
+  * e.solutions GMDLib:    2024_10_28-093808-OI-MAIN
+  * e.solutions MagicAdapter: 2024_06_21-122217
+  * GNSDK for Automotive: 3.18.14.13624 (2.6.14.13625)
+  * sSOA manifest: 24w15.4
+  * JDK version: openjdk 17.0.11
+  * Android SDK version: 34.0.2
+  * Android NDK version: 26.2.11394342
+
+-------------------------------------------------------------------------------
+
+App Version: 1.2.6-MAIN - 2025-02-28
+Clientinterface Version: 11.1.0-CLU51 - 2024-04-12
+
+  * OIG-79045 - [metadataservice_app][OI@A/Backport] Adding build option for Media-Jenkins for all components
+
+  * e.solutions ConradLib: OI_2025-01-16-142010
+  * e.solutions GMDLib:    2024_10_28-093808-OI-MAIN
+  * e.solutions MagicAdapter: 2024_06_21-122217
+  * GNSDK for Automotive: 3.18.14.13624 (2.6.14.13625)
+  * sSOA manifest: 24w15.4
+  * JDK version: openjdk 17.0.11
+  * Android SDK version: 34.0.2
+  * Android NDK version: 26.2.11394342
+
+-------------------------------------------------------------------------------
+
+App Version: 1.2.5-MAIN - 2025-01-17
+Clientinterface Version: 11.1.0-CLU51 - 2024-04-12
+
+  * OIG-78281 - [MAIN][MDS] Integration of ConRad-Library "OI_2025-01-16-142010"
+
+  * e.solutions ConradLib: OI_2025-01-16-142010
+  * e.solutions GMDLib:    2024_10_28-093808-OI-MAIN
+  * e.solutions MagicAdapter: 2024_06_21-122217
+  * GNSDK for Automotive: 3.18.14.13624 (2.6.14.13625)
+  * sSOA manifest: 24w15.4
+  * JDK version: openjdk 17.0.11
+  * Android SDK version: 34.0.2
+  * Android NDK version: 26.2.11394342
+
+-------------------------------------------------------------------------------
+
+App Version: 1.2.4-MAIN - 2025-01-03
+Clientinterface Version: 11.1.0-CLU51 - 2024-04-12
+
+  * OIG-69687 - [metadataservice_app][MDS] Adaptions for Magic/PANS CLU8 Backport
+
+  * e.solutions ConradLib: OI_2024-11-12-140501
+  * e.solutions GMDLib:    2024_10_28-093808-OI-MAIN
+  * e.solutions MagicAdapter: 2024_06_21-122217
+  * GNSDK for Automotive: 3.18.14.13624 (2.6.14.13625)
+  * sSOA manifest: 24w15.4
+  * JDK version: openjdk 17.0.11
+  * Android SDK version: 34.0.2
+  * Android NDK version: 26.2.11394342
+
+-------------------------------------------------------------------------------
+
+App Version: 1.2.3-MAIN - 2024-11-12
+Clientinterface Version: 11.1.0-CLU51 - 2024-04-12
+
+  * OIG-73254 - [MAIN][MDS] Integration of ConRad-Library "OI_2024-11-12-140501"
+
+  * e.solutions ConradLib: OI_2024-11-12-140501
+  * e.solutions GMDLib:    2024_10_28-093808-OI-MAIN
+  * e.solutions MagicAdapter: 2024_06_21-122217
+  * GNSDK for Automotive: 3.18.14.13624 (2.6.14.13625)
+  * sSOA manifest: 24w15.4
+  * JDK version: openjdk 17.0.11
+  * Android SDK version: 34.0.2
+  * Android NDK version: 26.2.11394342
+
+-------------------------------------------------------------------------------
+
+App Version: 1.2.2-MAIN - 2024-11-11
+Clientinterface Version: 11.1.0-CLU51 - 2024-04-12
+
+  * OIG-73259 - [MAIN][MDS] Integration of GMD-Library "2024_10_28-093808-OI-MAIN"
+
+  * e.solutions ConradLib: OI_2024-09-26-142707
+  * e.solutions GMDLib:    2024_10_28-093808-OI-MAIN
+  * e.solutions MagicAdapter: 2024_06_21-122217
+  * GNSDK for Automotive: 3.18.14.13624 (2.6.14.13625)
+  * sSOA manifest: 24w15.4
+  * JDK version: openjdk 17.0.11
+  * Android SDK version: 34.0.2
+  * Android NDK version: 26.2.11394342
+
+-------------------------------------------------------------------------------
+
+App Version: 1.2.1-MAIN - 2024-10-25
+Clientinterface Version: 11.1.0-CLU51 - 2024-04-12
+
+  * OIG-72688 - [MAIN][MDS] Adapt mds to use new conrad 
+                library version - OI_2024-09-26-142707
+
+  * e.solutions ConradLib: OI_2024-09-26-142707
+  * e.solutions GMDLib:    2024_03_28-084413-OI-MAIN
+  * e.solutions MagicAdapter: 2024_06_21-122217
+  * GNSDK for Automotive: 3.18.14.13624 (2.6.14.13625)
+  * sSOA manifest: 24w15.4
+  * JDK version: openjdk 17.0.11
+  * Android SDK version: 34.0.2
+  * Android NDK version: 26.2.11394342
+
+-------------------------------------------------------------------------------
+
+App Version: 1.2.0-MAIN - 2024-10-24
+Clientinterface Version: 11.1.0-CLU51 - 2024-04-12
+
+  * OIG-70264 - [metadataservice_app][PIPE24.4] - Integration 
+                from CLU53T branch (Android T) to MAIN branch 
+                (Android U, HCP3 Backport):
+                - CL 57709397 (in short: new gracenote 
+                certificate, common gradle plugin version 
+                updated, added car library integration...)
+
+  * e.solutions ConradLib: OI_52441745-MAIN
+  * e.solutions GMDLib:    2024_03_28-084413-OI-MAIN
+  * e.solutions MagicAdapter: 2024_06_21-122217
+  * GNSDK for Automotive: 3.18.14.13624 (2.6.14.13625)
+  * sSOA manifest: 24w15.4
+  * JDK version: openjdk 17.0.11
+  * Android SDK version: 34.0.2
+  * Android NDK version: 26.2.11394342
+
+-------------------------------------------------------------------------------
+
+App Version: 1.1.0-MAIN - 2024-09-11
+Clientinterface Version: 11.0.0 - 2023-12-13
+
+  * Codbase merge from CLU51 to MAIN branch
+  ** OIG-57689 - [metadataservice_app][PIPE24.3] - Integration from HCP3 to OI@A Android T - CL 56567676
+  ** OIG-68923 - Fixes : Media SI not working after stress test [9928682]
+  ** OIG-55288 - MCC usage in OI@A for SongLyrics
+  ** OIG-57689 - [metadataservice_app][PIPE24.3] - Integration from HCP3 to OI@A Android T - CL54486613; CL 54535984; CL 55136830; CL 55137985; CL 55865186; CL 55982109
+  ** OIG-59330 - Fixes : SQlite Error after User Change - No Logos [9989250] *improve robustness against power failure
+  ** OIG-57663 - [CLU51][metadataservice_app][PIPE24.3] - Build pipeline, infrastructure and Q-Gate related tasks (Integration of CL 55168991 from MAIN)
+  ** OIG-57993 - [metadataservice_app] Use compileOnly option for magicAdapter libs and update the libs to 2024_06_21-122217
+  ** OIG-57187 - [metadataservice_app] Deactivation ESM as Defualt  (Workaround for No OSL in Offlineuser [9920769])
+  ** OIG-52653 - [metadataservice_app][Esolutions] Stack protection mechanism to be ensured in Compiler/Linker in P-SW
+
+  * e.solutions ConradLib: OI_52441745-MAIN
+  * e.solutions GMDLib: 2024_03_28-084413-OI-MAIN
+  * GNSDK for Automotive: 3.18.14.13625 (2.6.14.13625)
+  * JDK version: openjdk 17.0.11
+  * Android SDK version: 33.0.0
+  * Android NDK version: 26.3.11579264
+
+-------------------------------------------------------------------------------
+
+App Version: 1.0.0-MAIN - 2024-04-26
+Clientinterface Version: 11.0.0 - 2023-12-13
+
+  * OIG-53237 - [metadataservice_app] Change of version schemata to include branch as postfix
+
+  * e.solutions ConradLib: OI_52441745-MAIN
+  * e.solutions GMDLib: 2024_03_28-084413-OI-MAIN
+  * GNSDK for Automotive: 3.18.7.12501 (2.6.7.12501)
+  * JDK version: openjdk 17
+  * Android SDK version: 33.0.0
+  * Android NDK version: 26.2.11394342
+
+-------------------------------------------------------------------------------
+
+App Version: 0.38.3 - 2024-04-05
+Clientinterface Version: 11.0.0 - 2023-12-13
+
+  * OIG-53310 - Adaption of "GracenoteServiceJNITest" due to JDK 17 /
+                Gradle 8.3
+
+  * e.solutions ConradLib: OI_52441745-MAIN
+  * e.solutions GMDLib: 2024_03_28-084413-OI-MAIN
+  * GNSDK for Automotive: 3.18.7.12501 (2.6.7.12501)
+  * JDK version: openjdk 17
+  * Android SDK version: 34.0.0
+  * Android NDK version: 26.2.11394342
+
+-------------------------------------------------------------------------------
+
+App Version: 0.38.2 - 2024-04-03
+Clientinterface Version: 11.0.0 - 2023-12-13
+
+  * HCPG-280464 - Fix for Gracenote song recognition not working [9834394]
+  * HCPG-280918 - Fix for [MDS] Only logo and not station name gets updated 
+                  [9837243]
+
+  * e.solutions ConradLib: OI_52441745-MAIN
+  * e.solutions GMDLib:    2024_03_28-084413-OI-MAIN
+  * GNSDK for Automotive: 3.18.7.12501 (2.6.7.12501)
+  * JDK version: openjdk 17
+  * Android SDK version: 34.0.0
+  * Android NDK version: 26.2.11394342
+
+-------------------------------------------------------------------------------
+
+App Version: 0.38.1 - 2024-03-26
+Clientinterface Version: 11.0.0 - 2023-12-13
+
+  * OIG-52952 - [metadataservice_app][PIPE24.2] - Build pipeline, infrastructure and Q-Gate related tasks (DM-Fix esoSDK 12.5.0)
+
+  * e.solutions ConradLib: OI_52441745-MAIN
+  * e.solutions GMDLib:     52588863
+  * GNSDK for Automotive: 3.18.7.12501 (2.6.7.12501)
+  * JDK version: openjdk 17
+  * Android SDK version: 34.0.0
+  * Android NDK version: 26.2.11394342
+  
+-------------------------------------------------------------------------------  
+
+App Version: 0.38.0 - 2024-03-14
+Clientinterface Version: 11.0.0 - 2023-12-13
+
+  * HCPG-275532 - [metadataservice_app][MDS] Update Kotlin version from "1.5.30" to "1.9.21"
+  * HCPG-275641 - Fix for [MDS] SongRec Shows Old Result [9719831]
+  * HCPG-271361 - [metadataservice_app][PIPE24.1] - Build pipeline, 
+                  infrastructure and Q-Gate related tasks
+
+  * e.solutions ConradLib: OI_52441745-MAIN
+  * e.solutions GMDLib:     52588863
+  * GNSDK for Automotive: 3.18.7.12501 (2.6.7.12501)
+  * JDK version: openjdk 11
+  * Android SDK version: 30.0.3
+  * Android NDK version: 21.3.6528147
+  
+-------------------------------------------------------------------------------  
+
+App Version: 0.37.6 - 2024-03-13
+Clientinterface Version: 11.0.0 - 2023-12-13
+
+  * OIG-49347 - [metadataservice_app] Adding "versions.json" incl. all necessary updates
+
+  * e.solutions ConradLib: OI_48974378-MAIN
+  * e.solutions GMDLib:     52588863
+  * GNSDK for Automotive: 3.18.7.12501 (2.6.7.12501)
+  * JDK version: openjdk 11
+  * Android SDK version: 30.0.3
+  * Android NDK version: 21.3.6528147
+
+-------------------------------------------------------------------------------
+
+App Version: 0.37.5 - 2024-03-13
+Clientinterface Version: 11.0.0 - 2023-12-13
+
+  * OIG-50785 - [mediaapp_app][USB] BugFix for OIBUG-4861 - [OI@A][MDS] ESM initialization in X531 not working
+
+  * e.solutions ConradLib: OI_48974378-MAIN 
+  * e.solutions GMDLib:     50929778
+  * GNSDK for Automotive: 3.18.7.12501 (2.6.7.12501)
+  * JDK version: openjdk 11
+  * Android SDK version: 30.0.3
+  * Android NDK version: 21.3.6528147
+
+-------------------------------------------------------------------------------
+
+App Version: 0.37.4 - 2024-03-06
+Clientinterface Version: 11.0.0 - 2023-12-13
+
+  * OIG-52080 - [metadataservice_app] Configure to use default network instead of Apn2 Network
+
+  * e.solutions ConradLib: OI_48974378-MAIN 
+  * e.solutions GMDLib:     52588863
+  * GNSDK for Automotive: 3.18.7.12501 (2.6.7.12501)
+  * JDK version: openjdk 11
+  * Android SDK version: 30.0.3
+  * Android NDK version: 21.3.6528147
+
+-------------------------------------------------------------------------------
+
+App Version: 0.37.3 - 2024-02-21
+Clientinterface Version: 11.0.0 - 2023-12-13
+
+  * OIG-46792 - [metadataservice_app][PIPE24.1] - Build pipeline, infrastructure and Q-Gate related tasks
+  * DM-FIX- 52489508 Adapt fw_util_android_newstapi and fw_comm_android_newstapi, update the gmdlib
+
+  * e.solutions ConradLib: OI_48974378-MAIN 
+  * e.solutions GMDLib:     52588863
+  * GNSDK for Automotive: 3.18.7.12501 (2.6.7.12501)
+  * JDK version: openjdk 11
+  * Android SDK version: 30.0.3
+  * Android NDK version: 21.3.6528147
+
+-------------------------------------------------------------------------------
+
+App Version: 0.37.2 - 2024-02-15
+Clientinterface Version: 11.0.0 - 2023-12-13
+
+  * OIG-50785 - [mediaapp_app][USB] BugFix for OIBUG-4861 - [OI@A][MDS] ESM initialization in X531 not working
+
+  * e.solutions ConradLib: OI_48974378-MAIN 
+  * e.solutions GMDLib:     50929778
+  * GNSDK for Automotive: 3.18.7.12501 (2.6.7.12501)
+  * JDK version: openjdk 11
+  * Android SDK version: 30.0.3
+  * Android NDK version: 21.3.6528147
+
+-------------------------------------------------------------------------------
+
+App Version: 0.37.1 - 2024-02-01
+Clientinterface Version: 11.0.0 - 2023-12-13
+
+  * OIG-50227 - [metadataservice_app] [MDS] Change default value to use ESM in Demo Activity to "FALSE"
+
+  * e.solutions ConradLib: OI_48974378-MAIN 
+  * e.solutions GMDLib:     50929778
+  * GNSDK for Automotive: 3.18.7.12501 (2.6.7.12501)
+  * JDK version: openjdk 11
+  * Android SDK version: 30.0.3
+  * Android NDK version: 21.3.6528147
+
+-------------------------------------------------------------------------------
+
+App Version: 0.37.0 - 2024-01-11
+Clientinterface Version: 11.0.0 - 2023-12-13
+
+  * HCPG-266467 - [metadataservice_app] [MDS] Necessary adaptation to use eso-FW based tracing in Gracenote-Service
+  * HCPG-270739 - Fix for [MDS] AudioRecord cleanup + eth0 usage [9743345]
+  * HCPG-257530 - [GMD] Service Implementation
+  * HCPG-266391 - [metadataservice_app] [MDS] Workaround "AudioRecord.release()" 
+                   after "AudioRecord.stop()" for Tuner no audio issues
+  * HCPG-266466 - [metadataservice_app][MDS] Fix for [MDS] Fatal Exception 
+                  when SongRecognition started [9638261]
+  * HCPG-264348 - [metadataservice_app] [MDS] Pruning of not Referenced 
+                  Logo Images in Radio Cache
+  * HCPG-264494 - Using ETags instead of timestamp
+  * HCPG-265263 - [metadataservice_app][MDS] Fix for [HCP3][MDS] GNSDK-Log is 
+                  enabled
+
+  * e.solutions ConradLib: OI_48974378-MAIN 
+  * e.solutions GMDLib:     50929778
+  * GNSDK for Automotive: 3.18.7.12501 (2.6.7.12501)
+  * JDK version: openjdk 11
+  * Android SDK version: 30.0.3
+  * Android NDK version: 21.3.6528147
+
+-------------------------------------------------------------------------------
+
+App Version: 0.36.4 - 2023-12-21
+Clientinterface Version: 10.1.0 - 2023-05-17
+
+  * OIG-47864 - [metadataservice_app] Fix for MDS has network device null [9749250]
+
+  * e.solutions ConradLib: OI_48974378-MAIN 
+  * GNSDK for Automotive: 3.18.7.12501 (2.6.7.12501)
+  * JDK version: openjdk 11
+  * Android SDK version: 30.0.3
+  * Android NDK version: 21.3.6528147
+
+--------------------------------------------------------------------------------
+
+App Version: 0.36.3 - 2023-12-20
+Clientinterface Version: 10.1.0 - 2023-05-17
+
+  * OIG-47864 - [metadataservice_app] Fix for MDS has network device null [9749250]
+
+  * e.solutions ConradLib: OI_48974378-MAIN 
+  * GNSDK for Automotive: 3.18.7.12501 (2.6.7.12501)
+  * JDK version: openjdk 11
+  * Android SDK version: 30.0.3
+  * Android NDK version: 21.3.6528147
+
+--------------------------------------------------------------------------------
+
+App Version: 0.36.2 - 2023-12-19
+Clientinterface Version: 10.1.0 - 2023-05-17
+
+  * OIG-47583 - [metadataservice_app] [MDS] Adding a switch to use ESM or not in Demo Activity
+
+  * e.solutions ConradLib: OI_48974378-MAIN 
+  * GNSDK for Automotive: 3.18.7.12501 (2.6.7.12501)
+  * JDK version: openjdk 11
+  * Android SDK version: 30.0.3
+  * Android NDK version: 21.3.6528147
+
+--------------------------------------------------------------------------------
+
+App Version: 0.36.1 - 2023-12-04
+Clientinterface Version: 10.1.0 - 2023-05-17
+
+  * OIG-43871 - [metadataservice_app][PIPE23.4] - Build pipeline, infrastructure and Q-Gate related tasks
+       Reverting temporary workaround for ESM artifacts resolution(correct ESM version added to sdk.json)
+
+  * e.solutions ConradLib: OI_48974378-MAIN 
+  * GNSDK for Automotive: 3.18.7.12501 (2.6.7.12501)
+  * JDK version: openjdk 11
+  * Android SDK version: 30.0.3
+  * Android NDK version: 21.3.6528147
+
+--------------------------------------------------------------------------------
+
+#App Version: 0.36.0 - 2023-11-30
+Clientinterface Version: 10.1.0 - 2023-05-17
+
+  * DM-FIX-51084526 - Adapt aidl interfaces location
+
+  * e.solutions ConradLib: OI_48974378-MAIN 
+  * GNSDK for Automotive: 3.18.7.12501 (2.6.7.12501)
+  * JDK version: openjdk 11
+  * Android SDK version: 30.0.3
+  * Android NDK version: 21.3.6528147
+
+--------------------------------------------------------------------------------
+
+App Version: 0.35.0 - 2023-10-13
+Clientinterface Version: 10.1.0 - 2023-05-17
+
+  * OIG-26783 - [metadataservice_app] [MDS] Magic Network Handling Gracenote
+
+  * e.solutions ConradLib: OI_48974378-MAIN 
+  * GNSDK for Automotive: 3.18.7.12501 (2.6.7.12501)
+  * JDK version: openjdk 11
+  * Android SDK version: 30.0.3
+  * Android NDK version: 21.3.6528147
+
+--------------------------------------------------------------------------------
+
+App Version: 0.34.0 - 2023-10-06
+Clientinterface Version: 10.1.0 - 2023-05-17
+
+  * OIG-35336 - [metadataservice_app] [MDS] Move cache to 
+                 Extended Storage Manager partition
+
+  * e.solutions ConradLib: OI_48974378-MAIN 
+  * GNSDK for Automotive: 3.18.7.12501 (2.6.7.12501)
+  * JDK version: openjdk 11
+  * Android SDK version: 30.0.3
+  * Android NDK version: 21.3.6528147
+
+-------------------------------------------------------------------------------
+
+App Version: 0.33.2 - 2023-08-29
+Clientinterface Version: 10.1.0 - 2023-05-17
+
+  * HCPG-262907 - [metadataservice_app] [MDS] PIPE 23.3 - Build pipeline, 
+                  infrastructure and Q-Gate - CLU43 - Corrected IRC-Log 
+                  for App-Version
+  * HCPG-264570 - [metadataservice_app][MDS] Fix for [China] Station Logo 
+                  not shown with the long time [9589395]
+  * HCPG-264407 - [metadataservice_app] [MDS] Correcting behaviour for old 
+                  radio station deletion, when logo is used by other station
+  * HCPG-263581 - [metadataservice_app] [MDS] Robustness measures for ResultDB
+                  handling in Gracenote-Service
+  * HCPG-264081 - [metadataservice_app] [MDS] Setting caching limit for 
+                   Radio-Station logos to 2000 entries
+  * HCPG-264180 - Fix for HCP3BUG-80328 - [HCP3][CLU43][MDS] ClassLoaderContext 
+                  size mismatch
+  * HCPG-263230 - Fix for HCP3BUG-77058 - [China] Online logo not available in
+                  Radio app [9506604] - Addendum
+  * HCPG-263779 - Fix for [MDS]no request to backend to get updated
+                  metadata [9501018]
+  * HCPG-263656 - [metadataservice_app][MDS] Fix for HCP3BUG-78431 - Still 
+                   referred images deleted in MDS cache [9555666]
+  * HCPG-263230 - [metadataservice_app] [MDS] Fix for HCP3BUG-77058 - [China] 
+                   Online logo not available in Radio app [9506604]
+  * HCPG-263335 - [metadataservice_app] [MDS] Integration of Gracenote-SDK
+                  "2.6.7.12501"
+  * HCPG-263197 - Fix for HCP3BUG-74970 - no station logo requests transmitted
+                  by MDS client [9492952]
+  * HCPG-262921 - [metadataservice_app] [MDS] Improve error state handling 
+                   in Kotlin and C++ part
+  * HCPG-262207 - [metadataservice_app] [MDS] Integration of Gracenote-SDK
+                  "2.6.7.12403"
+  * HCPG-262904 - [metadataservice_app] [MDS] Setting caching limit for 
+                   Radio-Station logos to 1000 entries
+
+  * e.solutions ConradLib: OI_48974378-MAIN
+  * GNSDK for Automotive: 3.18.7.12501 (2.6.7.12501)
+  * JDK version: openjdk 11
+  * Android SDK version: 30.0.3
+  * Android NDK version: 21.3.6528147
+
+-------------------------------------------------------------------------------
+
+App Version: 0.32.2 - 2023-08-18
+Clientinterface Version: 10.1.0 - 2023-05-17
+
+  * HCPG-264510 - [metadataservice_app] [MDS] Integration of ConRad-Library 
+                   version "HCP3_48336720-MAIN"
+
+  * e.solutions ConradLib: HCP3_48336720-MAIN 
+  * GNSDK for Automotive: 3.18.7.12162 (2.6.7.12162)
+  * JDK version: openjdk 11
+  * Android SDK version: 30.0.3
+  * Android NDK version: 21.3.6528147
+
+-------------------------------------------------------------------------------
+
+App Version: 0.32.1 - 2023-07-28
+Clientinterface Version: 10.1.0 - 2023-05-17
+
+  * HCPG-260997 - [metadataservice_app] [MDS] PIPE 23.2 - Integration 
+                   from CLU43 to CLU45 up to CL 47760541
+
+  * e.solutions ConradLib: 47232344-MAIN 
+  * GNSDK for Automotive: 3.18.7.12162 (2.6.7.12162)
+  * JDK version: openjdk 11
+  * Android SDK version: 30.0.3
+  * Android NDK version: 21.3.6528147
+
+-------------------------------------------------------------------------------
+
+App Version: 0.32.0 - 2023-07-19
+Clientinterface Version: 10.1.0 - 2023-05-17
+
+  * HCPG-246628 - [Lyrics] Full Feature - Service Implementation
+
+  * e.solutions ConradLib: 47232344-MAIN 
+  * GNSDK for Automotive: 3.18.7.12162 (2.6.7.12162)
+  * JDK version: openjdk 11
+  * Android SDK version: 30.0.3
+  * Android NDK version: 21.3.6528147
+
+-------------------------------------------------------------------------------
+
+App Version: 0.31.0 - 2023-05-24
+Clientinterface Version: 10.0.0 - 2022-12-01
+
+  * HHCPG-256401 - [metadataservice_app] [MDS] PIPE 23.2 - Build pipeline, 
+                   infrastructure and Q-Gate
+
+  * e.solutions ConradLib: 47232344-MAIN 
+  * GNSDK for Automotive: 3.18.7.12162 (2.6.7.12162)
+  * JDK version: openjdk 11
+  * Android SDK version: 30.0.3
+  * Android NDK version: 21.3.6528147
+
+-------------------------------------------------------------------------------
+
+App Version: 0.30.36 - 2023-06-13
+Clientinterface Version: 9.0.0 - 2022-09-14
+
+  * HCPG-260926 - [metadataservice_app] [MDS] Definition and implementation 
+                   of IRC tracing - MetadataService
+
+  * e.solutions ConradLib: 47306168-REL_CL43 
+  * GNSDK for Automotive: 3.18.7.12162 (2.6.7.12162)
+  * JDK version: openjdk 11
+  * Android SDK version: 30.0.3
+  * Android NDK version: 21.3.6528147
+
+-------------------------------------------------------------------------------
+
+App Version: 0.30.35 - 2023-05-26
+Clientinterface Version: 9.0.0 - 2022-09-14
+
+  * HCPG-261047 - Fix for Now playing station has no SongID after S2R [9419571]
+
+  * e.solutions ConradLib: 47306168-REL_CL43 
+  * GNSDK for Automotive: 3.18.7.12162 (2.6.7.12162)
+  * JDK version: openjdk 11
+  * Android SDK version: 30.0.3
+  * Android NDK version: 21.3.6528147
+
+-------------------------------------------------------------------------------
+
+App Version: 0.30.34 - 2023-05-17
+Clientinterface Version: 10.0.0 - 2022-12-01
+
+  * HCPG-244979 - Bring-up - Service Implementation
+
+  * e.solutions ConradLib: 46382585 
+  * GNSDK for Automotive: 3.18.7.12162 (2.6.7.12162)
+  * JDK version: openjdk 11
+  * Android SDK version: 30.0.3
+  * Android NDK version: 21.3.6528147
+
+-------------------------------------------------------------------------------
+
+App Version: 0.30.33 - 2023-05-15
+Clientinterface Version: 9.0.0 - 2022-09-14
+
+  * HCPG-260901 - Fix for HCP3BUG-67731 - [Japan] MDS Crash ASIA StationLogo
+                  Privacy Switch [9414794]
+
+  * e.solutions ConradLib: 46966929 
+  * GNSDK for Automotive: 3.18.7.12162 (2.6.7.12162)
+  * JDK version: openjdk 11
+  * Android SDK version: 30.0.3
+  * Android NDK version: 21.3.6528147
+
+-------------------------------------------------------------------------------
+
+App Version: 0.30.32 - 2023-05-09
+Clientinterface Version: 9.0.0 - 2022-09-14
+
+  * HCPG-260677 - [metadataservice_app] [MDS] Fix for HCP3BUG-70982 - Fingerprint
+                  Performed But Not Forwarded To Radio [9432811]	
+
+
+  * e.solutions ConradLib: 46966929 
+  * GNSDK for Automotive: 3.18.7.12162 (2.6.7.12162)
+  * JDK version: openjdk 11
+  * Android SDK version: 30.0.3
+  * Android NDK version: 21.3.6528147
+
+-------------------------------------------------------------------------------
+
+App Version: 0.30.31 - 2023-05-08
+Clientinterface Version: 9.0.0 - 2022-09-14
+
+  * HCPG-260665 - Fix for HCP3BUG-64509 - Onl.Logos and Hyb avail. vanished
+                  [9361248]
+
+  * e.solutions ConradLib: 46966929 
+  * GNSDK for Automotive: 3.18.7.12162 (2.6.7.12162)
+  * JDK version: openjdk 11
+  * Android SDK version: 30.0.3
+  * Android NDK version: 21.3.6528147
+
+-------------------------------------------------------------------------------
+
+App Version: 0.30.30 - 2023-05-04
+Clientinterface Version: 9.0.0 - 2022-09-14
+
+  * HCPG-259665 - [metadataservice_app] cookie robustness measure when system time is manipulated
+
+  * e.solutions ConradLib: 46966929 
+  * GNSDK for Automotive: 3.18.7.12162 (2.6.7.12162)
+  * JDK version: openjdk 11
+  * Android SDK version: 30.0.3
+  * Android NDK version: 21.3.6528147
+
+-------------------------------------------------------------------------------
+
+App Version: 0.30.29 - 2023-04-26
+Clientinterface Version: 9.0.0 - 2022-09-14
+
+  * HCPG-259575 - [metadataservice_app] [MDS] HCP3BUG-66623 - [China] [USB][R]USB aft flashback can't enter entertainmen [9384656]
+
+  * e.solutions ConradLib: 46382585 
+  * GNSDK for Automotive: 3.18.7.12162 (2.6.7.12162)
+  * JDK version: openjdk 11
+  * Android SDK version: 30.0.3
+  * Android NDK version: 21.3.6528147
+
+-------------------------------------------------------------------------------
+
+App Version: 0.30.28 - 2023-04-19
+Clientinterface Version: 9.0.0 - 2022-09-14
+
+  * HCPG-258995 - [metadataservice_app] [MDS] HCP3BUG-65098 - MDS crash after selecting a wifi network [9374578]
+
+  * e.solutions ConradLib: 46382585 
+  * GNSDK for Automotive: 3.18.7.12162 (2.6.7.12162)
+  * JDK version: openjdk 11
+  * Android SDK version: 30.0.3
+  * Android NDK version: 21.3.6528147
+
+-------------------------------------------------------------------------------
+
+App Version: 0.30.27 - 2023-03-29
+Clientinterface Version: 9.0.0 - 2022-09-14
+
+  * HCPG-257078 - Review and correction of setting the system language in GracenoteService
+
+  * e.solutions ConradLib: 46382585 
+  * GNSDK for Automotive: 3.18.7.12162 (2.6.7.12162)
+  * JDK version: openjdk 11
+  * Android SDK version: 30.0.3
+  * Android NDK version: 21.3.6528147
+
+-------------------------------------------------------------------------------
+
+App Version: 0.30.26 - 2023-03-24
+Clientinterface Version: 9.0.0 - 2022-09-14
+
+  * HCPG-257727 - [metadataservice_app] [MDS] Fix for HCP3BUG-63515 - MDS Crash
+                  during actions in radio content v30.19 [9350129]
+
+  * e.solutions ConradLib: 46382585 
+  * GNSDK for Automotive: 3.18.7.12162 (2.6.7.12162)
+  * JDK version: openjdk 11
+  * Android SDK version: 30.0.3
+  * Android NDK version: 21.3.6528147
+
+-------------------------------------------------------------------------------
+
+App Version: 0.30.25 - 2023-03-14
+Clientinterface Version: 9.0.0 - 2022-09-14
+
+  * HCPG-256516 - Integration of ConRad-Library for "Hardcoded Account Manager"
+                  - CL 46382585
+
+  * e.solutions ConradLib: 46382585 
+  * GNSDK for Automotive: 3.18.7.12162 (2.6.7.12162)
+  * JDK version: openjdk 11
+  * Android SDK version: 30.0.3
+  * Android NDK version: 21.3.6528147
+
+-------------------------------------------------------------------------------
+
+App Version: 0.30.24 - 2023-03-02
+Clientinterface Version: 9.0.0 - 2022-09-14
+
+  * HCPG-254445 - [metadataservice_app] [MDS] Add support for framework tracing in GracenoteService
+
+  * e.solutions ConradLib: 46309715
+  * GNSDK for Automotive: 3.18.7.12162 (2.6.7.12162)
+  * JDK version: openjdk 11
+  * Android SDK version: 30.0.3
+  * Android NDK version: 21.3.6528147
+
+-------------------------------------------------------------------------------
+
+App Version: 0.30.23 - 2023-03-01
+Clientinterface Version: 9.0.0 - 2022-09-14
+
+  * HCPG-245499 - [metadataservice_app] [MDS] Adding IRC-Log for China GB/T regarding usage of geo coordinates (Take-Over from previous project)
+
+  * e.solutions ConradLib: 46309715
+  * GNSDK for Automotive: 3.18.7.12162 (2.6.7.12162)
+  * JDK version: openjdk 11
+  * Android SDK version: 30.0.3
+  * Android NDK version: 21.3.6528147
+
+-------------------------------------------------------------------------------
+
+App Version: 0.30.22 - 2023-02-28
+Clientinterface Version: 9.0.0 - 2022-09-14
+
+  * HCPG-255923 - Fix for No Song Ident. during the complete bus cycle
+                  [9277206]
+
+  * e.solutions ConradLib: 46309715
+  * GNSDK for Automotive: 3.18.7.12162 (2.6.7.12162)
+  * JDK version: openjdk 11
+  * Android SDK version: 30.0.3
+  * Android NDK version: 21.3.6528147
+
+-------------------------------------------------------------------------------
+
+App Version: 0.30.21 - 2023-02-27
+Clientinterface Version: 9.0.0 - 2022-09-14
+
+  * HCPG-256017 - Timestamp length only lasts up to 2038
+
+  * e.solutions ConradLib: 46309715
+  * GNSDK for Automotive: 3.18.7.12162 (2.6.7.12162)
+  * JDK version: openjdk 11
+  * Android SDK version: 30.0.3
+  * Android NDK version: 21.3.6528147
+
+-------------------------------------------------------------------------------
+
+App Version: 0.30.20 - 2023-02-16
+Clientinterface Version: 9.0.0 - 2022-09-14
+
+  * HCPG-240269 - [metadataservice_app] [MDS] Usage of compiler flags defined
+                  by Team Security for Gracenote
+
+  * e.solutions ConradLib: 45939469
+  * GNSDK for Automotive: 3.18.7.12162 (2.6.7.12162)
+  * JDK version: openjdk 11
+  * Android SDK version: 30.0.3
+  * Android NDK version: 21.3.6528147
+
+-------------------------------------------------------------------------------
+
+App Version: 0.30.19 - 2023-02-15
+Clientinterface Version: 9.0.0 - 2022-09-14
+
+  * HCPG-254476 - Fix for SongID changed not in time when station skipped
+
+  * e.solutions ConradLib: 45939469
+  * GNSDK for Automotive: 3.18.7.12093
+  * JDK version: openjdk 11
+  * Android SDK version: 30.0.3
+  * Android NDK version: 21.3.6528147
+
+-------------------------------------------------------------------------------
+
+App Version: 0.30.18 - 2023-02-03
+Clientinterface Version: 9.0.0 - 2022-09-14
+
+  * HCP3GLOBCL42-11018 - Switching between two Result Databases including Race
+                         Condition Fix
+
+  * e.solutions ConradLib: 45939469
+  * GNSDK for Automotive: 3.18.7.12093
+  * JDK version: openjdk 11
+  * Android SDK version: 30.0.3
+  * Android NDK version: 21.3.6528147
+
+-------------------------------------------------------------------------------
+
+App Version: 0.30.17 - 2023-01-23
+Clientinterface Version: 9.0.0 - 2022-09-14
+
+  * HCPG-253367 - Add Request ID to TraceAnalyzer logs
+
+  * e.solutions ConradLib: 45939469
+  * GNSDK for Automotive: 3.18.7.12093
+  * JDK version: openjdk 11
+  * Android SDK version: 30.0.3
+  * Android NDK version: 21.3.6528147
+
+-------------------------------------------------------------------------------
+
+App Version: 0.30.16 - 2023-01-17
+Clientinterface Version: 9.0.0 - 2022-09-14
+
+  * HCPG-252067 - Integration of ConRad-Library with CL 45867058
+
+  * e.solutions ConradLib: 45867058
+  * GNSDK for Automotive: 3.18.7.12093
+  * JDK version: openjdk 11
+  * Android SDK version: 30.0.3
+  * Android NDK version: 21.3.6528147
+
+-------------------------------------------------------------------------------
+
+App Version: 0.30.15 - 2023-01-16
+Clientinterface Version: 9.0.0 - 2022-09-14
+
+  * HCPG-252127 - HCP3BUG-53049 - MDS client died and save image already exists
+                  [9211688]
+
+  * e.solutions ConradLib: 45771803
+  * GNSDK for Automotive: 3.18.7.12093
+  * JDK version: openjdk 11
+  * Android SDK version: 30.0.3
+  * Android NDK version: 21.3.6528147
+
+-------------------------------------------------------------------------------
+
+App Version: 0.30.14 - 2023-01-16
+Clientinterface Version: 9.0.0 - 2022-09-14
+
+  * HCPG-250588 - HCP3BUG-54047 - [MDS][Gracenote] ExternalID for Album 
+                  not available for clients
+
+  * e.solutions ConradLib: 45771803
+  * GNSDK for Automotive: 3.18.7.12093
+  * JDK version: openjdk 11
+  * Android SDK version: 30.0.3
+  * Android NDK version: 21.3.6528147
+
+-------------------------------------------------------------------------------
+
+App Version: 0.30.13 - 2022-12-15
+Clientinterface Version: 9.0.0 - 2022-09-14
+
+  * HCPG-252062 - BugFix for HCP3BUG-53591 - Coverart on comparison system
+                  with other image [9218214]
+
+  * e.solutions ConradLib: 45771803
+  * GNSDK for Automotive: 3.18.7.12093
+  * JDK version: openjdk 11
+  * Android SDK version: 30.0.3
+  * Android NDK version: 21.3.6528147
+
+-------------------------------------------------------------------------------
+
+App Version: 0.30.12 - 2022-12-12
+Clientinterface Version: 9.0.0 - 2022-09-14
+
+  * HCPG-251534 - [metadataservice_app] [MDS] Integration of gnsdk-auto-2.6.7	
+
+  * e.solutions ConradLib: 45771803
+  * GNSDK for Automotive: 3.18.7.12093
+  * JDK version: openjdk 11
+  * Android SDK version: 30.0.3
+  * Android NDK version: 21.3.6528147
+
+-------------------------------------------------------------------------------
+
+App Version: 0.30.11 - 2022-12-12
+Clientinterface Version: 9.0.0 - 2022-09-14
+
+  * HCPG-250156 - Fix for HCP3BUG-51233 - Missing Online Stationlogo on SWR4 KL
+                  [9185915]
+
+  * e.solutions ConradLib: 45771803
+  * GNSDK for Automotive: 3.18.6.11263
+  * JDK version: openjdk 11
+  * Android SDK version: 30.0.3
+  * Android NDK version: 21.3.6528147
+
+-------------------------------------------------------------------------------
+
+App Version: 0.30.10 - 2022-12-07
+Clientinterface Version: 9.0.0 - 2022-09-14
+
+  * HCPG-251397 - X-Mcc Header not set when HD Bearers are requested [9221906]
+
+  * e.solutions ConradLib: 45771803
+  * GNSDK for Automotive: 3.18.6.11263
+  * JDK version: openjdk 11
+  * Android SDK version: 30.0.3
+  * Android NDK version: 21.3.6528147
+
+-------------------------------------------------------------------------------
+
+App Version: 0.30.9 - 2022-12-03
+Clientinterface Version: 9.0.0 - 2022-09-14
+
+  * HCPG-249132 - Metadataservice Crash After Skip Station [9173009]
+
+  * e.solutions ConradLib: 45685670
+  * GNSDK for Automotive: 3.18.6.11263
+  * JDK version: openjdk 11
+  * Android SDK version: 30.0.3
+  * Android NDK version: 21.3.6528147
+
+-------------------------------------------------------------------------------
+
+App Version: 0.30.8 - 2022-11-29
+Clientinterface Version: 9.0.0 - 2022-09-14
+
+  * HCPG-250119 - [China] [R][USB]USB flashback when click USB media [9018911]
+
+  * e.solutions ConradLib: 45685670
+  * GNSDK for Automotive: 3.18.6.11263
+  * JDK version: openjdk 11
+  * Android SDK version: 30.0.3
+  * Android NDK version: 21.3.6528147
+
+-------------------------------------------------------------------------------
+
+App Version: 0.30.7 - 2022-11-25
+Clientinterface Version: 9.0.0 - 2022-09-14
+
+  *  HCPG-249266 - HCP3BUG-50044 - [NAR] Wrong cover art when switch from SXM
+                   episode to FM [9164166]	
+
+
+  * e.solutions ConradLib: 45685670
+  * GNSDK for Automotive: 3.18.6.11263
+  * JDK version: openjdk 11
+  * Android SDK version: 30.0.3
+  * Android NDK version: 21.3.6528147
+
+-------------------------------------------------------------------------------
+
+App Version: 0.30.6 - 2022-11-22
+Clientinterface Version: 9.0.0 - 2022-09-14
+
+  *  HCPG-238951 - [metadataservice_app] [MDS] Review and addressing initial
+                   Klocwork findings in Gracenote-Service	
+
+
+  * e.solutions ConradLib: 45685670
+  * GNSDK for Automotive: 3.18.6.11263
+  * JDK version: openjdk 11
+  * Android SDK version: 30.0.3
+  * Android NDK version: 21.3.6528147
+
+-------------------------------------------------------------------------------
+
+App Version: 0.30.5 - 2022-11-21
+Clientinterface Version: 9.0.0 - 2022-09-14
+
+  *  HCPG-248839 - HCP3BUG-48668 - Radio App crash after Station selection 
+                   [9137884]
+
+  * e.solutions ConradLib: 45685670
+  * GNSDK for Automotive: 3.18.6.11263
+  * JDK version: openjdk 11
+  * Android SDK version: 30.0.3
+  * Android NDK version: 21.3.6528147
+
+-------------------------------------------------------------------------------
+
+App Version: 0.30.4 - 2022-11-15
+Clientinterface Version: 9.0.0 - 2022-09-14
+
+  *  HCPG-249081 - Integration of ConRad-Lib with ECC-Handling by FM
+
+  * e.solutions ConradLib: 45685670
+  * GNSDK for Automotive: 3.18.6.11263
+  * JDK version: openjdk 11
+  * Android SDK version: 30.0.3
+  * Android NDK version: 21.3.6528147
+
+-------------------------------------------------------------------------------
+
+App Version: 0.30.3 - 2022-11-14
+Clientinterface Version: 8.0.0 - 2022-03-01
+
+  *  HCPG-243256 - Integration of refined root CA-Bundle from Gracenote
+
+  * e.solutions ConradLib: 45564642
+  * GNSDK for Automotive: 3.18.6.11263
+  * JDK version: openjdk 11
+  * Android SDK version: 30.0.3
+  * Android NDK version: 21.3.6528147
+
+-------------------------------------------------------------------------------
+
+App Version: 0.30.2 - 2022-11-10
+Clientinterface Version: 9.0.0 - 2022-09-14
+
+  *  HCPG-238951 - Review and addressing initial Klocwork findings in
+                   Gracenote-Service
+
+  * e.solutions ConradLib: 45564642
+  * GNSDK for Automotive: 3.18.6.11263
+  * JDK version: openjdk 11
+  * Android SDK version: 30.0.3
+  * Android NDK version: 21.3.6528147
+
+-------------------------------------------------------------------------------
+
+App Version: 0.30.1 - 2022-10-11
+Clientinterface Version: 9.0.0 - 2022-09-14
+
+  *  HCP3GLOBCL42-13654 - [China] [R][USB]USB flashback when click USB media
+                          [9018911]
+
+  * e.solutions ConradLib: 45564642
+  * GNSDK for Automotive: 3.18.6.11263
+  * JDK version: openjdk 11
+  * Android SDK version: 30.0.3
+  * Android NDK version: 21.3.6528147
+
+-------------------------------------------------------------------------------
+
+App Version: 0.30.0 - 2022-09-22
+Clientinterface Version: 9.0.0 - 2022-09-14
+
+  * HCPG-244594 - Update of AIDL generator in order to update rxjava 2 to
+                  rxjava 3
+
+  * e.solutions ConradLib: 45564642
+  * GNSDK for Automotive: 3.18.6.11263
+  * JDK version: openjdk 11
+  * Android SDK version: 30.0.3
+  * Android NDK version: 21.3.6528147
+
+-------------------------------------------------------------------------------
+
+App Version: 0.29.0 - 2022-09-14
+Clientinterface Version: 8.0.0 - 2022-03-01
+
+  * HCP3BUG-41970 - [HCP3][HYB] MDR Stations not online available [9003642]
+  * HCPG-231248 - Robustness measures for handling of persisted data
+
+  * e.solutions ConradLib: 45564642
+  * GNSDK for Automotive: 3.18.6.11263
+  * JDK version: openjdk 11
+  * Android SDK version: 30.0.3
+  * Android NDK version: 21.3.6528147
+
+-------------------------------------------------------------------------------
+
+App Version: 0.28.2 - 2022-08-31
+Clientinterface Version: 8.0.0 - 2022-03-01
+
+  * HCPG-245588 - Integration of conradlib including brand and project
+                  information
+
+  * e.solutions ConradLib: 45564642
+  * GNSDK for Automotive: 3.18.6.11263
+  * JDK version: openjdk 9
+  * Android SDK version: 30.0.3
+  * Android NDK version: 21.3.6528147
+
+-------------------------------------------------------------------------------
+
+App Version: 0.28.1 - 2022-07-06
+Clientinterface Version: 8.0.0 - 2022-03-01
+
+  * HCPG-243866 - Infrastructure optimization and Integration
+
+  * e.solutions ConradLib: 45476097
+  * GNSDK for Automotive: 3.18.6.11263
+  * JDK version: openjdk 9
+  * Android SDK version: 30.0.3
+  * Android NDK version: 21.3.6528147
+
+-------------------------------------------------------------------------------
+
+App Version: 0.28.0 - 2022-06-29
+Clientinterface Version: 8.0.0 - 2022-03-01
+
+  * HCPG-240322 - Update of Open source component in MDS
+
+  * e.solutions ConradLib: 45443789
+  * GNSDK for Automotive: 3.18.6.11263
+  * JDK version: openjdk 9
+  * Android SDK version: 30.0.3
+  * Android NDK version: 21.3.6528147
+
+-------------------------------------------------------------------------------
+
+App Version: 0.27.0 - 2022-03-29
+Clientinterface Version: 8.0.0 - 2022-03-01
+
+  * HCP3GLOBCL43-7760 - AIDL-Interface adaptation regarding external IDs 
+                        from Gracenote
+
+  * e.solutions ConradLib: 45240647
+  * GNSDK for Automotive: 3.18.6.11263
+  * JDK version: openjdk 9
+  * Android SDK version: 30.0.3
+  * Android NDK version: 21.3.6528147
+
+-------------------------------------------------------------------------------
+
+App Version: 0.26.2 - 2022-03-29
+Clientinterface Version: 7.1.1 - 2021-10-20
+
+  * HCPG-205051 - Crash of Metadata-Service App if ESM initialization fails
+
+  * e.solutions ConradLib: 45240647
+  * GNSDK for Automotive: 3.18.6.11263
+  * JDK version: openjdk 9
+  * Android SDK version: 30.0.3
+  * Android NDK version: 21.3.6528147
+
+-------------------------------------------------------------------------------
+
+App Version: 0.26.1 - 2022-03-29
+Clientinterface Version: 7.1.1 - 2021-10-20
+
+  * HCPG-238728 - [iAP] Downloaded Gracenote covers partly not used [8565774]
+
+  * e.solutions ConradLib: 45240647
+  * GNSDK for Automotive: 3.18.6.11263
+  * JDK version: openjdk 9
+  * Android SDK version: 30.0.3
+  * Android NDK version: 21.3.6528147
+
+-------------------------------------------------------------------------------
+
+App Version: 0.26.0 - 2022-03-17
+Clientinterface Version: 7.1.1 - 2021-10-20
+
+  * HCP3GLOBCL43-5770 - Adaption to new NAV interface and package names
+
+  * e.solutions ConradLib: 45240647
+  * GNSDK for Automotive: 3.18.6.11263
+  * JDK version: openjdk 9
+  * Android SDK version: 30.0.3
+  * Android NDK version: 21.3.6528147
+
+-------------------------------------------------------------------------------
+
+App Version: 0.25.1 - 2022-03-16
+Clientinterface Version: 7.1.1 - 2021-10-20
+
+  * HCP3GLOBCL42-11055 - Fix for wrong Position interface used
+
+  * e.solutions ConradLib: 45240647
+  * GNSDK for Automotive: 3.18.6.11263
+  * JDK version: openjdk 9
+  * Android SDK version: 30.0.3
+  * Android NDK version: 21.3.6528147
+
+-------------------------------------------------------------------------------
+
+App Version: 0.25.0 - 2022-03-03
+Clientinterface Version: 7.1.1 - 2021-10-20
+
+  * HCPG-238835 - Permission Adaptions „GET_ACCOUNTS_PRIVILEGED“
+
+  * e.solutions ConradLib: 45240647
+  * GNSDK for Automotive: 3.18.5.10671
+  * JDK version: openjdk 9
+  * Android SDK version: 30.0.3
+  * Android NDK version: 21.3.6528147
+
+-------------------------------------------------------------------------------
+
+App Version: 0.24.0 - 2021-12-07
+Clientinterface Version: 7.1.1 - 2021-10-20
+
+  * HCPG-236846 - Separate APK releases for arm64 and x86_64 plattform
+
+  * e.solutions ConradLib: 45049751
+  * GNSDK for Automotive: 3.18.5.10671
+  * JDK version: openjdk 9
+  * Android SDK version: 30.0.3
+  * Android NDK version: 21.3.6528147
+
+-------------------------------------------------------------------------------
+
+App Version: 0.23.1 - 2021-11-11
+Clientinterface Version: 7.1.1 - 2021-10-20
+
+  * HCPG-235870 - Update tracing categories in accordance with latest Privacy
+                  Tagging/Flags
+
+  * e.solutions ConradLib: 45049751
+  * GNSDK for Automotive: 3.18.5.10671
+  * JDK version: openjdk 9
+  * Android SDK version: 30.0.2
+  * Android NDK version: 21.3.6528147
+
+-------------------------------------------------------------------------------
+
+App Version: 0.23.0 - 2021-11-10
+Clientinterface Version: 7.1.1 - 2021-10-20
+
+  * HCP3BUG-31318 - [HCP3][MDS] No Metadata and logo displayed for station
+
+  * e.solutions ConradLib: 45043129
+  * GNSDK for Automotive: 3.18.5.10671
+  * JDK version: openjdk 9
+  * Android SDK version: 30.0.2
+  * Android NDK version: 21.3.6528147
+
+-------------------------------------------------------------------------------
+
+App Version: 0.22.1 - 2021-10-21
+Clientinterface Version: 7.1.1 - 2021-10-20
+
+  * HCP3BUG-30642 - Song Recognition update metadata for previous trac
+                    [8806530]
+
+  * e.solutions ConradLib: 44996115
+  * GNSDK for Automotive: 3.18.5.10671
+  * JDK version: openjdk 9
+  * Android SDK version: 30.0.2
+  * Android NDK version: 21.3.6528147
+
+-------------------------------------------------------------------------------
+
+App Version: 0.22.0 - 2021-10-19
+Clientinterface Version: 7.1.0 - 2021-09-07
+
+  * HCPG-235986 - Migration to stable platform library from e.solutions
+                  framework and JDK9 adaptations
+
+  * e.solutions ConradLib: 44996115
+  * GNSDK for Automotive: 3.18.5.10671
+  * JDK version: openjdk 9
+  * Android SDK version: 30.0.2
+  * Android NDK version: 21.3.6528147
+
+-------------------------------------------------------------------------------
+
+App Version: 0.21.0 - 2021-09-30
+Clientinterface Version: 7.1.0 - 2021-09-07
+
+  * HCP3GLOBCL42-10332 - GNSDK Asia station logo caching
+
+  * e.solutions ConradLib: 44942465
+  * GNSDK for Automotive: 3.18.5.10671
+  * JDK version: 1.8.0_65
+  * Android SDK version: 30.0.2
+  * Android NDK version: 21.3.6528147
+
+-------------------------------------------------------------------------------
+
+App Version: 0.20.0 - 2021-09-17
+Clientinterface Version: 7.1.0 - 2021-09-07
+
+  * HCPG-234910 - Integration of client interface version 7.1.0
+
+  * e.solutions ConradLib: 44942465
+  * GNSDK for Automotive: 3.18.5.10671
+  * JDK version: 1.8.0_65
+  * Android SDK version: 30.0.2
+  * Android NDK version: 21.3.6528147
+
+-------------------------------------------------------------------------------
+
+App Version: 0.19.0 - 2021-09-15
+Clientinterface Version: 7.0.0 - 2021-07-20
+
+  * HCPG-234914 - Finalization of CVE Scan - Version update / alignment of OS
+                  components
+  * HCP3GLOBCL42-7148 - GNSDK Asia station logo caching - Service ID
+  * HCPG-233613 - Enable minimization of platform key (MetadataService)
+
+
+  * e.solutions ConradLib: 44942465
+  * GNSDK for Automotive: 3.18.5.10671
+  * JDK version: 1.8.0_65
+  * Android SDK version: 30.0.2
+  * Android NDK version: 21.3.6528147
+
+-------------------------------------------------------------------------------
+
+App Version: 0.18.0 - 2021-09-01
+Clientinterface Version: 7.0.0 - 2021-07-20
+
+  * HCP3GLOBCL42-7146 - GNSDK Asia station logo implementation
+
+  * e.solutions ConradLib: 44864750
+  * GNSDK for Automotive: 3.18.5.10671
+  * JDK version: 1.8.0_65
+  * Android SDK version: 30.0.2
+  * Android NDK version: 21.3.6528147
+
+-------------------------------------------------------------------------------
+
+App Version: 0.17.0 - 2021-08-05
+Clientinterface Version: 7.0.0 - 2021-07-20
+
+  * HCPG-231662 - Refinement of package names
+  * HCPG-231801 - External ID and song data provision on interface
+  * HCPG-231802 - GNSDK infrastructure to provide external IDs and Mood / Tempo
+  * HCP3GLOBCL42-9410 - Implementation of AIDL-Interface extension regarding
+                        Gracenote IDs in Metadata-Service App
+
+  * e.solutions ConradLib: 44857057
+  * GNSDK for Automotive: 3.18.5.10671
+  * JDK version: 1.8.0_65
+  * Android SDK version: 30.0.2
+  * Android NDK version: 21.3.6528147
+
+-------------------------------------------------------------------------------
+
+App Version: 0.16.0 - 2021-07-22
+Clientinterface Version: 6.0.0 - 2021-05-26
+
+  * HCP3BUG-26345 - [HCP3][MDS] Capturing audio data fails when started by
+    external app
+
+  * e.solutions ConradLib: 0.12.0
+  * GNSDK for Automotive: 2.6.1.9774
+  * JDK version: 1.8.0_65
+  * Android SDK version: 30.0.2
+  * Android NDK version: 21.3.6528147
+
+-------------------------------------------------------------------------------
+
+App Version: 0.15.0 - 2021-06-10
+Clientinterface Version: 6.0.0 - 2021-05-26
+
+  * HCPG-232997 - [metadataservice_app] [MDS] Integration of client interface
+    library v6.0.0
+
+  * e.solutions ConradLib: 0.12.0
+  * GNSDK for Automotive: 2.6.1.9774
+  * JDK version: 1.8.0_65
+  * Android SDK version: 30.0.2
+  * Android NDK version: 21.3.6528147
+
+-------------------------------------------------------------------------------
+
+App Version: 0.14.0 - 2021-06-01
+Clientinterface Version: 5.0.0 - 2021-05-25
+
+  * HCP3_Sync-50170 - [MDS] Deployment of Metadata-Service App in definedAndroid partition
+
+  * e.solutions ConradLib: 0.12.0
+  * GNSDK for Automotive: 2.6.1.9774
+  * JDK version: 1.8.0_65
+  * Android SDK version: 30.0.2
+  * Android NDK version: 21.3.6528147
+
+-------------------------------------------------------------------------------
+App Version: 0.14.0 - 2021-05-25
+Clientinterface Version: 5.0.0 - 2021-05-25
+
+  * HCP3_Sync-58050 - [MDS] AIDL-Interface extension regarding Asian station logos and names
+
+  * e.solutions ConradLib: 0.12.0
+  * GNSDK for Automotive: 2.6.1.9774
+  * JDK version: 1.8.0_65
+  * Android SDK version: 30.0.2
+  * Android NDK version: 21.3.6528147
+
+-------------------------------------------------------------------------------
+App Version: 0.13.2 - 2021-05-20
+Clientinterface Version: 4.1.0 - 2021-02-18
+
+  * HCP3BUG-24475 - [HCP3][MDS] Crash in demo activity when switching away from permission tab
+
+  * e.solutions ConradLib: 0.12.0
+  * GNSDK for Automotive: 2.6.1.9774
+  * JDK version: 1.8.0_65
+  * Android SDK version: 30.0.2
+  * Android NDK version: 21.3.6528147
+
+-------------------------------------------------------------------------------
+
+App Version: 0.13.1 - 2021-05-14
+Clientinterface Version: 4.1.0 - 2021-02-18
+
+  * HCP3_Sync-60259 - [MDS] Override for backend base URL in MDS demo app.
+
+  * e.solutions ConradLib: 0.12.0
+  * GNSDK for Automotive: 2.6.1.9774
+  * JDK version: 1.8.0_65
+  * Android SDK version: 30.0.2
+  * Android NDK version: 21.3.6528147
+
+-------------------------------------------------------------------------------
+
+App Version: 0.13.0 - 2021-05-12
+Clientinterface Version: 4.1.0 - 2021-02-18
+
+  * HCP3_Sync-28554 - [MDS] APN1/APN2 handling
+
+  * e.solutions ConradLib: 0.11.2
+  * GNSDK for Automotive: 2.6.1.9774
+  * JDK version: 1.8.0_65
+  * Android SDK version: 30.0.2
+  * Android NDK version: 21.3.6528147
+
+-------------------------------------------------------------------------------
+
+App Version: 0.12.2 - 2021-03-31
+Clientinterface Version: 4.1.0 - 2021-02-18
+
+  * HCP3_Sync-33869 - [MDS] New Service List entry for Connected Radio
+
+  * e.solutions ConradLib: 0.9.0
+  * GNSDK for Automotive: 2.6.1.9774
+  * JDK version: 1.8.0_65
+  * Android SDK version: 30.0.2
+  * Android NDK version: 21.3.6528147
+
+-------------------------------------------------------------------------------
+
+App Version: 0.12.1 - 2021-03-24
+Clientinterface Version: 4.1.0 - 2021-02-18
+
+  * HCP3_Sync-5513 - [MDS] Song recognition implementation
+  * HCP3_Sync-38394 - [MDS] Handling of permissions, notifications and Disable-Reasons
+  * HCP3_Sync-8367 - [MDS] Implementation of Factory settings
+  * HCPG-229535 - [metadataservice_app] [MDS] Adding convienent functionality for "deletion of cache" and "default settings" to demo activity
+
+  * e.solutions ConradLib: 0.9.0
+  * GNSDK for Automotive: 2.6.1.9774
+  * JDK version: 1.8.0_65
+  * Android SDK version: 30.0.2
+  * Android NDK version: 21.3.6528147
+
+-------------------------------------------------------------------------------
+
+App Version: 0.10.0 - 2021-03-04
+Clientinterface Version: 4.1.0 - 2021-02-18
+
+  * HCP3_Sync-33833 - [MDS] Implementation of tracing requirements for IVI - Privacy requirements
+  * updated ConradLib to version 0.9.0
+
+  * e.solutions ConradLib: 0.9.0
+  * GNSDK for Automotive: 2.6.1.9774
+  * JDK version: 1.8.0_65
+  * Android SDK version: 30.0.2
+  * Android NDK version: 21.3.6528147
+
+-------------------------------------------------------------------------------
+
+App Version: 0.9.1 - 2021-02-23
+Clientinterface Version: 4.1.0 - 2021-02-18
+
+  * HCPG-229545 - [metadataservice_app] [MDS] Integration of ConRad library version 0.8.3
+
+  * e.solutions ConradLib: 0.8.3
+  * GNSDK for Automotive: 2.6.1.9774
+  * JDK version: 1.8.0_65
+  * Android SDK version: 30.0.2
+  * Android NDK version: 21.3.6528147
+
+-------------------------------------------------------------------------------
+
+App Version: 0.9.0 - 2021-02-19
+Clientinterface Version: 4.1.0 - 2021-02-18
+
+  * HCP3BUG-18513 - [HCP3][MDS] No hybrid radio data available after turning on online connection
+  * HCP3_Sync-38398 - [MDS] Client interface extensions regarding notifications, errors and status updates
+
+  * e.solutions ConradLib: 0.8.1
+  * GNSDK for Automotive: 2.6.1.9774
+  * JDK version: 1.8.0_65
+  * Android SDK version: 30.0.2
+  * Android NDK version: 21.3.6528147
+
+-------------------------------------------------------------------------------
+App Version: 0.8.0 - 2020-12-03
+Clientinterface Version: 4.0.0 - 2020-10-13
+
+  * HCP3_Sync-13438 - [MDS] Implementation of IVI Security concepts
+    - declared signature|privileged permission 
+      "technology.cariad.entertainment.metadataservice.USE_SERVICE"
+    - ensure client id is only used from registered app
+  * HCP3_Sync-13428 - [MDS] Implementation of tracing requirements for IVI- 
+    Basic infrastructure
+    - integrated e.solutions framework tracing library
+    - trace messages are flagged as USER_UNKNOWN|CATEGORY_UNDECIDED (pf:uU)
+
+  * e.solutions ConradLib: 0.7.3
+  * GNSDK for Automotive: 2.6.1.9774
+  * JDK version: 1.8.0_65
+  * Android SDK version: 29.0.2
+  * Android NDK version: 21.2.6472646
+
+-------------------------------------------------------------------------------
+
+App Version: 0.7.0 - 2020-11-25
+Clientinterface Version: 4.0.0 - 2020-10-13
+
+  * HCP3_Sync-12802 - [MDS] Service list ID check
+    - implemented AIDL interface towards CoreServices (ServiceListApi/
+      DisableReasonsApi)
+    - evaluation of ServiceList and DisableReasons is disabled by default on
+      development builds and can be enabled in the settings tab of the demo
+      activity
+  * minor improvements to the demo activity
+
+  * e.solutions ConradLib: 0.6.2
+  * GNSDK for Automotive: 2.6.1.9774
+  * JDK version: 1.8.0_65
+  * Android SDK version: 29.0.2
+  * Android NDK version: 21.2.6472646
+
+-------------------------------------------------------------------------------
+
+App Version: 0.6.0 - 2020-11-20
+Clientinterface Version: 4.0.0 - 2020-10-13
+
+  * HCP3_Sync-23733 - [MDS] Adaptation of App regarding mNand IVI partitioning
+    - moved app local data to extended storage partition: metadataservice-data
+  * Respond with valid uris pointing to album covers to song recongition
+    requests
+
+  * e.solutions ConradLib: 0.6.2
+  * GNSDK for Automotive: 2.6.1.9774
+  * JDK version: 1.8.0_65
+  * Android SDK version: 29.0.2
+  * Android NDK version: 21.2.6472646
+
+-------------------------------------------------------------------------------
+
+App Version: 0.5.0 - 2020-10-22
+Clientinterface Version: 4.0.0 - 2020-10-13
+
+  * HCP3_Sync-28730 - [MDS] Interface Adaptation for ProviderIDs
+    - moved provider identifiers to station class
+  * HCP3_Sync-28257 - [MDS] Public AIDL-Interface Cleanup
+    - removed mime type and bitrate fields from station web streams
+  * Improvements to Demo Activity
+    - updated list of example bearers; included expected result station as hint
+    - fixed visual glitch caused by partially transparent images
+    - disabled nested scrolling with streams and provider identifiers list
+      in station details
+
+  * e.solutions ConradLib: 0.6.2
+  * GNSDK for Automotive: 2.6.1.9774
+  * JDK version: 1.8.0_65
+  * Android SDK version: 29.0.2
+  * Android NDK version: 21.2.6472646
+
+-------------------------------------------------------------------------------
+
+App Version: 0.4.0 - 2020-09-10
+Clientinterface Version: 2.1.0 - 2020-07-23
+
+  * HCPFEAT-23437 [MDS] Station Logo lookup:
+    - station logos are provided by test backend (live mode/internet access)
+
+  * e.solutions ConradLib: 0.5.0
+  * GNSDK for Automotive: 2.6.1.9774
+  * JDK version: 1.8.0_65
+  * Android SDK version: 29.0.2
+  * Android NDK version: 21.2.6472646
+
+-------------------------------------------------------------------------------
+
+App Version: 0.3.0 - 2020-08-28
+Clientinterface Version: 2.1.0 - 2020-07-23
+
+  * HCPFEAT-11701 [MDS] Station metadata lookup
+  * HCPFEAT-3304  [MDS] Text based cover lookup implementation
+  * Version information is shown in demo app settings tab
+
+  * e.solutions ConradLib: 0.4.1
+  * GNSDK for Automotive: 2.6.1.9774
+  * JDK version: 1.8.0_65
+  * Android SDK version: 29.0.2
+  * Android NDK version: 21.2.6472646
+
+-------------------------------------------------------------------------------
+
+App Version: 0.2.0 - 2020-07-30
+Clientinterface Version: 2.1.0 - 2020-07-23
+
+  * HCPFEAT-20969 [MDS] Integration of App to official Android IVI-Release
+  * HCPFEAT-25216 [MDS] Interface Extension - HIGH/LOW stream quality Flag
+
+  * e.solutions ConradLib: 0.3.1
+  * GNSDK for Automotive: 2.6.1.9774
+  * JDK version: 1.8.0_212
+  * Android SDK version: 29.0.2
+  * Android NDK version: 21.2.6472646
+
+-------------------------------------------------------------------------------
+
+App Version: 0.1.0 - 2020-07-10
+Clientinterface Version: 2.0.0 - 2020-07-10
+
+  * initial internal release
+
+  * e.solutions ConradLib: 0.2.0
+  * GNSDK for Automotive: 2.6.1.9774
+  * JDK version: 1.8.0_212
+  * Android SDK version: 29.0.2
+  * Android NDK version: 21.2.6472646
+
+===============================================================================
+4.0 Known Issues
+===============================================================================
+
+

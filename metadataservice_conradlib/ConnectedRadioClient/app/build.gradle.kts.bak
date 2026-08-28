@@ -1,0 +1,270 @@
+import io.gitlab.arturbosch.detekt.Detekt
+import org.asciidoctor.gradle.jvm.AsciidoctorTask
+import org.gradle.api.tasks.PathSensitivity.RELATIVE
+import java.text.SimpleDateFormat
+import java.util.*
+
+plugins {
+    alias(libs.plugins.android.library)
+    alias(libs.plugins.kotlin.android)
+    id("checkstyle")
+    alias(libs.plugins.detekt)
+    alias(libs.plugins.asciidoctor.convert)
+    alias(libs.plugins.asciidoctor.pdf)
+    alias(libs.plugins.cyclonedx)
+}
+
+apply(from = "../jacoco.gradle")
+
+java {
+    toolchain {
+        languageVersion.set(JavaLanguageVersion.of(17))
+    }
+}
+
+var releaseDate: String = SimpleDateFormat("YYYY-MM-dd-HHmmss").format(Date())
+val appVersionName = "OI_$releaseDate"
+
+version = appVersionName
+group = "de.esolutions.connectedradioclient"
+
+android {
+    namespace = "de.esolutions.connectedradioclient"
+    // sdk version from the harman documentation chapter "10.3 How to build apps with HCP3 Android Platform APIs"
+    compileSdk = 33 // Android 13 - Tiramisu
+
+    defaultConfig {
+        minSdk = 28 // Android 9 - Pie
+        testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
+        testInstrumentationRunnerArguments += mapOf("runnerBuilder" to "de.mannodermaus.junit5.AndroidJUnit5Builder")
+
+        // Write custom values into the byte code (BuildConfig class).
+        // CARE: The registration endpoint will send the version to the backend.
+        buildConfigField("String", "VERSION_NAME", "\"$appVersionName\"")
+    }
+
+    kotlinOptions {
+        jvmTarget = "17"
+    }
+
+    compileOptions {
+        sourceCompatibility = JavaVersion.VERSION_17
+        targetCompatibility = JavaVersion.VERSION_17
+    }
+
+    packaging {
+        resources.excludes.add("META-INF/LICENSE.md")
+        resources.excludes.add("META-INF/LICENSE-notice.md")
+        resources.excludes.add("META-INF/INDEX.LIST")
+        resources.excludes.add("META-INF/*.kotlin_module")
+    }
+
+    buildTypes {
+        getByName("release") {
+            isMinifyEnabled = false
+            setProguardFiles(listOf(getDefaultProguardFile("proguard-android-optimize.txt"), "proguard-rules.pro"))
+        }
+        getByName("debug") {
+            enableUnitTestCoverage = true
+        }
+    }
+
+    testOptions {
+        unitTests.isReturnDefaultValues = true
+        unitTests.isIncludeAndroidResources = true
+    }
+
+    buildFeatures {
+        buildConfig = true
+    }
+}
+
+dependencies {
+    implementation(libs.kotlin.stdlib)
+    implementation(libs.kotlin.reflect)
+
+    implementation(libs.androidx.core.ktx) // need sdk version 34
+    implementation(libs.okhttp)
+    implementation(libs.okhttp.urlconnection)
+    implementation(libs.moshi.kotlin)
+    implementation(libs.coroutines.core)
+
+    testImplementation(libs.junit.jupiter.api)
+    testImplementation(libs.junit.jupiter.params)
+    testImplementation(libs.mockito.core)
+    testImplementation(libs.okhttp.mockwebserver)
+
+    testRuntimeOnly(libs.junit.jupiter.engine)
+
+    androidTestImplementation(libs.androidx.runner)
+    androidTestImplementation(libs.androidx.rules)
+    androidTestImplementation(libs.junit.jupiter.api)
+    androidTestImplementation(libs.mockito.core)
+    androidTestImplementation(libs.android.test.core)
+    androidTestRuntimeOnly(libs.android.test.runner)
+
+    detekt(libs.detekt.cli)
+    detektPlugins(libs.detekt.formatting)
+}
+
+tasks.withType<Test>().configureEach {
+    useJUnitPlatform()
+
+    // See https://docs.gradle.com/enterprise/test-distribution/#accessing_jdk_internal_classes_from_your_tests
+    // Only working for Java 17, needed for Tests (SystemServices and ColouredConfig using java internal classes)
+    jvmArgs(
+        "--add-opens", "java.base/java.lang=ALL-UNNAMED",
+        "--add-opens", "java.base/java.lang.reflect=ALL-UNNAMED"
+    )
+}
+asciidoctorj {
+    modules.diagram.setVersion("2.2.0")
+    fatalWarnings(missingIncludes())
+}
+
+tasks.withType<org.asciidoctor.gradle.jvm.AbstractAsciidoctorTask> {
+    attributes(mapOf("sectanchors" to true))
+    baseDirFollowsSourceDir()
+    outputs.cacheIf { true }
+    inputs.property(
+        "trackBaseDir",
+        baseDir.toRelativeString(projectDir)
+    ) // overwrite because asciidoc uses absolutePath internally
+    resources { } // disable implicit image copy, because asciidoc does not use PathSensitivity.RELATIVE
+}
+
+tasks.register("asciidocHtml") {
+    dependsOn("main")
+    doLast {
+        mkdir("${buildDir}/docs/asciidocHtml")
+        copy {
+            from(File("${buildDir}/docs/asciidocDetailedDesign").toRelativeString(projectDir)) {
+                include("*.html")
+            }
+            into(File("${buildDir}/docs/asciidocHtml/src/detailed_designs").toRelativeString(projectDir))
+        }
+
+        copy {
+            from(File("${buildDir}/docs/asciidocMain").toRelativeString(projectDir)) {
+                include("*.html")
+            }
+            into(File("${buildDir}/docs/asciidocHtml").toRelativeString(projectDir))
+        }
+
+        delete("${buildDir}/docs/asciidocMain", "${buildDir}/docs/asciidocDetailedDesign", "${buildDir}/docs/images")
+    }
+}
+
+tasks.register("main", AsciidoctorTask::class) {
+    dependsOn("detailedDesign")
+    setSourceDir(file("${project.rootDir}/../doc/"))
+    sources(
+        delegateClosureOf<PatternSet> {
+            // "/*.adoc"
+            include(
+                "main.adoc",
+                "how_to_build_custom_mds.adoc",
+                "how_to_search_in_logs.adoc"
+            )
+        }
+    )
+    // enable incremental build and build cache
+    inputs.dir("${project.rootDir}/../doc/").withPathSensitivity(RELATIVE) // add diagrams and images
+}
+
+tasks.register("detailedDesign", AsciidoctorTask::class) {
+    setSourceDir(file("${project.rootDir}/../doc/src/detailed_designs/"))
+    sources(
+        delegateClosureOf<PatternSet> {
+            include("/*.adoc")
+        }
+    )
+    // enable incremental build and build cache
+    inputs.dir("${project.rootDir}/../doc/src/detailed_designs/")
+        .withPathSensitivity(RELATIVE) // add diagrams and images
+}
+
+configure<CheckstyleExtension> {
+    toolVersion = "10.11.0"
+    isIgnoreFailures = false
+    isShowViolations = true
+    config = project.resources.text.fromFile {
+        file("../../spice/checkstyle/java_checkstyle_hcp3_for_8.19_and_up.xml")
+    }
+}
+tasks.register(name = "Checkstyle", type = Checkstyle::class) {
+    source("src/main/java")
+    isIgnoreFailures = false
+    isShowViolations = true
+    include("**/*.java")
+    include("**/*.kt")
+    classpath = files()
+}
+tasks.withType<Checkstyle>().configureEach {
+    reports {
+        xml.required = false
+        html.required = true
+    }
+}
+// Add Checkstyle to Gradle "check"-Task, our jenkins runs the check command to check the project.
+tasks.named("check").configure {
+    dependsOn(tasks.named("Checkstyle"))
+}
+
+tasks.cyclonedxBom {
+    setIncludeConfigs(listOf("releaseRuntimeClasspath"))
+    setProjectType("application")
+    setSchemaVersion("1.5")
+    setDestination(project.file("build/reports"))
+    setOutputName("sbom")
+    setOutputFormat("json")
+    setIncludeBomSerialNumber(false)
+    setIncludeLicenseText(true)
+    setComponentVersion("2.0.0")
+}
+
+// Detekt
+detekt {
+    toolVersion = "1.19.0"
+    source = files("./src/main/java")
+    config = files("../../spice/detekt/kotlin_detekt_config.yml")
+    autoCorrect = true
+}
+tasks.register(name = "Detekt", type = Detekt::class) {
+    reports {
+        html.required.set(true)
+        txt.required.set(true)
+        xml.required.set(true)
+    }
+}
+
+tasks.register("copyDeploy") {
+    group = "eso"
+    description = "Copy all files for delivery"
+    dependsOn("assembleDebug", "assembleRelease")
+
+    doLast {
+
+        val versionDir = File("${project.rootDir}/outputs/metadataservice_conradlib/$appVersionName")
+        if (!versionDir.exists()) {
+            mkdir(versionDir.path)
+            versionDir.setReadable(true)
+            versionDir.setWritable(true)
+        }
+
+        copy {
+            from("${project.layout.buildDirectory.get()}/outputs/aar")
+            include("*-release.aar")
+            into("${project.rootDir}/outputs/metadataservice_conradlib/$appVersionName")
+            rename {
+                return@rename "conradlib-$appVersionName.aar"
+            }
+        }
+
+        copy {
+            from("${project.layout.buildDirectory.get()}/reports")
+            include("sbom.*")
+            into("${project.rootDir}/outputs/metadataservice_conradlib/$appVersionName")
+        }
+    }
+}

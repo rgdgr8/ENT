@@ -1,0 +1,238 @@
+{
+	"sourceFolder": [
+		"ConnectedRadioClient/app/src/main/java/de/esolutions/connectedradioclient/"
+	],
+	"testFolder": [
+		"ConnectedRadioClient/app/src/androidTest/",
+		"ConnectedRadioClient/app/src/test/",
+		"ConnectedRadioClient/app/src/sharedTest/"
+	],
+	"sourceFilePattern": [
+		".*\\.java",
+		".*\\.kt"
+	],
+	"ruleset": [
+		{
+			"unit": "GenericMoshiParser",
+			"pattern": [
+				"ConnectedRadioClient/app/src/main/java/de/esolutions/connectedradioclient/api/GenericMoshiParser.kt"
+			],
+			"testPattern": [
+				"ConnectedRadioClient/app/src/test/java/de/esolutions/connectedradioclient/api/MoshiParserTest.kt"
+			]
+		},
+		{
+			"unit": "Http",
+			"pattern": [
+				"ConnectedRadioClient/app/src/main/java/de/esolutions/connectedradioclient/api/Http.kt",
+				"ConnectedRadioClient/app/src/main/java/de/esolutions/connectedradioclient/api/LogJavaNetCookieJar.kt",
+				"ConnectedRadioClient/app/src/main/java/de/esolutions/connectedradioclient/api/NetworkDns.kt"
+			],
+			"testPattern": [
+				"ConnectedRadioClient/app/src/test/java/de/esolutions/connectedradioclient/api/HttpTest.kt",
+				"ConnectedRadioClient/app/src/test/java/de/esolutions/connectedradioclient/api/LogJavaNetCookieJarTest.kt",
+				"ConnectedRadioClient/app/src/test/java/de/esolutions/connectedradioclient/api/NetworkDnsTest.kt"
+			]
+		},
+		{
+			"unit": "SystemPropertyReader",
+			"pattern": [
+				"ConnectedRadioClient/app/src/main/java/de/esolutions/connectedradioclient/api/SystemPropertyReader.kt"
+			],
+			"testPattern": [
+				"ConnectedRadioClient/app/src/androidTest/java/de/esolutions/connectedradioclient/api/SystemPropertyReader.kt"
+			]
+		},
+		{
+			"unit": "Data",
+			"pattern": [
+				"ConnectedRadioClient/app/src/main/java/de/esolutions/connectedradioclient/data/.*"
+			],
+			"testPattern": [
+				"ConnectedRadioClient/app/src/test/java/de/esolutions/connectedradioclient/data/.*"
+			],
+			"justifySize": "Unit mostly contains dto objects without logic."
+		},
+		{
+			"unit": "Debug",
+			"pattern": [
+				"ConnectedRadioClient/app/src/main/java/de/esolutions/connectedradioclient/debug/.*"
+			],
+			"notest": "The Unit is excluded from the test coverage because its not used by the customer",
+			"justifySize": "Unit mostly contains dto objects without logic."
+		},
+		{
+			"unit": "LogoCallback",
+			"pattern": [
+				"ConnectedRadioClient/app/src/main/java/de/esolutions/connectedradioclient/handlers/backend/callbacks/LogoCallback.kt"
+			],
+			"testPattern": [
+				"ConnectedRadioClient/app/src/test/java/de/esolutions/connectedradioclient/handlers/backend/callbacks/LogoCallbackTest.kt"
+			]
+		},
+		{
+			"unit": "LookupCallback",
+			"pattern": [
+				"ConnectedRadioClient/app/src/main/java/de/esolutions/connectedradioclient/handlers/backend/callbacks/LookupCallback.kt"
+			],
+			"testPattern": [
+				"ConnectedRadioClient/app/src/test/java/de/esolutions/connectedradioclient/handlers/backend/callbacks/LookupCallbackTest.kt"
+			]
+		},
+		{
+			"unit": "IController",
+			"pattern": [
+				"ConnectedRadioClient/app/src/main/java/de/esolutions/connectedradioclient/handlers/backend/controller/IController.kt"
+			],
+			"notest": "Only interface definition"
+		},
+		{
+			"unit": "RequestController",
+			"pattern": [
+				"ConnectedRadioClient/app/src/main/java/de/esolutions/connectedradioclient/handlers/backend/controller/RequestController.kt"
+			],
+			"testPattern": [
+				"ConnectedRadioClient/app/src/test/java/de/esolutions/connectedradioclient/handlers/backend/controller/RequestControllerTest.kt"
+			]
+		},
+		{
+			"unit": "RegistrationFailureException",
+			"pattern": [
+				"ConnectedRadioClient/app/src/main/java/de/esolutions/connectedradioclient/handlers/backend/exceptions/RegistrationFailureException.kt"
+			],
+			"notest": "Only exception implementation without logic"
+		},
+		{
+			"unit": "ExecutorWorker",
+			"pattern": [
+				"ConnectedRadioClient/app/src/main/java/de/esolutions/connectedradioclient/handlers/backend/executor/ExecutorWorker.kt"
+			],
+			"testPattern": [
+				"ConnectedRadioClient/app/src/test/java/de/esolutions/connectedradioclient/handlers/backend/executor/ExecutorWorkerTest.kt"
+			]
+		},
+		{
+			"unit": "PausableThreadPoolExecutor",
+			"pattern": [
+				"ConnectedRadioClient/app/src/main/java/de/esolutions/connectedradioclient/handlers/backend/executor/PausableThreadPoolExecutor.kt"
+			],
+			"testPattern": [
+				"ConnectedRadioClient/app/src/test/java/de/esolutions/connectedradioclient/handlers/backend/executor/PausableThreadPoolExecutorTest.kt"
+			]
+		},
+		{
+			"unit": "IJob",
+			"pattern": [
+				"ConnectedRadioClient/app/src/main/java/de/esolutions/connectedradioclient/handlers/backend/jobs/IJob.kt"
+			],
+			"notest": "Only interface definition"
+		},
+		{
+			"unit": "LogoRequestJob",
+			"pattern": [
+				"ConnectedRadioClient/app/src/main/java/de/esolutions/connectedradioclient/handlers/backend/jobs/LogoRequestJob.kt"
+			],
+			"testPattern": [
+				"ConnectedRadioClient/app/src/test/java/de/esolutions/connectedradioclient/handlers/backend/jobs/LogoRequestJobTest.kt"
+			]
+		},
+		{
+			"unit": "LookupRequestJob",
+			"pattern": [
+				"ConnectedRadioClient/app/src/main/java/de/esolutions/connectedradioclient/handlers/backend/jobs/LookupRequestJob.kt"
+			],
+			"testPattern": [
+				"ConnectedRadioClient/app/src/test/java/de/esolutions/connectedradioclient/handlers/backend/jobs/LookupRequestJobTest.kt"
+			]
+		},
+		{
+			"unit": "RegistrationRequestJob",
+			"pattern": [
+				"ConnectedRadioClient/app/src/main/java/de/esolutions/connectedradioclient/handlers/backend/jobs/RegistrationRequestJob.kt"
+			],
+			"testPattern": [
+				"ConnectedRadioClient/app/src/test/java/de/esolutions/connectedradioclient/handlers/backend/jobs/RegistrationRequestJobTest.kt"
+			]
+		},
+		{
+			"unit": "HandleRegistration",
+			"pattern": [
+				"ConnectedRadioClient/app/src/main/java/de/esolutions/connectedradioclient/handlers/backend/middleware/HandleRegistration.kt"
+			],
+			"testPattern": [
+				"ConnectedRadioClient/app/src/test/java/de/esolutions/connectedradioclient/handlers/backend/middleware/HandleRegistrationTest.kt"
+			]
+		},
+		{
+			"unit": "ServerDowntimeHandler",
+			"pattern": [
+				"ConnectedRadioClient/app/src/main/java/de/esolutions/connectedradioclient/handlers/backend/middleware/ServerDowntimeHandler.kt"
+			],
+			"testPattern": [
+				"ConnectedRadioClient/app/src/test/java/de/esolutions/connectedradioclient/handlers/backend/middleware/ServerDowntimeHandlerTest.kt"
+			]
+		},
+		{
+			"unit": "LookupRequestContainer",
+			"pattern": [
+				"ConnectedRadioClient/app/src/main/java/de/esolutions/connectedradioclient/handlers/backend/LookupRequestContainer.kt"
+			],
+			"testPattern": [
+				"ConnectedRadioClient/app/src/test/java/de/esolutions/connectedradioclient/handlers/backend/LookupRequestContainerTest.kt"
+			]
+		},
+		{
+			"unit": "TokenHandler",
+			"pattern": [
+				"ConnectedRadioClient/app/src/main/java/de/esolutions/connectedradioclient/handlers/coreservices/TokenHandler.kt"
+			],
+			"testPattern": [
+				"ConnectedRadioClient/app/src/test/java/de/esolutions/connectedradioclient/handlers/coreservices/TokenHandler.kt"
+			]
+		},
+		{
+			"unit": "ConRadClient",
+			"pattern": [
+				"ConnectedRadioClient/app/src/main/java/de/esolutions/connectedradioclient/handlers/media/ConRadClient.kt"
+			],
+			"testPattern": [
+				"ConnectedRadioClient/app/src/test/java/de/esolutions/connectedradioclient/handlers/media/ConRadClientTest.kt",
+				"ConnectedRadioClient/app/src/test/java/de/esolutions/connectedradioclient/handlers/media/ConRadClientIntegrationTest.kt"
+			]
+		},
+		{
+			"unit": "IRadioStationDataCallback",
+			"pattern": [
+				"ConnectedRadioClient/app/src/main/java/de/esolutions/connectedradioclient/handlers/media/IRadioStationDataCallback.kt"
+			],
+			"notest": "Only interface definition"
+		},
+		{
+			"unit": "SendToMedia",
+			"pattern": [
+				"ConnectedRadioClient/app/src/main/java/de/esolutions/connectedradioclient/handlers/media/SendToMedia.kt"
+			],
+			"testPattern": [
+				"ConnectedRadioClient/app/src/test/java/de/esolutions/connectedradioclient/handlers/media/SendToMediaTest.kt"
+			]
+		},
+		{
+			"unit": "IRC",
+			"pattern": [
+				"ConnectedRadioClient/app/src/main/java/de/esolutions/connectedradioclient/irc/.*"
+			],
+			"testPattern": [
+				"ConnectedRadioClient/app/src/test/java/de/esolutions/connectedradioclient/irc/.*"
+			]
+		},
+		{
+			"unit": "Logger",
+			"pattern": [
+				"ConnectedRadioClient/app/src/main/java/de/esolutions/connectedradioclient/logger/.*"
+			],
+			"testPattern": [
+				"ConnectedRadioClient/app/src/test/java/de/esolutions/connectedradioclient/logger/.*"
+			]
+		}
+	]
+}

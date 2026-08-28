@@ -1,0 +1,12 @@
+<?xml version="1.0" encoding="utf-8"?>
+
+<permissions>
+
+    <privapp-permissions package="technology.cariad.entertainment.metadataservice">
+        <permission name="android.permission.CAPTURE_AUDIO_OUTPUT"/>
+        <permission name="android.permission.CONNECTIVITY_USE_RESTRICTED_NETWORKS"/>
+        <permission name="android.permission.GET_ACCOUNTS_PRIVILEGED"/>
+        <permission name="android.car.permission.CAR_VENDOR_EXTENSION"/>
+    </privapp-permissions>
+
+</permissions>

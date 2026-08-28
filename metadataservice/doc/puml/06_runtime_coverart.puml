@@ -1,0 +1,46 @@
+@startuml
+
+participant MetadataService as client
+participant JNI as jni
+participant GnService as gnservice
+participant GnRequestCoverart as request
+participant GNSDK as gnsdk
+participant GracenoteBackend as backend
+
+activate client
+client -> jni: doTextLookupForAlbum
+
+activate jni
+jni -> gnservice: requestCoverArtFromMetadata
+
+activate gnservice
+gnservice -> request: create request
+
+activate request
+request -> gnsdk: query album
+
+activate gnsdk
+gnsdk -> backend: query album
+
+backend --> gnsdk: result album
+gnsdk --> request: result album
+request -> gnsdk: query metadata
+gnsdk --> request: result metadata
+request -> gnsdk: query image uri
+gnsdk --> request: result image uri
+request -> gnsdk: query image data
+gnsdk -> backend: query image data
+backend --> gnsdk: result image data
+gnsdk --> request: result image data
+deactivate gnsdk
+
+request --> gnservice: result metadata & image
+deactivate request
+
+gnservice --> client: result metadata & image
+deactivate gnservice
+
+deactivate jni
+deactivate client
+
+@enduml

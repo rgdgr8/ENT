@@ -1,0 +1,9 @@
+include::config.adoc[]
+
+[[section-permissions_tab]]
+== Permissions Tab
+
+This tab is used in order to check the last status of the permissions (e.g. missing permissions) for the application.
+User can click on REFRESH button to see the current status.
+
+image:{imgdir}/09_permissions_tab.png[]

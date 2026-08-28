@@ -1,0 +1,16 @@
+@startuml
+title Get full data from the backend
+
+participant "metadataservice_app" as media
+participant "metadataservice_conradlib" as crc
+participant "ConnectedRadio_Backend" as crb
+
+media -> crc : init()
+activate crc
+crc -> crb : registration with client version and api versions
+activate crb
+crc <- crb : receive config including endpoints
+deactivate crb
+crc -> crc : save config for this process
+
+@enduml

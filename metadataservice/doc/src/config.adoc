@@ -1,0 +1,19 @@
+// asciidoc settings for EN (English)
+// ==================================
+:title-page:
+
+:toc-title: Table of Contents
+
+// enable table-of-contents
+:toc:
+
+// where are images located?
+// generated images
+ifndef::imagesdir[:imagesdir: ./../.images]
+ifndef::imagesoutdir[:imagesoutdir: ./../.images]
+
+// crafted images
+:imgdir: ./../images
+
+// where are plantuml files located?
+:pumldir: ./../puml

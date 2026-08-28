@@ -1,0 +1,25 @@
+@startuml
+
+skinparam componentStyle uml2
+
+actor "Tester" as tester
+
+component "view" <<component>> {
+component "Demo" <<unit>> as demo_2
+}
+
+component "model" <<component>> {
+component "Demo" <<unit>> as demo_1
+}
+
+component "util" <<component>> {
+component "Demo" <<unit>> as demo_3
+}
+
+tester ..> view
+
+view ..> model
+view .> util
+model .> util
+
+@enduml

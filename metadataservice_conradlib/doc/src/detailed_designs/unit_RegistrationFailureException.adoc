@@ -1,0 +1,103 @@
+include::../config.adoc[]
+//imagesdir must be overwritten, it is already included in the config.adoc
+:imagesdir: ../../images
+:hash: #
+
+= image:ESO_Logo_Colour_positive_RGB.png[eso_icon,350,350,float="right",align="center"] Design metadataservice_conradlib - Unit RegistrationFailureException
+:toc-title: Table of Contents
+
+'''
+
+// numbering from here on
+:numbered:
+:stem: latexmath
+
+
+[unit=RegistrationFailureException, role=unit]
+== <<Unit>> RegistrationFailureException
+This document specifies the design of the unit *RegistrationFailureException*, it is part of the link:../../main.{type}[metadataservice_conradlib].
+
+This exception class is to clarify that the registration failed.
+It must extend the java Exception class and give "Backend registration failed" to the parent constructor as message.
+
+== Provided Interface (public methods and properties)
+
+=== RegistrationFailureException.responseCode
+
+The response code that was returned by the backend or null if no response from the backend was received.
+The variable must be of type Int or null.
+It must be final, so no one can change it after the class was initialized.
+
+[,kotlin]
+----
+val retryAfter: Long?
+----
+
+=== RegistrationFailureException.retryAfter
+
+The retry after value that was returned by the backend or null if the header is not specified.
+The variable must be of type Long or null.
+It must be final, so no one can change it after the class was initialized.
+
+[,kotlin]
+----
+val retryAfter: Long?
+----
+
+=== RegistrationFailureException.class(responseCode: Int?, retryAfter: Long?)
+
+The constructor should set the responseCode and retryAfter variables and call the parent constructor.
+
+*Arguments*
+
+|===
+|name|value range |valid values |resolution |unit | description
+
+|retryAfter
+|Long or null
+|1 or more, null
+|+-1
+|Seconds
+|The received retry after header value.
+
+|responseCode
+|Int or null
+|Http status code, null
+|n/a
+|Http status code
+|The received http status code.
+|===
+
+== Dependencies (Used Units, methods and properties)
+
+No dependencies to other units of this software element.
+
+== Runtime View
+
+[dynamic_sequence=startup, unit=RegistrationFailureException, role=dynamic_sequence]
+=== Startup
+
+The constructor mus save the given variable to retryAfter.
+
+[dynamic_sequence=shutdown, unit=RegistrationFailureException, role=dynamic_sequence]
+=== Shutdown
+
+The calling unit must simply remove all references to this instance,
+which causes the kotlin garbage collector to remove it from the heap.
+
+[dynamic_sequence=startup_after_s2r, unit=RegistrationFailureException, role=dynamic_sequence]
+=== Suspend
+
+Since this is a kotlin class without deep android references, no suspend state needs to be considered.
+
+[dynamic_sequence=resume, unit=RegistrationFailureException, role=dynamic_sequence]
+=== Resume
+
+Since this is a kotlin class without deep android references, no suspend state needs to be considered.
+
+[[section-design-decisions]]
+== Design Decisions
+
+No further design decisions were made for the implementation of this unit other than those already mentioned in link:../../main.{type}[metadataservice_conradlib].
+
+include::../about-arc42.adoc[]

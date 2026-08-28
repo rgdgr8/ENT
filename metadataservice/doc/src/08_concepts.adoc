@@ -1,0 +1,177 @@
+include::config.adoc[]
+
+[[section-concepts]]
+== Cross-cutting Concepts
+
+=== Bearer Strings
+
+The bearer table does not store a bearers individual parameters in separate columns. Each bearer type consists of different parameters, hence it would either leave a lot of empty fields in the bearer table, or require separate tables for each type. Both strategies are not ideal and make lookups for specific bearers more expensive. To work around this issue, bearer objects are converted to strings when stored within the database. The conversion uses a custom format similar to the ETSI specified bearer uris. It is required to store information alongside a bearer, that is not part of the aforementioned specification, making a custom solution unavoidable. +
+
+Below are descriptions for the individual fields as well as the bearer string format. Optional values are enclosed in square brackets.
+
+[cols="1,1,2,3,1,1", options="header"]
+.Table Bearer Parameters
+|===
+|Parameter |Used By |Description |Format |Required |Example
+
+| pi    | FM        | Program identifier                | 4 hex chars (without 0x prefix)    | yes | 16b0
+| freq  | FM, HD    | Frequency                         | 5 hex chars (with leading 0) or *  | yes | 09990
+| sid   | DAB       | Service identifier                | 4 or 8 hex chars                   | yes | d318
+| eid   | DAB       | Ensemble identifier               | 4 hex chars                        | yes | 10a5
+| scids | DAB       | Sub service identifier            | 1 hex char                         | yes | 3
+| tx    | HD        | Transmitter identifier            | 5 hex chars                        | yes | 021f8
+| mid   | HD        | Sub program service channel (SPS) | 1 hex char                         | SPS | 2
+| cc    | HD        | Country code                      | 3 hex chars                        | yes | 292
+| ecc   | FM, DAB   | Extended country code             | 2 hex chars                        | DAB | a0
+| mcc   | FM, DAB   | Mobile country code               | 3 decimal chars                    | yes | 261
+|===
+
+[cols="1,5", options="header", width="50%"]
+.Table Bearer String Format
+|===
+| Type  | Format
+
+| FM    | fm:<pi>.<freq>.<mcc>[.<ecc>]
+| DAB   | dab:<eid>.<sid>.<scids>.<mcc>.<ecc>
+| HD    | hd:<tx>.<cc>[.<mid>]
+|===
+
+=== Error Handling
+
+On the external interfaces error handling mostly boils down to verification of a clients request parameters.
+These errors are indicated via the generated onError client callback functions. +
+For instance, service disable information as a plain text is sent to the clients via onError callback functions.
+The request and retry handling itself is implemented in MetadataService.
+Hence once it is internally decided that a clients request can't be fulfilled, all options for recovering from the error state have been exhausted.
+Providing the error to the client is not more meaningful than just providing no or an empty answer depending on the defined behavior of the clients request. +
+The expected behavior of each request is documented on the external interface itself.
+
+#TODO: add internal error handling once we have a more detailed picture, probably during development of the demo#
+
+=== Retry Handling
+
+#TODO: Further clarification required regarding meaningful retry handling using the ConRad client library for the hybrid radio back-end.# #TODO: My expectation would be that Gracenote retry handling if necessary would be part of the native implementation.#
+
+=== Threading
+
+The current idea is to use structured concurrency to mitigate many common issues of multithreaded applications.
+The reactive interface we defined doesn't enforce a strictly sequential processing order of client requests.
+In order to provide data as fast as possible it is necessary to work on multiple requests in parallel, potentially serving data from various sources.
+This also avoids unnecessary delays caused by one slow back-end request delaying other requests.
+Nevertheless to make estimations over the system memory and load, the maximum amount of requests being processed simultaneously has to be restricted.
+Further clarification is also needed on what each provider actually supports here. +
+Access to certain external resources such as the file system or a database are either synchronous by design or access in a thread safe manner has to be ensured by the application.
+
+=== Security
+
+To ensure MetadataService is only used by authorized clients, a custom permission declared as part of the app needs to be held by all clients.
+This permission protects both the AIDL service, and the content provider through which image files can be requested.
+
+[source,xml]
+<permission
+    android:name="technology.cariad.entertainment.metadataservice.USE_SERVICE"
+    android:protectionLevel="signature|privileged" />
+
+Flagging the permission as both signature and privileged ensures, that only pre-installed apps going through the established vetting process, will be allowed to use this permission.
+
+=== Data Validation
+
+All data coming from external sources has to be sanitized. + 
+For strings this includes mostly checking of valid encodings as required and enforcing length limits defined on a per value basis. +
+For Images from the back-ends at least the raw data size has be checked against defined upper bounds.
+Additional checks that would require to decode the image, have to be performed elsewhere.
+(Unless MDS is doing scaling/cutting for which it has to decode the images anyway.) +
+Lastly the integrity of request parameters has to be checked depending on the interface contract of each function.
+
+=== Testing
+
+Testing is planned to be done on three different levels:
+
+. The correct behavior of each unit - a class or a set of classes - will be ensured by unit tests. +
+The goal for unit tests is to be run on each developers machine, to avoid unintended changes to the behavior of a unit either when adding or changing unrelated functionality, or during refactorings.
+The unit test suite should not rely on any external systems.
+Fast execution of the unit test suit is essential.
+Additionally these tests will also be run on the continuous integration server and constitute one of the quality gates a change to the source code is required to pass before it can be submitted to a release branch.
+
+. Integration test on the emulator/simulation/unit (tbd) will be used to test the behavior of our external interface including as many external dependencies as possible.
+This includes file system and database access as well as actually issuing requests to a real provider back-end or a demo/test version thereof.
+
+. Lastly the overall system behavior from customer perspective will be covered with system tests, to further ensure that all the different involved parts work together.
+The test plan for manual testing will be available on Polarion.
+
+* Testing Process and Strategy: #TODO: add link to baselined document#
+
+=== Tracing
+
+For tracing the library provided by e.solutions Framework team will be used.
+This wraps Android's standard logging mechanism and additionally allows categorization of trace messages for filtering later on.
+
+Log messages should include all necessary information to retrace the internal control flow for both debugging during development and bug fixing in later stages of the product life cycle.
+Care must be taken, that no sensitive data either related to a user or restricted by local laws of the respective sales market are included.
+By default all trace messages are written with privacy flags set to "NOT_CATEGORIZED", making them also available in restricted regions in east asia.
+
+Tracing must not be excessive both to avoid high system and tracing back-end load.
+
+=== Online Data Availability
+
+Any functionality requiring back-end access via the Internet has to be controllable by the user.
+Using these features unavoidably creates a trail of metadata at certain points also outside of the control of us e.g. on the side of the respective Internet provider.
+Not being able to control when the system is allowed to go online might thus be a violation of the users privacy. +
+This should be possible both on a per client basis as well as having a global system setting overruling all other client specific settings. +
+Additionally the availability of individual metadata providers has to be controllable via ServiceList.
+This is also an AIDL interface to which MetadataService connects to as a client.
+
+==== Network handling
+
+The access point over which requests of a certain DataProvider are routed, are configured via ServiceList.
+For production use MetadataService only distinguishes between two different valid APNs: APN_VENDOR and APN_CUSTOMER.
+These two APNs are sometimes also referred to as APN1 (VENDOR) and APN2 (CUSTOMER).
+All other APNs defined by the ServiceList are mapped as follows:
+
+[cols="1,1",options="header"]
+.Mapping of APNs between ServiceList and MetadataService
+|===
+|ServiceList       |MDS
+|APN_VENDOR        |APN_VENDOR
+|APN_ESIMONLY      |APN_CUSTOMER
+|APN_NOESIM        |APN_CUSTOMER
+|APN_CUSTOMER      |APN_CUSTOMER
+|APN_NOTALLOWED    |APN_NOTALLOWED
+|===
+
+A network matching an APN needs to fulfill a set of criteria, e.g. it has to use specific networking technologies. +
+The tables below list the applicable transport types and network capabilities for each APN.
+The APN D-Link is only relevant for testing on dev builds.
+
+[cols="1,1",options="header"]
+.Transport Types per Apn
+|===
+|APN             |Transport Types
+|APN_NOTALLOWED  | -
+|APN_VENDOR      |Cellular
+|APN_CUSTOMER    |Cellular
+|APN_DLINK       |WiFi, Ethernet
+|===
+
+[cols="1,1",options="header"]
+.Network Capabilities per Apn
+|===
+|APN             |Capabilities
+|APN_NOTALLOWED  | -
+|APN_VENDOR      |OEM_PAID, INTERNET
+|APN_CUSTOMER    |NOT_RESTRICTED, INTERNET
+|APN_DLINK       |INTERNET
+|===
+
+Additionally if tethering is allowed, the following transport type is also permissible:
+
+* WiFi
+
+If multiple matching networks are available the prioritization is done by the Android operating system as follows:
+
+. Ethernet
+. Wifi
+. Cellular
+
+This default order ensures, that if tethering is allowed, the tethering network is preferred over any cellular network.
+

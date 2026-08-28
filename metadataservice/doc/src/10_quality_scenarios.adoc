@@ -1,0 +1,81 @@
+[[section-quality-scenarios]]
+== Quality Requirements
+
+Most general quality requirements are defined in HCP3 Quality Assurance Plan, Southside Architecture Guidelines, Technical Guidelines for Compute Node components.
+As Metadata-Service App is not a safety critical component, there is not much to add beyond those.
+
+The documents are located in Sharepoint as follows:
+
+* https://sharepoint.esolutions.de/sites/prj-prozessdokumente/Configuration/GlobalSouthsideProcessDocuments/Southside_Guideline_Architecture.docx?d=wffda8fa0641044619164b5399105e0d1[Southside Architecture Guidelines]
+* https://sharepoint.esolutions.de/sites/prj-prozessdokumente/Configuration/GlobalProcessDocuments/Global_Guideline_TechnicalComputeNode.docx?d=w9eba08f1d81c4446806019581fa5b793[Technical Guidelines for Compute Node components]
+* https://sharepoint.eso.local/sites/projects/hcp3/_layouts/15/DocIdRedir.aspx?ID=ESOPR-959771314-4585[HCP3 Quality Assurance Plan]
+
+In addition the Metadata-Service TestApp is tesing both the static and dynamic behaviour of AIDL interface offered to clients.
+
+=== Watchdog Concept
+
+Currently the application relies solely on Android's own detection of stuck processes/threads.
+If Android detects an app is not responsive anymore, it is killed and restarted after a certain time period.
+If Android detects an app crashed, it is restarted after a certain time period.
+
+=== Persistence Concept
+
+#TODO: chapter to be added as part of a separate task#
+
+=== Technical Guidelines Checklist
+
+[cols="15,45,10,30" options="header"]
+|===
+| **ID** | **Description** | **Covered** | **Rational**
+| CL_TECH_001
+| Are all compiler options (includes, library paths, warnings, C/C++ standards, optimization, security settings, etc.) configured as provided by the e.solutions framework?
+| Yes
+| e.solutions Framework is only used for logging. Both the native Gracenote-Service and -SDK are built using the defined compiler flags
+
+| CL_TECH_002
+| Is persistent data handled bulletproof? Is version mismatch, data corruption or missing data handled gracefully in all cases?
+| Yes
+| The database schemata has a dedicated version and checksums are in place; corrupted databases are deleted and built newly from scratch.
+  
+  An explicit "flush" and "fsync" is called after logos/coverarts are written to the underlying filesystem.
+  
+  Dead links in the database which are pointing to a no longer existing files and files without a corresponding link in database have been
+  adressed.
+  
+  Hedgehog test have been executed. A datasheet about worst case flash usage (ro and rw) is available
+
+| CL_TECH_003
+| Is every thread covered by the watchdog concept or documented otherwise?
+| No
+| No watchdog concept on top of the Android framework has been implemented inside the Metadata-Service App
+
+| CL_TECH_004
+| Is the restartability tested?
+| Yes
+| Metadata-Service App is a background service which is started / stopped on demand
+
+| CL_TECH_005
+| Is the thread priority and core pinning concept reported to and agreed with e.solutions?
+| Yes
+| Currently only default thread priority and affinity are used.
+
+| CL_TECH_006
+| Is it guaranteed that all file manipulations are persisted and in a consistent state after a reboot due to sudden power loss and some recovery /cleanup is performed?
+| Yes
+| s. CL_TECH_002; the cleanup for dead links in the database or files in the flash is done on demand and not during the start of the Metadata-Service App
+
+| CL_TECH_007
+| Are all powersaving modes handled properly?
+| Yes
+| Only applies to standard Android App lifecycle; Metadata-Service App is neither aware of car power management nor specific suspend2ram interface
+
+| CL_TECH_008
+| Were all known system limitations considered?
+| Yes
+| Android defaults are used
+
+| CL_TECH_009
+| Does an up-to-date TARA exist for the software element?
+| Yes
+| -
+|===

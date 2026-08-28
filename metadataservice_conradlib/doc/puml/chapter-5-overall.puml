@@ -1,0 +1,24 @@
+@startuml
+skinparam componentStyle uml2
+hide class circle
+hide class
+hide members
+hide methods
+allow_mixing
+
+    node "Infotainment System" as is
+    database "IVI Partition" as ivi
+    component "metadataservice_app" as mds {
+        component "metadataservice_conradlib" as crc
+    }
+    component "Android SDK" as and
+    cloud "ConnectedRadio_Backend" as crb
+    component "Account Manager" as am
+
+    is *--ivi
+    ivi *--mds
+    ivi *--and
+    mds <-left-> and
+    crc <-down-> crb
+    crc <-down-> am
+@enduml

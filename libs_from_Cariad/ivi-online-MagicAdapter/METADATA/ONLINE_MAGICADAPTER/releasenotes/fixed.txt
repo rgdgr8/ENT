@@ -1,0 +1,6 @@
+OIG-41032 : 9540416 : [ICC][OFF]Navi_markers_missed [9540416]
+OIG-52110 : 9851268 : OCF can not reach to DisabledReasons for TTIAA-Log [9851268]
+OIG-53701 : 9883319 : OIA: DopiInMap is not available [9883319]
+OIG-73620 : 10160957 : Http error - Connectivity disable reason present [10160957]
+OIG-73785 : 10291396 : Navigation onlines services not working [10291396]
+OIG-89788 : 10440135 : B151_X161 connection error by userlogin [10440135]

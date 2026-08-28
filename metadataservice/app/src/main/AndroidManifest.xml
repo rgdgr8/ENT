@@ -1,0 +1,115 @@
+<?xml version="1.0" encoding="utf-8"?>
+<manifest xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools">
+
+    <!-- Identity-specific service permission contract injected from Gradle. -->
+    <permission
+        android:name="${mdsUseServicePermission}"
+        android:protectionLevel="signature|privileged" />
+
+    <!-- Keep the legacy client contract available alongside the CARiAD contract. -->
+    <permission
+        android:name="${mdsLegacyUseServicePermission}"
+        android:protectionLevel="signature|privileged" />
+
+    <uses-permission android:name="android.permission.INTERNET" />
+    <uses-permission android:name="android.permission.ACCESS_NETWORK_STATE" />
+    <uses-permission android:name="android.permission.CHANGE_NETWORK_STATE" />
+    <uses-permission android:name="android.permission.CONNECTIVITY_USE_RESTRICTED_NETWORKS" />
+    <uses-permission android:name="android.permission.ACCESS_FINE_LOCATION" />
+    <uses-permission android:name="android.permission.ACCESS_BACKGROUND_LOCATION" />
+    <uses-permission android:name="android.permission.RECORD_AUDIO" />
+
+    <uses-permission android:name="technology.cariad.magic.service.permission.ALL" />
+    <uses-permission android:name="de.esolutions.coreservices.permission.ALL" />
+    <uses-permission android:name="com.volkswagenag.nav.NAV_CORE_USER" />
+
+    <uses-permission android:name="de.esolutions.android.framework.gateway.BIND_SERVICE_ADMIN_SERVICE" />
+    <uses-permission android:name="de.esolutions.fw.comm.permission.CONSUME_ASI_DIAG_PERS_STORAGE" />
+    <uses-permission android:name="com.volkswagenag.esm.METADATA_RW" />
+
+    <uses-permission android:name="android.car.permission.CAR_VENDOR_EXTENSION" />
+
+    <uses-permission
+        android:name="android.permission.CAPTURE_AUDIO_OUTPUT"
+        tools:ignore="ProtectedPermissions" />
+
+    <uses-permission
+        android:name="android.permission.GET_ACCOUNTS_PRIVILEGED"
+        tools:ignore="ProtectedPermissions" />
+
+    <application
+        android:name="${mdsApplicationClass}"
+        android:allowBackup="false"
+        android:icon="@mipmap/ic_launcher"
+        android:label="@string/app_name"
+        android:roundIcon="@mipmap/ic_launcher_round"
+        android:supportsRtl="true"
+        android:theme="@style/AppTheme"
+        tools:replace="android:allowBackup">
+
+        <!-- LOCAL BUILD: Changed required="false" to allow installation on emulators -->
+        <uses-library
+            android:name="de.esolutions.fw.android.platform_library"
+            android:required="false" />
+        <uses-library
+            android:name="com.volkswagenag.storagemanager"
+            android:required="false" />
+
+        <uses-library
+            android:name="de.esolutions.magicadapter"
+            android:required="false" />
+
+        <meta-data
+            android:name="de.esolutions.magicadapter.config"
+            android:resource="@raw/magic_adapter_configuration" />
+
+        <meta-data
+            android:name="technology.cariad.magic.service.configuration"
+            android:resource="@xml/iptransactions"/>
+
+        <!-- This is required for CL8/backport to interact with coreservices -->
+        <meta-data
+            android:name="de.esolutions.coreservices.configuration"
+            android:resource="@xml/iptransactions_hcp3"/>
+
+        <!-- Mocking ServiceList needs to be removed when E2E fuctionality is available
+        <meta-data
+            android:name="de.esolutions.magicadapter.mockSL"
+            android:resource="@raw/mock_service_list"/> -->
+
+        <meta-data
+            android:name="sSOAManifestPath"
+            android:value="manifests" />
+
+        <!-- Permission enforcement is done per AIDL request in MetadataServiceImpl.onTransact(). -->
+        <service
+            android:name="${mdsServiceClass}"
+            android:enabled="true"
+            android:exported="true">
+            <intent-filter>
+                <action android:name="${mdsAidlAction}" />
+                <action android:name="${mdsLegacyAidlAction}" />
+            </intent-filter>
+        </service>
+
+        <!--
+            Access is enforced per request in MetadataImageProvider.openFile(): the caller must
+            hold USE_SERVICE permission and must have been granted the specific image URI
+            via AccessManager. query/insert/update are unsupported.
+        -->
+        <provider
+            android:name="${mdsProviderClass}"
+            android:authorities="${mdsProviderAuthority}"
+            android:exported="true"
+            tools:ignore="ExportedContentProvider" />
+
+    </application>
+
+    <queries>
+        <intent>
+            <action android:name="com.volkswagenag.nav.service.PositionInformation.BIND" />
+        </intent>
+    </queries>
+
+</manifest>

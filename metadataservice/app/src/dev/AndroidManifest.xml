@@ -1,0 +1,32 @@
+<?xml version="1.0" encoding="utf-8"?>
+<manifest xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    package="technology.cariad.entertainment.metadataservice">
+
+    <application
+        android:usesCleartextTraffic="true"
+        android:theme="@style/Theme.Mds"
+        tools:replace="android:theme">
+
+        <activity
+            android:name=".view.DemoActivity"
+            android:label="Cariad MDS"
+            android:windowSoftInputMode="stateHidden|adjustPan"
+            android:process=":demo"
+            android:exported="true">
+            <intent-filter>
+                <action android:name="android.intent.action.MAIN" />
+                <category android:name="android.intent.category.LAUNCHER" />
+            </intent-filter>
+        </activity>
+
+        <service
+            android:name=".service.DebugService"
+            android:enabled="true"
+            android:exported="false">
+        </service>
+
+    </application>
+
+</manifest>
+

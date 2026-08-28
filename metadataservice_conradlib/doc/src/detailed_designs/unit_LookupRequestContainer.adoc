@@ -1,0 +1,286 @@
+﻿include::../config.adoc[]
+//imagesdir must be overwritten, it is already included in the config.adoc
+:imagesdir: ../../images
+:hash: #
+
+= image:ESO_Logo_Colour_positive_RGB.png[eso_icon,350,350,float="right",align="center"] Design metadataservice_conradlib - Unit LookupRequestContainer
+:toc-title: Table of Contents
+
+'''
+
+// numbering from here on
+:numbered:
+:stem: latexmath
+
+
+[unit=LookupRequestContainer, role=unit]
+== <<Unit>> LookupRequestContainer
+This document specifies the design of the unit *LookupRequestContainer*, it is part of the link:../../main.{type}[metadataservice_conradlib].
+
+This class is responsible to bundle multiple link:unit_MediaRequestObject.adoc[MediaRequestObject] to one link:unit_LookupRequestJob.adoc[LookupRequestJob].
+
+The class must create a new link:unit_LookupRequestJob.adoc[LookupRequestJob] by the received data and put it into the link:unit_ExecutorWorker.adoc[ExecutorWorker], if one of the following conditions is met:
+
+- Received the maximum configured amount of MediaRequestObject.
+- The maximum batch wait delay since initialisation has expired.
+- No MediaRequestObject has arrived since the configured batch debounce interval.
+
+A LookupRequestJob may only be created if at least one MediaRequestObject has arrived.
+It must be possible to cancel the async debounce from the outside if it has not yet happened.
+Each container may only create one LookupRequestJob and place it on the queue, after which it becomes unusable.
+
+== Provided Interface (public methods and properties)
+
+=== LookupRequestContainer.class(registrationHandler: HandleRegistration, tokenHandler: TokenHandler, mcc: String?): LookupRequestContainer
+
+The constructor should accept following variables and store them privately in the class,
+as they will be needed later to initialize an LookupRequestJob instance.
+
+*Arguments*
+
+|===
+|name|value range |valid values |resolution | description
+
+|registrationHandler
+|HandleRegistration
+|HandleRegistration-Instances
+|-
+|The HandleRegistration that is used to initialize an LookupRequestJob instance.
+
+|tokenHandler
+|TokenHandler
+|TokenHandler-Instances
+|-
+|The TokenHandler that is used to initialize an LookupRequestJob instance.
+
+|mcc
+|String?
+|String that contains a number with three digits or null
+|+-1
+|The Mobile Country Code that is used to initialize an LookupRequestJob instance.
+
+|===
+
+=== LookupRequestContainer.addRequest(mediaRequestObject: MediaRequestObject)
+
+Stores the received MediaRequestObject internally in the instance.
+Starts the LookupRequestJob debounce, if the max amount of objects is received by this call or if the max wait time since initialisation has expired.
+Otherwise, it must start a thread/coroutine that starts the async debounce in the configured wait delay.
+
+Between addRequest calls the caller always has to start cancelDebounceJob and is only allowed to call this function one more time,
+if cancelDebounceJob returned true.
+
+*Arguments*
+
+|===
+|name|value range |valid values | description
+
+|mediaRequestObject
+|MediaRequestObject
+|MediaRequestObject-Instances
+|MediaRequestObject that should be stored and later be given to a LookupRequestJob
+
+|===
+
+*Return*
+
+None
+
+*Exceptions*
+
+None
+
+*Special attributes*
+
+** async: This function should open new threads to perform delayed operations.
+** timing: Should not put the caller thread to sleep, this function should end quickly.
+
+=== LookupRequestContainer.cancelDebounceJob(): Boolean
+
+Cancels the async-debounce thread, previously started by LookupRequestContainer.addRequest.
+
+*Arguments*
+
+None
+
+*Return*
+
+|===
+|Name|value range |valid values | description
+
+|Response
+|Boolean
+|true, false
+|True if now no debounce thread is running anymore, and it is still possible to submit new MediaRequestObject. Otherwise false.
+|===
+
+*Exceptions*
+
+None
+
+
+== Dependencies (Used Units, methods and properties)
+This is an overview of the used methods and properties from other units.
+
+|===
+|Destination unit|Destination method/property |comment
+
+|link:unit_Data.adoc[Data]
+|Config.requestConfig.batchDebounce
+|Start the debounce job, if no new MediaRequestObject has arrived since the time period of the variable.
+
+|link:unit_Data.adoc[Data]
+|Config.requestConfig.batchMaxWait
+|Start the debounce job, if the age of the LookupRequestContainer since initialization is older than the time period of the variable.
+
+|link:unit_Data.adoc[Data]
+|Config.requestConfig.batchSize
+|Start the debounce job, if the LookupRequestContainer received the here configured amount of MediaRequestObject instances.
+
+|link:unit_LookupRequestJob.adoc[LookupRequestJob]
+|LookupRequestJob.class
+|Create this job by the given MediaRequestObject, MCC, HandleRegistration and TokenHandler.
+
+|link:unit_ExecutorWorker.adoc[ExecutorWorker]
+|ExecutorWorker.enqueue
+|Start the debounce job, if the LookupRequestContainer received the here configured amount of MediaRequestObject instances.
+
+|===
+
+== Runtime View
+
+[dynamic_sequence=startup, unit=LookupRequestContainer, role=dynamic_sequence]
+=== Startup
+
+At initialisation the class has to save the current time to a variable,
+so it can calculate the instance age and dispatch the job if it is waiting too long.
+
+[dynamic_sequence=shutdown, unit=LookupRequestContainer, role=dynamic_sequence]
+=== Shutdown
+
+When this class has served its purpose, the methods should do nothing more.
+
+The calling unit must simply remove all references to this instance,
+which causes the kotlin garbage collector to remove it from the heap.
+
+[dynamic_sequence=startup_after_s2r, unit=LookupRequestContainer, role=dynamic_sequence]
+=== Suspend
+
+Since this is a kotlin class without android references, no suspend state needs to be considered.
+
+
+[dynamic_sequence=resume, unit=LookupRequestContainer, role=dynamic_sequence]
+=== Resume
+
+Since this is a kotlin class without android references, no suspend state needs to be considered.
+
+
+=== Debounce delay reached
+
+[plantuml, title="Debounce delay reached", format="svg", id="LookupRequestContainer-Timeout"]
+----
+
+participant "Arbitrary Unit" as caller
+participant "LookupRequestContainer" as container <<unit>>
+participant "LookupRequestJob" as job <<unit>>
+participant "ExecutorWorker" as worker <<unit>>
+
+caller -> container: addRequest
+container --> container: Start async thread
+activate container
+container -> container: Sleep until timeout or canceled by cancelDebounceJob
+
+caller->container: cancelDebounceJob
+note right: Sleeping thread stopped by cancelDebounceJob
+container -> container: Stop async thread
+deactivate container
+
+caller -> container: addRequest
+container --> container: Start async thread
+activate container
+container -> container: Sleep until timeout or canceled by cancelDebounceJob
+note left: No cancelDebounceJob call\nbefore timeout has expired
+
+container <-> job: Initialize LookupRequestJob
+container -> worker: Enqueue job
+
+----
+
+=== Limit of MediaRequestObject objects reached
+
+[plantuml, title="Limit of MediaRequestObject objects reached", format="svg", id="LookupRequestContainer-Size-Limit"]
+----
+
+participant "Arbitrary Unit" as caller
+participant "LookupRequestContainer" as container <<unit>>
+participant "LookupRequestJob" as job <<unit>>
+participant "ExecutorWorker" as worker <<unit>>
+
+loop Amount of times from (Config.requestConfig.batchSize - 1)
+caller -> container: addRequest
+container --> container: Start async thread
+activate container
+container -> container: Sleep until timeout or canceled by cancelDebounceJob
+
+caller->container: cancelDebounceJob
+note right: Sleeping thread stopped by cancelDebounceJob
+container -> container: Stop async thread
+deactivate container
+end
+
+caller -> container: addRequest
+note right: Limit of MediaRequestObject objects is reached
+activate container
+container <-> job: Initialize LookupRequestJob
+container -> worker: Enqueue job
+
+----
+
+== Design Decisions
+
+=== When to start the request
+
+A decision hat to be made at what time we start the request to the backend.
+
+==== Option 1: For every bearer
+
+Start a request for every bearer which is sent to us.
+
+==== Option 2: Bundle multiple bearer
+
+Bundle multiple bearer and sent one request with all bearer at once. +
+But we have to decided about the trigger to start the request.
+
+===== Option 2.1: Start request after some time after the last bearer request
+
+Start with a new timer every time after a bearer has been requested from us.
+Send the request if the timer is over with all bearer at once.
+
+===== Option 2.2: Start request after a total time after the first bearer request
+
+Start one time for after the first bearer has been requested.
+Send the request if the timer is over no matter how much bearer are requested so far.
+
+===== Option 2.3: Start request after a fix number of bearer
+
+Send the request after a fix number of bearer are requested regardless of time.
+
+==== Conclusion:
+
+Send a backend request for every bearer separate create a lot of traffic and load for the backend.
+And we would reduce the traffic and load as much as we can. +
+Send multiple bearer at once is the preferred way.
+
+Start with a new time every time a bearer is requested can cause to long waiting time for the first requested bearer and a large request body. +
+Send the request after a total time can cause to large requests body too but define a max waiting time for the first bearer. +
+Wait until a fix number of bearer are requested can limit the request size, but it is possible that some bearer are never requested if not enough requested in total.
+
+With this information we decided to use a mix of all of these options to use the positive and reduce the negative properties. +
+We start a new time every time a bearer is requested to ensure we start the request if no new bearer is requested. +
+To limit the max waiting time we start a global time after the first request to and check after every new request if this time is over.
+If it's over, we start the request with the current amount of bearer. +
+And to reduce the total requested bearer at once we set a size limit. This is also checked after every request and the request is started if the max number is reached. +
+With all this measures we reduce the max waiting time and limit the max number of bearer in one request.
+
+
+include::../about-arc42.adoc[]

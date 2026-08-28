@@ -1,0 +1,265 @@
+﻿include::../config.adoc[]
+//imagesdir must be overwritten, it is already included in the config.adoc
+:imagesdir: ../../images
+:hash: #
+
+= image:ESO_Logo_Colour_positive_RGB.png[eso_icon,350,350,float="right",align="center"] Design metadataservice_conradlib - Unit RequestController
+:toc-title: Table of Contents
+
+'''
+
+// numbering from here on
+:numbered:
+:stem: latexmath
+
+
+[unit=RequestController,role=unit]
+== <<Unit>> RequestController
+
+This document specifies the design of the unit *RequestController*, it is part of the link:../../main.{type}[metadataservice_conradlib].
+This class is a implementation of the link:unit_IController.adoc[IController] interface.
+
+The class is responsible to handle all incoming link:unit_MediaRequestObject.adoc[MediaRequestObject] instances and bundle them into link:unit_LookupRequestContainer.adoc[LookupRequestContainer].
+The MediaRequestObject's must be seperated by Mobile Country Code which is contained therein, so it could hold multiple link:unit_LookupRequestContainer.adoc[LookupRequestContainer] at the same time.
+
+The Unit is initialized with a context object, which is a standard Android component that provides information about the application environment, this is used to create an TokenHandler instance.
+
+After initialisation, it should create link:unit_RegistrationRequestJob.adoc[RegistrationRequestJob]
+and enqueue it onto the link:unit_ExecutorWorker.adoc[ExecutorWorker].
+
+To initialize any number of LookupRequestContainer, the class should create all dependencies once and pass them to the class.
+
+== Provided Interface (public methods and properties)
+
+=== RequestController.getRadioStationData(mediaRequestObject: MediaRequestObject)
+
+Receives an instance of MediaRequestObject and adds it to a LookupRequestContainer.
+If no LookupRequestContainer is available for the MCC, it must create a new one.
+Before sending the request to LookupRequestContainer,
+it must check by cancelDebounceJob if the container is still usable.
+
+*Arguments*
+
+|===
+|name|value range |valid values | description
+
+|mediaRequestObject
+|MediaRequestObject
+|MediaRequestObject-Instances
+|The MediaRequestObject that should be added to an LookupRequestContainer.
+
+|===
+
+*Return*
+
+None
+
+*Annotations*
+
+- @Synchronized
+
+*Exceptions*
+
+None
+
+=== RequestController.class(context: Context): RequestController
+
+The constructor has to save the received Context, so it can use it later.
+
+*Arguments*
+
+|===
+|name|value range |valid values | description
+
+|context
+|Context
+|Context
+|The Context that must be used to initialize the TokenHandler to receive backend tokens.
+|===
+
+
+== Dependencies (Used Units, methods and properties)
+
+This is an overview of the used methods and properties from other units.
+
+|===
+|Destination unit|Destination method/property |comment
+
+|link:unit_MediaRequestObject.adoc[MediaRequestObject]
+|LookupRequestContainer.mcc
+|Receive the mobile country code by an MediaRequestObject instance.
+
+|link:unit_LookupRequestContainer.adoc[LookupRequestContainer]
+|LookupRequestContainer.class
+|Initialise new container instances.
+
+|link:unit_LookupRequestContainer.adoc[LookupRequestContainer]
+|LookupRequestContainer.addRequest()
+|Add the MediaRequestObject to a LookupRequestContainer.
+
+|link:unit_LookupRequestContainer.adoc[LookupRequestContainer]
+|LookupRequestContainer.cancelDebounceJob()
+|Check if the LookupRequestContainer is usable.
+
+|link:unit_RegistrationRequestJob.adoc[RegistrationRequestJob]
+|RegistrationRequestJob.class
+|Create this job after initialisation.
+
+|link:unit_ExecutorWorker.adoc[ExecutorWorker]
+|ExecutorWorker.enqueue
+|Put an RegistrationRequestJob into the worker after initialisation.
+
+|===
+
+== Runtime View
+
+[dynamic_sequence=startup,unit=RequestController,role=dynamic_sequence]
+=== Startup
+
+[plantuml,title="Init sequence",format="svg",id="startup"]
+----
+
+participant "Arbitrary Unit" as caller
+participant "RequestController" as controller <<unit>>
+participant "RegistrationRequestJob" as job <<unit>>
+participant "ExecutorWorker" as worker <<unit>>
+
+caller->controller: Initialize RequestController by Android Context
+activate controller
+controller<->job: Initialize by TokenHandler
+controller->worker: Enqueue job
+
+----
+
+[dynamic_sequence=shutdown,unit=RequestController,role=dynamic_sequence]
+=== Shutdown
+
+The calling unit can simply remove all references to this instance,
+which causes the kotlin garbage collector to remove it from the heap.
+
+[dynamic_sequence=startup_after_s2r,unit=RequestController,role=dynamic_sequence]
+=== Suspend
+
+Since this is a kotlin class without android references, no suspend state needs to be considered.
+
+[dynamic_sequence=resume,unit=RequestController,role=dynamic_sequence]
+=== Resume
+
+Since this is a kotlin class without android references, no suspend state needs to be considered.
+
+=== Multiple requests with same MCC
+
+[plantuml,title="Multiple requests with same MCC",format="svg",id="same-mcc"]
+----
+
+participant "Arbitrary Unit" as caller
+participant "RequestController" as controller <<unit>>
+participant "LookupRequestContainer" as container <<unit>>
+
+caller->controller: getRadioStationData()
+activate controller
+
+controller<->container: Initialize new LookupRequestContainer
+
+controller->container: cancelDebounceJob()
+activate container
+controller<-container: true
+deactivate container
+controller->container: addRequest
+deactivate controller
+
+caller->controller: getRadioStationData()
+activate controller
+controller->container: cancelDebounceJob()
+activate container
+controller<-container: true
+deactivate container
+controller->container: addRequest
+deactivate controller
+
+caller->controller: getRadioStationData()
+activate controller
+controller->container: cancelDebounceJob()
+activate container
+controller<-container: false
+deactivate container
+note left: No more addRequest for this\nLookupRequestContainer allowed
+
+controller<->container: Initialize new LookupRequestContainer
+controller->container: cancelDebounceJob()
+activate container
+controller<-container: true
+deactivate container
+controller->container: addRequest
+deactivate controller
+----
+
+=== Multiple requests with different MCC
+
+[plantuml,title="Multiple requests with different MCC",format="svg",id="different-mcc"]
+----
+
+participant "Arbitrary Unit" as caller
+participant "RequestController" as controller <<unit>>
+participant "LookupRequestContainer for MCC Nr. 1" as container1 <<unit>>
+participant "LookupRequestContainer for MCC Nr. 2" as container2 <<unit>>
+
+caller->controller: getRadioStationData() with MCC Nr. 1
+activate controller
+controller<->container1: Initialize new LookupRequestContainer with MCC Nr. 1
+controller->container1: cancelDebounceJob()
+activate container1
+controller<-container1: true
+deactivate container1
+controller->container1: addRequest
+deactivate controller
+
+caller->controller: getRadioStationData() with MCC Nr. 2
+activate controller
+controller<->container2: Initialize new LookupRequestContainer with MCC Nr. 2
+controller->container2: cancelDebounceJob()
+activate container2
+controller<-container2: true
+deactivate container2
+controller->container2: addRequest
+deactivate controller
+
+caller->controller: getRadioStationData() with MCC Nr. 1
+activate controller
+controller->container1: cancelDebounceJob()
+activate container1
+controller<-container1: false
+deactivate container1
+note left: No more addRequest for this\nLookupRequestContainer allowed
+
+controller<->container1: Initialize new LookupRequestContainer with MCC Nr. 1
+controller->container1: cancelDebounceJob()
+activate container1
+controller<-container1: true
+deactivate container1
+controller->container1: addRequest
+deactivate controller
+
+----
+
+== Design Decisions
+
+=== Handle multiple MCCs
+
+Normal only one MCC (mobile country code) is used. But it's possible that a car is close to the country's borders
+and receive stations from more country's at ones. In this case we could send the wrong information for the requested bearer.
+
+==== Option 1: Add the MCC to the request object
+
+Add the MCC to the request object and send it within the request body for every requested bearer separate.
+
+==== Option 2: Create separate requests for every MCC
+
+Create a separate request container for every MCC and send multiple requests to the backend.
+
+==== Conclusion:
+
+As the case of multiple MCCs rarely occurs it's the best way to hold multiple request container and add new bearer sorted by there MCCs. +
+In this way we can handle every request on the same way on client side and backend side.
+
+include::../about-arc42.adoc[]

@@ -1,0 +1,15 @@
+@startuml
+
+Missing: cover art has never been requested or was cleaned up
+Complete: cover art is received
+Updating: fetching update - transient
+
+[*] --> Missing
+
+Missing --> Updating: client request
+
+Updating --> Complete: cover art found
+
+Complete --> Missing: clean up
+
+@enduml

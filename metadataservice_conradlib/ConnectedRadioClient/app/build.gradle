@@ -1,0 +1,60 @@
+// Simplified build.gradle for local development integration with MetadataService
+// This replaces the build.gradle.kts when building as a module
+
+plugins {
+    id 'com.android.library'
+    id 'kotlin-android'
+}
+
+def releaseDate = new java.text.SimpleDateFormat("yyyy-MM-dd-HHmmss").format(new Date())
+def appVersionName = "OI_$releaseDate"
+
+android {
+    namespace 'de.esolutions.connectedradioclient'
+    compileSdk 33
+
+    defaultConfig {
+        minSdk 28
+        testInstrumentationRunner "androidx.test.runner.AndroidJUnitRunner"
+
+        buildConfigField "String", "VERSION_NAME", "\"$appVersionName\""
+    }
+
+    kotlinOptions {
+        jvmTarget = "1.8"
+    }
+
+    compileOptions {
+        sourceCompatibility JavaVersion.VERSION_1_8
+        targetCompatibility JavaVersion.VERSION_1_8
+    }
+
+    packaging {
+        resources.excludes.add("META-INF/LICENSE.md")
+        resources.excludes.add("META-INF/LICENSE-notice.md")
+        resources.excludes.add("META-INF/INDEX.LIST")
+        resources.excludes.add("META-INF/*.kotlin_module")
+    }
+
+    buildTypes {
+        release {
+            minifyEnabled false
+            proguardFiles getDefaultProguardFile('proguard-android-optimize.txt'), 'proguard-rules.pro'
+        }
+    }
+
+    buildFeatures {
+        buildConfig = true
+    }
+}
+
+dependencies {
+    implementation "org.jetbrains.kotlin:kotlin-stdlib-jdk8:1.9.21"
+    implementation "org.jetbrains.kotlin:kotlin-reflect:1.9.21"
+
+    implementation "androidx.core:core-ktx:1.10.1"
+    implementation "com.squareup.okhttp3:okhttp:4.12.0"
+    implementation "com.squareup.okhttp3:okhttp-urlconnection:4.12.0"
+    implementation "com.squareup.moshi:moshi-kotlin:1.15.0"
+    implementation "org.jetbrains.kotlinx:kotlinx-coroutines-core:1.8.1"
+}

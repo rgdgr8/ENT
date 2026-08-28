@@ -1,0 +1,91 @@
+﻿include::../config.adoc[]
+//imagesdir must be overwritten, it is already included in the config.adoc
+:imagesdir: ../../images
+:hash: #
+
+= image:ESO_Logo_Colour_positive_RGB.png[eso_icon,350,350,float="right",align="center"] Design metadataservice_conradlib - Unit IController
+:toc-title: Table of Contents
+
+'''
+
+// numbering from here on
+:numbered:
+:stem: latexmath
+
+
+[unit=IController, role=unit]
+== <<Unit>> IController
+This document specifies the design of the unit *IController*, it is part of the link:../../main.{type}[metadataservice_conradlib].
+
+This interface has the purpose of implementing different controllers that can accept and respond to the incoming requests.
+
+== Provided Interface (public methods and properties)
+
+=== IController.getRadioStationData(mediaRequestObject: MediaRequestObject)
+
+*Arguments*
+
+|===
+|name|value range |valid values | description
+
+|mediaRequestObject
+|MediaRequestObject
+|MediaRequestObject-Instance
+|The received MediaRequestObject object that should be answered by this controller.
+
+|===
+
+
+*Return*
+
+None
+
+*Exceptions*
+
+None
+
+*Special attributes*
+
+** async: If IO becomes necessary, the callback should be answered asynchronously.
+** timing: Should not put the caller thread to sleep or do IO in sync, this function should end quickly.
+
+== Dependencies (Used Units, methods and properties)
+This is an overview of the used methods and properties from other units.
+
+|===
+|Destination unit|Destination method/property |comment
+
+|link:unit_MediaRequestObject.adoc[MediaRequestObject]
+|MediaRequestObject
+|The implementation of this interface should receive instances of MediaRequestObject.
+
+|===
+
+== Runtime View
+
+[dynamic_sequence=startup, unit=IController, role=dynamic_sequence]
+=== Startup
+
+This is only a kotlin interface without any logic.
+
+[dynamic_sequence=shutdown, unit=IController, role=dynamic_sequence]
+=== Shutdown
+
+This is only a kotlin interface without any logic.
+
+[dynamic_sequence=startup_after_s2r, unit=IController, role=dynamic_sequence]
+=== Suspend
+
+This is only a kotlin interface without any logic.
+
+[dynamic_sequence=resume, unit=IController, role=dynamic_sequence]
+=== Resume
+
+This is only a kotlin interface without any logic.
+
+[[section-design-decisions]]
+== Design Decisions
+
+No further design decisions were made for the implementation of this unit other than those already mentioned in link:../../main.{type}[metadataservice_conradlib].
+
+include::../about-arc42.adoc[]

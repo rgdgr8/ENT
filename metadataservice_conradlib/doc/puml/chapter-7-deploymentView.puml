@@ -1,0 +1,11 @@
+@startuml
+skinparam componentStyle uml2
+
+ node "Infotainment System" {
+    node "IVI /system/app" {
+        node "metadataservice_app" {
+            node "metadataservice_conradlib"
+        }
+    }
+}
+@enduml

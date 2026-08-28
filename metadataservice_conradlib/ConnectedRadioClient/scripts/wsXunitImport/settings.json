@@ -1,0 +1,28 @@
+{
+  "projectId": "OI_Global_CLU51",
+  "title": "ConRadClient[CHANGELIST]",
+  "severity": "verification",
+  "templateId": "TRTemplate1_autom",
+  "ermaReleaseName": "None",
+  "testEnvironment": [
+    {
+      "element": "UnitTests",
+      "software": "JUnit",
+      "hardware": "Emulator"
+    },
+    {
+      "element": "ivi.metadataservice.app",
+      "software": "CHANGELIST"
+    }
+  ],
+  "assignee": "stbr8385",
+  "aelModuleNameUnderTest": "perforce-swarm.eso.local:8443/files/oi/metadataservice/metadataservice_conradlib",
+  "artefactNameUnderTest": "ivi.metadataservice.app",
+  "artefactVersionUnderTest": ["CHANGELIST"],
+  "releaseCluster": ["cluster8"],
+  "traces": "T:/TestDatenIN/HCP3/QualityGates/main_metadataservice_conradlib",
+  "testConclusion": "None",
+  "testRunAttachment": false,
+  "dryRun": false,
+  "reservoir.endpoint": "architecture.eso.local:50061"
+}

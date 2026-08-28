@@ -1,0 +1,163 @@
+[[section-introduction-and-goals]]
+== Introduction and Goals
+
+The following chapter describes the most important requirements of Metadata-Service App together with the core quality goals. 
+The Metadata-Service App consists of the three major parts, each with its own architecture document respectively documentation -
+the path to the respective document in the SCM is stated in brackets relative to this document:
+
+* MetadataService (<../metadataservice/doc/main.adoc>)
+* GracenoteService (<../gracenoteservice/doc/main.adoc>)
+* 3rd-Party off-the-shelf product "GNSDK for Auto" (<../gracenotesdk/docs/start_here.html>)
+
+All common parts are described in this document, all specific parts in the individual documents.
+
+In the section <<Stakeholders,Stakeholders>> are listed, including their interest in or relation with the project.
+
+
+=== Motivation
+
+The user experience in todays cars revolves largely around the in-car infotainment system. +
+When customers are listening to content from their own devices which may include limited or no embedded metadata the infotainment system should be able to determine the playing tracks and display as much relevant information about the currently playing songs as possible. 
+The same applies when listening to local radio broadcasts. The quality of a radio broadcast is influenced by quite a few factors such as distance to the broadcasting station, terrain or local weather conditions. An automatic transition to a web based stream as the signal 
+quality deteriorates enhances the end-user experience and allows them to keep their focus on the street instead of having to select a different station.
+
+In order to add the above mentioned augmentations huge databases containing virtually all currently available audio content are required. Creating and maintaining these datasets is a huge undertaking, which leads to entire businesses forming around providing these as services. 
+Unfortunately their is no single product on the market fulfilling all needs, which necessitates the integration of multiple of these services. Several components in the infotainment system may want to request additional metadata. Therefore offering an abstraction over multiple metadata 
+providers reduces complexity and therefore potentially development time for them. Having a single entity in the system to manage the various client requests and providers introduces the possibility for more elaborate caching strategies, reducing both the overall load on the back-end servers as well as mobile network traffic.
+In order to enhance the user experience in the vehicle the Metadata-Service App fulfills all the needs necessary for media enrichment, such as normalized metadata and media imagery as well as content identification via connecting to the Gracenote Online Databases and providing these data to the 
+user interface. It is used for providing cover art for the users own playing media files, radio station logos for broadcasting stations and identifying music played by broadcasting stations or in the vehicle available content and providing the corresponding metadata. 
+Also Ids from external providers (external Ids) such as Amazon, Apple, Spotify etc. are used for creating playlists, wishlists or shopping lists. Mood and tempo information of the currently playing content can be used to change the car ambience (vehicle ambient lights etc.) accordingly.
+
+=== Core Features
+
+Derived from the above <<Motivation,Motivation>> Metadata-Service App should contain the following core functionality.
+The list may be extended as further features are added in later clusters.
+
+* serve metadata including cover art, lyrics and radio station logos from multiple back-end providers to clients
+* serve alternative web streams for local radio stations
+* identify currently playing content through audio stream finger printing
+* cache data to reduce response times towards clients and network traffic on the provider back-ends
+
+
+=== Requirements Overview
+
+==== Demo Activity
+
+* Metadata-Service App shall include an activity to request and display radio station data in an Android TextView. This is for demonstration purposes only and not part of the final product
+* Metadata-Service App shall include an activity to request and display radio station logos in an Android ImageView. This is for demonstration purposes only and not part of the final product
+* Metadata-Service App shall include an activity to request start/stop song recognition and display the result in an Android TextView. This is for demonstration purposes only and not part of the final product
+* Metadata-Service App shall include an activity to request text based cover art lookup and display the image in an Android ImageView. This is for demonstration purposes only and not part of the final product
+* Metadata-Service App shall include an activity to request and display lyrics. This is for demonstration purposes only and not part of the final product
+* Metadata-Service App shall include an activity to request and display music metadata. This is for demonstration purposes only and not part of the final product
+* Metadata-Service App include an activity to request changes on settings (online data enable/disable, radio demo mode enable/disable ..etc). This is for demonstration purposes only and not part of the final product
+
+* A manual for the Demo Activity shall be provided to all customers / developers
+
+==== Client-side interface
+
+* Metadata-Service App shall accept requests from clients for radio station data
+* Metadata-Service App shall accept requests from clients for radio station logo
+
+* Metadata-Service App shall accept requests from clients for cover art
+* Metadata-Service App shall accept requests from clients regarding enabling/disabling audio stream fingerprinting
+
+* Metadata-Service App shall accept requests from clients regarding enabling/disabling online data
+
+* Metadata-Service App shall accept requests from clients for lyrics
+* Metadata-Service App shall accept requests from clients for music metadata
+
+* Metadata-Service App shall provide radio station data to clients via AIDL interface
+* Metadata-Service App shall provide URIs to radio station logos to clients via AIDL interface
+* Metadata-Service App shall provide radio station logos to clients via an Android ContentProvider
+* Metadata-Service App shall provide lyrics to to clients via AIDL interface
+* Metadata-Service App shall provide music metadata to to clients via AIDL interface
+
+* Metadata-Service App shall provide both radio station logos and cover arts to clients via an Android ContentProvider
+
+==== MetadataService
+
+===== MetadataService business logic
+
+* MetadataService shall cache radio station data retrieved from the hybrid radio back-end in a local database
+* MetadataService shall cache radio station logos on the file system in a dedicated partition
+
+* MetadataService shall only request radio station data from hybrid radio back-end if it is not already in the cache
+
+* MetadataService shall cache cover art images on the file system in a dedicated partition
+
+===== Hybrid radio provider
+
+* MetadataService shall request FM/DAB/IBOC(HD) station metadata via ConRad client from the hybrid radio back-end
+* MetadataService shall request FM/DAB/IBOC(HD) station logos via ConRad client from the hybrid radio back-end
+
+===== Global music data provider
+* MetadataService shall request music metatada via GMD client from the Gracenote back-end
+
+===== GracenoteService
+
+* MetadataService shall request cover arts via GracenoteService from the Gracenote back-end using metadata provided by the client as input
+* MetadataService shall enable/disable the audio stream fingerprinting as per client request
+* MetadataService shall receive cover arts from GracenoteService as a result of audio stream fingerprinting
+* MetadataService shall receive lyrcis from GracenoteService as a result of audio stream fingerprinting
+
+
+==== GracenoteService
+
+===== Internal JNI interface
+
+* GracenoteService shall accept requests from MetadataService for radio station data and logo for Asian markets only (for the time being)
+
+* GracenoteService shall accept requests from MetadataService for cover art
+* GracenoteService shall accept requests from MetadataService regarding enabling/disabling audio stream fingerprinting
+
+* GracenoteService shall provide radio station data and logos to clients
+
+* GracenoteService shall provide title, album name, artist name for currently playing content
+* GracenoteService shall provide coverart for currently playing content
+* GracenoteService shall provide mood and tempo information for currently playing content
+* GracenoteService shall provide external ids for currently playing content
+* GracenoteService shall provide lyrics for currently playing content
+
+===== GracenoteService business logic
+
+* GracenoteService shall cache radio station data retrieved from online lookup in a local database
+* GracenoteService shall cache radio station logos retrieved from online lookup in a local database
+* GracenoteService must not cache lyrics retrieved from online lookup in a local database
+
+* GracenoteService shall request cover arts from the Gracenote back-end using metadata provided by the MetadataService as input
+* GracenoteService shall enable/disable the audio stream fingerprinting as per MetadataService request
+* GracenoteService shall receive cover arts from Gracenote back-end as a result of audio stream fingerprinting
+* GracenoteService shall receive lyrics from Gracenote back-end as a result of audio stream fingerprinting
+
+
+==== Non-functional
+
+* For debugging purposes Metadata-Service App shall trace its performed actions
+* The log messages shall adhere to the format defined by e.solutions Framework team, to allow filtering, disabling and forwarding to different tracing back-ends
+* Logging shall not take up excessive system resources
+
+=== Quality Goals
+
+Most general quality requirements are defined in HCP3 Quality Assurance Plan, Southside Architecture Guidelines, Technical Guidelines for Compute Node components.
+As Metadata-Service App is not a safety critical component, there is not much to add beyond those.
+Additionally mentioning generic quality goals such as performance, reliability,... doesn't seem to be too beneficial.
+
+=== Stakeholders
+
+[options="header",cols="1,2,2"]
+|===
+|Role/Name|Contact|Expectations
+| _Customer_ | _Christian Winter (christian.winter@cariad.technology)_ | _Responsible FO for the project at Cariad_
+| _Customer_ | _Philipp Drose (philipp.drose@cariad.technology)_ | _Responsible FO for the project at Cariad_
+| _Customer_ | _Florian Köppl (florian.koeppl@cariad.technology)_ | _Responsible PO for the project at Cariad_
+| _Managing Director_ | _Rainer Lange (rainer.lange@esolutions.de)_ | _Managing Director in e.solutions_
+| _Director_ | _Christian Kelz (christian.kelz@esolutions.de)_ | _Technical Director in e.solutions_
+| _Manager_ | _Sebastian Kiesel (sebastian.kiesel@esolutions.de)_ | _Responsible for Metadata-Service App in e.solutions_
+| _Manager_ | _Stefan Loibl (stefan.loibl@esolutions.de)_ | _Responsible for ConRad Client project in e.solutions_
+| _Team-Lead_ | _Stefan Braun (stefan.braun@esolutions.de)_ | _Responsible for ConRad Client project in e.solutions_
+| _Developer_ | _Matthias Stühlinger (matthias.stuehlinger@comlet.de)_ | _Development and maintenance of MetadataService source code_
+| _Developer_ | _Yazdan Sharifi (yazdan.sharifi@esolutions.de)_ | _Development and maintenance of MetadataService source code_
+| _Developer_ | _Michael Irsiegler (extern.michael.irsiegler@esolutions.de)_ | _Development and maintenance of GracenoteService source code_
+| _Developer_ | _Artem Moskalenko (artem.moskalenko@esolutions.de)_ | _Maintenance and analysis of GracenoteService and MetadataService source code_
+| _User/Developer_ | _Walter Zink (walter.zink@esolutions.de)_ | _Development and maintenance of HMI Client source code_
+|===

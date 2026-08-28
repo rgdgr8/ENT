@@ -1,0 +1,33 @@
+@startuml
+title Workflow for getRadioStationData
+
+|Main Thread|
+start
+
+-getRadioStationData()
+
+if (RequestContainer exists?) then (No)
+    -Create new RequestContainer
+else (Yes)
+endif
+
+:Add request to RequestContainer;
+
+if (Max elements or wait time reached?) then (Yes)
+    -Add LookupJob with RequestContainer to the queue
+    -Reset waiting RequestContainer
+    stop
+else (No)
+    if (Coroutine is running?) then (Yes)
+        -Cancel coroutine
+    else (No)
+    endif
+    -Start Coroutine
+    |Coroutine|
+    -Wait the configured debounce delay
+    -Add LookupJob with RequestContainer to the queue
+    -Reset waiting RequestContainer
+    stop
+endif
+
+@enduml

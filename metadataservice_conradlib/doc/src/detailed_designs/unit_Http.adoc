@@ -1,0 +1,568 @@
+﻿include::../config.adoc[]
+//imagesdir must be overwritten, it is already included in the config.adoc
+:imagesdir: ../../images
+:hash: #
+
+= image:ESO_Logo_Colour_positive_RGB.png[eso_icon,350,350,float="right",align="center"] Design metadataservice_conradlib - Unit Http
+:toc-title: Table of Contents
+
+'''
+
+// numbering from here on
+:numbered:
+:stem: latexmath
+
+
+[unit=Http, role=unit]
+== <<Unit>> Http
+This document specifies the design of the unit *Http*, it is part of the link:../../main.{type}[metadataservice_conradlib].
+
+The OkHttp client is responsible to send requests to the backend with defined security settings.
+The http client must be implemented as kotlin object (Singleton).
+It has to support cookies and use CookiePolicy.ACCEPT_ALL.
+
+It should use following timeouts:
+
+- Call timeout: 40s
+- Read timeout: 20s
+- Write timeout: 20s
+- Connect timeout: 10s
+
+For the connection following security settings from the CARIAD spec should be used:
+
+- ConnectionSpec.MODERN_TLS
+- TLS Version
+* TlsVersion.TLS_1_2
+* TlsVersion.TLS_1_3
+- Cipher suites
+* CipherSuite.TLS_ECDHE_ECDSA_WITH_CHACHA20_POLY1305_SHA256
+* CipherSuite.TLS_ECDHE_ECDSA_WITH_AES_256_GCM_SHA384
+* CipherSuite.TLS_ECDHE_ECDSA_WITH_AES_128_GCM_SHA256
+* CipherSuite.TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
+* CipherSuite.TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256
+* CipherSuite.TLS_DHE_RSA_WITH_AES_256_GCM_SHA384
+* CipherSuite.TLS_DHE_RSA_WITH_AES_128_GCM_SHA256
+* CipherSuite.TLS_AES_256_GCM_SHA384
+* CipherSuite.TLS_CHACHA20_POLY1305_SHA256
+* CipherSuite.TLS_AES_128_GCM_SHA256
+
+We want to improve the logging of the http client,
+so the LogJavaNetCookieJar wrapper around a JavaNetCookieJar should be implemented and used.
+This class that implements the CookieJar interface, should log all changes to cookies to the Logger.
+
+To use only specified networks, we have to implement our own network dns by a Dns interface.
+This class should use the given network to resolve hostnames.
+If no network is given, it should use the default system dns.
+
+== Provided Interface (public methods and properties)
+
+=== Http.enqueueGet(url: HttpUrl, header: RequestHeader, callback: Callback)
+
+Send a GET request to the backend without waiting for the result.
+If the result is available, trigger the callback class.
+
+*Arguments*
+
+|===
+|name|value range |valid values | description
+
+|url
+|okhttp3.HttpUrl
+|okhttp3.HttpUrl
+|Sent the http request to this url.
+
+|header
+|RequestHeader
+|RequestHeader
+|Data transfer object that stores the header values that should be sent with this request.
+
+|callback
+|okhttp3.Callback
+|okhttp3.Callback
+|Callback that should be triggered if a result to the request is available.
+|===
+
+*Return*
+
+None
+
+*Exceptions*
+
+None
+
+*Special attributes*
+
+** async: Starts a async http request.
+
+=== Http.executeGet(url: HttpUrl, header: RequestHeader): okhttp3.Response
+
+Sena a GET request to the backend and wait for the result.
+
+*Arguments*
+
+|===
+|name|value range |valid values | description
+
+|url
+|okhttp3.HttpUrl
+|okhttp3.HttpUrl
+|Sent the http request to this url.
+
+|header
+|RequestHeader
+|RequestHeader
+|Data transfer object that stores the header values that should be sent with this request.
+|===
+
+*Return*
+
+|===
+|Type|value range |valid values | description
+
+|Response
+|okhttp3.Response
+|okhttp3.Response
+|Result of the http request.
+|===
+
+*Exceptions*
+
+- IOException: If sending the request fails, see OkHttp documentation for more information.
+
+*Special attributes*
+
+** async: Starts a async http request.
+
+=== Http.enqueuePost(url: HttpUrl, header: RequestHeader, body: String, callback: Callback)
+
+Send a POST request to the backend without waiting for the result.
+If the result is available, trigger the callback class.
+Send the request with a media type of "application/json".
+
+*Arguments*
+
+|===
+|name|value range |valid values | description
+
+|url
+|okhttp3.HttpUrl
+|okhttp3.HttpUrl
+|Sent the http request to this url.
+
+|header
+|RequestHeader
+|RequestHeader
+|Data transfer object that stores the header values that should be sent with this request.
+
+|body
+|String
+|String
+|Body of the http request.
+
+|callback
+|okhttp3.Callback
+|okhttp3.Callback
+|Callback that should be triggered if a result to the request is available.
+|===
+
+*Return*
+
+None
+
+*Exceptions*
+
+None
+
+*Special attributes*
+
+** async: Starts a async http request.
+
+=== Http.executePost(url: HttpUrl, header: RequestHeader, body: String): okhttp3.Response
+
+Sena a POST request to the backend and wait for the result.
+Send the request with a media type of "application/json".
+
+*Arguments*
+
+|===
+|name|value range |valid values | description
+
+|url
+|okhttp3.HttpUrl
+|okhttp3.HttpUrl
+|Sent the http request to this url.
+
+|header
+|RequestHeader
+|RequestHeader
+|Data transfer object that stores the header values that should be sent with this request.
+|===
+
+*Return*
+
+|===
+|Type|value range |valid values | description
+
+|Response
+|okhttp3.Response
+|okhttp3.Response
+|Result of the http request.
+|===
+
+*Exceptions*
+
+- IOException: If sending the request fails, see OkHttp documentation for more information.
+
+*Special attributes*
+
+** async: Starts a async http request.
+
+=== Http.getCookie(name: String); HttpCookie?
+
+Read a cookie value out of the cookie manager.
+
+*Arguments*
+
+|===
+|name|value range |valid values | description
+
+|name
+|String
+|String
+|The name of the cookie.
+|===
+
+*Return*
+
+|===
+|Type|value range |valid values| default | description
+
+|Response
+|HttpCookie?
+|HttpCookie or null
+|null
+|The cookie with the given name or null if not exists.
+|===
+
+*Exceptions*
+
+None
+
+=== Http.generateRequestID(): String
+
+Generate a uuid as string, that should be used as request id.
+
+*Arguments*
+
+None
+
+*Return*
+
+|===
+|Type|value range |valid values | description
+
+|Response
+|String
+|String containing UUID
+|UUID that should be used as request id.
+|===
+
+*Exceptions*
+
+None
+
+=== Http.setKeepAlive(keepAlive: Long)
+
+Create a new OkHttp client with a ConnectionPool that uses the given keep alive duration.
+If the keep alive value is zero or less, it should deactivate the keep alive.
+Before throwing away the old http client, it must evict all connections from the connection pool.
+
+*Arguments*
+
+|===
+|name|value range |valid values |resolution |unit | description
+
+|keepAlive
+|Long
+|Long
+|+-1
+|Seconds
+|The keep alive setting that should be set.
+|===
+
+*Return*
+
+None
+
+*Exceptions*
+
+None
+
+=== Http.setNetwork(network: Network)
+
+Create a new OkHttp client that uses the given network for all requests.
+Before throwing away the old http client, it must evict all connections from the connection pool.
+The function has to set a socketFactory and the NetworkDns for this.
+
+*Arguments*
+
+|===
+|name|value range |valid values | description
+
+|network
+|android.net.Network
+|android.net.Network
+|Use this network to send requests.
+|===
+
+*Return*
+
+None
+
+*Exceptions*
+
+None
+
+=== LogJavaNetCookieJar.class(cookieHandler: CookieHandler): LogJavaNetCookieJar
+
+This class implements the okhttp3.CookieJar interface.
+It should wrap the JavaNetCookieJar and additionally log all changes to the cookies.
+
+*Arguments*
+
+|===
+|name|value range |valid values | description
+
+|cookieHandler
+|java.net.CookieHandler
+|java.net.CookieHandler
+|Use this instance to initialize a JavaNetCookieJar.
+|===
+
+=== LogJavaNetCookieJar.loadForRequest(url: HttpUrl)
+
+Call the loadForRequest function from the wrapped JavaNetCookieJar.
+
+*Arguments*
+
+|===
+|name|value range |valid values | description
+
+|url
+|okhttp3.HttpUrl
+|okhttp3.HttpUrl
+|Load the cookies from the given url.
+|===
+
+*Return*
+
+None
+
+*Exceptions*
+
+None
+
+=== LogJavaNetCookieJar.saveFromResponse(url: HttpUrl, cookies: List<Cookie>)
+
+Call the saveFromResponse function from the wrapped JavaNetCookieJar,
+also log all changes to the cookie jar in this function.
+
+*Arguments*
+
+|===
+|name|value range |valid values | description
+
+|url
+|okhttp3.HttpUrl
+|okhttp3.HttpUrl
+|Save the cookies for this url.
+
+|cookies
+|List<okhttp3.Cookie>
+|List<okhttp3.Cookie>
+|Cookies that must be saved to the cookie jar.
+|===
+
+*Return*
+
+None
+
+*Exceptions*
+
+None
+
+=== NetworkDns.class(mNetwork: Network? = null): NetworkDns
+
+This class must implement the okhttp3.Dns interface.
+Save the given network for later use.
+
+*Arguments*
+
+|===
+|name|value range |valid values|default | description
+
+|mNetwork
+|android.net.Network?
+|android.net.Network or null
+|null
+|Use this network for dns resolution.
+|===
+
+=== NetworkDns.lookup(hostname: String): List<InetAddress>
+
+Use the network to resolve the given hostname.
+If the network is null, then use the system default dns.
+
+*Arguments*
+
+|===
+|name|value range |valid values | description
+
+|hostname
+|String
+|String
+|Hostname that must be resolved.
+|===
+
+*Return*
+
+|===
+|Type|value range |valid values | description
+
+|Response
+|List<InetAddress>
+|List<InetAddress>
+|List of found InetAddress from the dns lookup.
+|===
+
+*Exceptions*
+
+None
+
+== Dependencies (Used Units, methods and properties)
+
+This is an overview of the used methods and properties from other units.
+
+|===
+|Destination unit|Destination method/property |comment
+
+|link:unit_Data.adoc[Data]
+|RequestHeader.class
+|Data transfer object for http headers.
+
+|link:unit_Logger.adoc[Logger]
+|Logger.class
+|Log changes to the cookie jar.
+|===
+
+== Runtime View
+
+[dynamic_sequence=startup, unit=Http, role=dynamic_sequence]
+=== Startup
+
+At Http class initialisation, it should initialize the OkHttp client with the specified settings.
+
+[dynamic_sequence=shutdown, unit=Http, role=dynamic_sequence]
+=== Shutdown
+
+The Http class is a kotlin object (Singleton) that will stay in the memory forever, so it can be reused.
+
+[dynamic_sequence=startup_after_s2r, unit=Http, role=dynamic_sequence]
+=== Suspend
+
+Since this is a kotlin class without deep android references, no suspend state needs to be considered.
+
+[dynamic_sequence=resume, unit=Http, role=dynamic_sequence]
+=== Resume
+
+Since this is a kotlin class without deep android references, no suspend state needs to be considered.
+
+=== Enqueue Get request
+
+[plantuml, title="enqueueGet()", format="svg", id="enqueueGet"]
+----
+participant "Arbitrary Unit" as caller
+participant "Http" as http <<unit>>
+participant "OkHttp" as okhttp
+participant "Callback" as callback
+
+caller -> http: enqueueGet()
+activate http
+http --> okhttp: enqueue()
+deactivate http
+
+activate okhttp
+okhttp -> callback: onResponse()
+deactivate okhttp
+----
+
+=== Execute Get request
+
+[plantuml, title="executeGet()", format="svg", id="executeGet"]
+----
+participant "Arbitrary Unit" as caller
+participant "Http" as http <<unit>>
+participant "OkHttp" as okhttp
+
+caller -> http: executeGet()
+activate http
+http -> okhttp: execute()
+
+activate okhttp
+okhttp -> okhttp: Start HTTP Request
+http <- okhttp: Response
+deactivate okhttp
+
+caller <- http: Response
+deactivate http
+----
+
+=== Enqueue Get fails
+
+[plantuml, title="enqueueGet() fails", format="svg", id="enqueueGet-failure"]
+----
+participant "Arbitrary Unit" as caller
+participant "Http" as http <<unit>>
+participant "OkHttp" as okhttp
+participant "Callback" as callback
+
+caller -> http: enqueueGet()
+activate http
+http --> okhttp: enqueue()
+deactivate http
+
+activate okhttp
+activate okhttp
+okhttp -> okhttp !!: Start HTTP Request
+okhttp -> callback: onFailure()
+deactivate okhttp
+----
+
+=== Execute Get fails
+
+[plantuml, title="executeGet() fails", format="svg", id="executeGet-failure"]
+----
+participant "Arbitrary Unit" as caller
+participant "Http" as http <<unit>>
+participant "OkHttp" as okhttp
+
+caller -> http: executeGet()
+activate http
+http -> okhttp: execute()
+
+activate okhttp
+activate okhttp
+okhttp -> okhttp !!: Start HTTP Request
+http <- okhttp: Throw Exception
+deactivate okhttp
+
+caller <- http: Throw Exception
+deactivate http
+----
+
+[[section-design-decisions]]
+== Design Decisions
+
+No further design decisions were made for the implementation of this unit other than those already mentioned in link:../../main.{type}[metadataservice_conradlib].
+
+include::../about-arc42.adoc[]

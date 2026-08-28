@@ -1,0 +1,185 @@
+﻿include::../config.adoc[]
+//imagesdir must be overwritten, it is already included in the config.adoc
+:imagesdir: ../../images
+:hash: #
+
+= image:ESO_Logo_Colour_positive_RGB.png[eso_icon,350,350,float="right",align="center"] Design metadataservice_conradlib - Unit GenericMoshiParser
+:toc-title: Table of Contents
+
+'''
+
+// numbering from here on
+:numbered:
+:stem: latexmath
+
+[unit=GenericMoshiParser, role=unit]
+== <<Unit>> GenericMoshiParser
+This document specifies the design of the unit *GenericMoshiParser*, it is part of the link:../../main.{type}[metadataservice_conradlib].
+
+This class is responsible to use the Moshi parser library and so on parse JSON to objects and vise versa.
+It should be implemented as kotlin object (Singleton).
+
+== Provided Interface (public methods and properties)
+
+=== GenericMoshiParser.parseToJson(data: T): String
+
+This generic function should parse the given objects to a json string by using the Moshi parser library.
+
+*Arguments*
+
+|===
+|name|value range |valid values | description
+
+|data
+|Any class
+|Any class
+|The instance that should be serialized to a json string.
+|===
+
+*Return*
+
+|===
+|Type|value range |valid values | description
+
+|Response
+|String
+|String that contains a JSON
+|Object as JSON
+|===
+
+*Exceptions*
+
+None
+
+=== GenericMoshiParser.parseFromJson(json: String, parameterizedType: ParameterizedType? = null): T?
+
+This generic function should parse the given string to objects by using the Moshi parser library.
+
+*Arguments*
+
+|===
+|name|value range |valid values|default | description
+
+|json
+|String
+|String that contains a JSON
+|n/a
+|The instance that should be serialized to a json string.
+
+|parameterizedType
+|java.lang.reflect.ParameterizedType?
+|java.lang.reflect.ParameterizedType or null
+|null
+|List of object types if there are not defined by the generic function types or null if not required for parsing.
+|===
+
+*Return*
+
+|===
+|Type|value range |valid values | description
+
+|Response
+|T?
+|Any class or null
+|Returns the parsed objects or null if parsing failed.
+|===
+
+*Exceptions*
+
+None
+
+== Dependencies (Used Units, methods and properties)
+
+No dependencies to other units, only the Moshi parser library is required.
+
+== Runtime View
+
+[dynamic_sequence=startup, unit=GenericMoshiParser, role=dynamic_sequence]
+=== Startup
+
+No explicit specification required, because no constructor or startup logic exists.
+
+[dynamic_sequence=shutdown, unit=GenericMoshiParser, role=dynamic_sequence]
+=== Shutdown
+
+This class is a kotlin object (Singleton) that will stay in the memory forever, so it can be reused.
+
+[dynamic_sequence=startup_after_s2r, unit=GenericMoshiParser, role=dynamic_sequence]
+=== Suspend
+
+Since this is a kotlin class without deep android references, no suspend state needs to be considered.
+
+[dynamic_sequence=resume, unit=GenericMoshiParser, role=dynamic_sequence]
+=== Resume
+
+Since this is a kotlin class without deep android references, no suspend state needs to be considered.
+
+=== Parse class to Json
+
+[plantuml, title="parseToJson()", format="svg", id="parseToJson"]
+----
+participant "Arbitrary Unit" as caller
+participant "GenericMoshiParser" as parser <<unit>>
+participant "Moshi" as moshi
+
+caller -> parser: parseToJson()
+activate parser
+
+parser <-> moshi: Build Moshi Parser
+parser -> moshi: toJson()
+activate moshi
+parser <- moshi: JSON-String
+deactivate moshi
+
+caller <- parser: JSON-String
+deactivate parser
+----
+
+=== Parse from Json to class
+
+[plantuml, title="parseFromJson()", format="svg", id="parseFromJson"]
+----
+participant "Arbitrary Unit" as caller
+participant "GenericMoshiParser" as parser <<unit>>
+participant "Moshi" as moshi
+
+caller -> parser: parseFromJson()
+activate parser
+
+parser <-> moshi: Build Moshi Parser
+parser -> moshi: fromJson()
+activate moshi
+parser <- moshi: Data Object
+deactivate moshi
+
+caller <- parser: Data Object
+deactivate parser
+----
+
+=== ParseFromJson failed
+
+[plantuml, title="parseFromJson() failed", format="svg", id="parseFromJson-failure"]
+----
+participant "Arbitrary Unit" as caller
+participant "GenericMoshiParser" as parser <<unit>>
+participant "Moshi" as moshi
+
+caller -> parser: parseFromJson()
+activate parser
+
+parser <-> moshi: Build Moshi Parser
+parser -> moshi: fromJson()
+activate moshi
+parser <- moshi: Throw Exception
+deactivate moshi
+
+caller <- parser: null
+deactivate parser
+----
+
+[[section-design-decisions]]
+== Design Decisions
+
+No further design decisions were made for the implementation of this unit other than those already mentioned in link:../../main.{type}[metadataservice_conradlib].
+
+include::../about-arc42.adoc[]

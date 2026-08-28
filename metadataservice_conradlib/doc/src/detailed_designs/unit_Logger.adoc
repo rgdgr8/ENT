@@ -1,0 +1,557 @@
+﻿include::../config.adoc[]
+//imagesdir must be overwritten, it is already included in the config.adoc
+:imagesdir: ../../images
+:hash: #
+
+= image:ESO_Logo_Colour_positive_RGB.png[eso_icon,350,350,float="right",align="center"] Design metadataservice_conradlib - Unit Logger
+:toc-title: Table of Contents
+
+'''
+
+// numbering from here on
+:numbered:
+:stem: latexmath
+
+
+[unit=Logger,role=unit]
+== <<Unit>> Logger
+
+This document specifies the design of the unit *Logger*, it is part of the link:../../main.{type}[metadataservice_conradlib].
+
+The logger is responsible to write information to the eso traces to find bugs and understand the client behavior.
+The Logger class is a kotlin object (Singleton).
+
+Built the log message like this:
+
+1. If bearer is not null, bearer representation in square brackets
+2. Message
+3. LoggerTags seperated by blank character
+4. Request id prefixed by "#request:"
+5. "#crc"
+
+If writing traces fails, write the log message via kotlin println and prepend:
+
+1. Timestamp
+2. Level name
+3. Privacy flag name
+
+== Provided Interface (public methods and properties)
+
+=== Logger.init(loggerChannelRoot: String)
+
+Initialize the TraceClient from the eso framework by the given trace channel.
+Call TraceClient.createTraceChannel to create a ITraceChannel instance and use "$+{loggerChannelRoot}+.connectedradioclient" as channel parameter.
+
+*Arguments*
+
+|===
+|name|value range |valid values | description
+
+|loggerChannelRoot
+|String
+|String not empty
+|The logger channel from the MetaDataService that should be prefixed.
+|===
+
+*Return*
+
+None
+
+*Exceptions*
+
+None
+
+=== Logger.t(pf: PrivacyFlags, logInfo: LogInfo?, message: String, vararg tags: LoggerTags)
+
+Write a trace log message to the ITraceChannel.
+Built the log message as defined in the unit description.
+
+*Arguments*
+
+|===
+|name|value range |valid values | description
+
+|pf
+|PrivacyFlags
+|PrivacyFlags
+|Data security classification.
+
+|logInfo
+|LogInfo?
+|LogInfo or null
+|Data Transfer Object for metadata.
+
+|message
+|String
+|String not empty
+|The primary log message information.
+
+|tags
+|vararg LoggerTags
+|Zero or more LoggerTags
+|LoggerTags that should be included in the log message.
+|===
+
+*Return*
+
+None
+
+*Exceptions*
+
+None
+
+=== Logger.d(pf: PrivacyFlags, logInfo: LogInfo?, message: String, vararg tags: LoggerTags)
+
+Write a debug log message to the ITraceChannel.
+Built the log message as defined in the unit description.
+
+*Arguments*
+
+|===
+|name|value range |valid values | description
+
+|pf
+|PrivacyFlags
+|PrivacyFlags
+|Data security classification.
+
+|logInfo
+|LogInfo?
+|LogInfo or null
+|Data Transfer Object for metadata.
+
+|message
+|String
+|String not empty
+|The primary log message information.
+
+|tags
+|vararg LoggerTags
+|Zero or more LoggerTags
+|LoggerTags that should be included in the log message.
+|===
+
+*Return*
+
+None
+
+*Exceptions*
+
+None
+
+=== Logger.i(pf: PrivacyFlags, logInfo: LogInfo?, message: String, vararg tags: LoggerTags)
+
+Write a info log message to the ITraceChannel.
+Built the log message as defined in the unit description.
+
+*Arguments*
+
+|===
+|name|value range |valid values | description
+
+|pf
+|PrivacyFlags
+|PrivacyFlags
+|Data security classification.
+
+|logInfo
+|LogInfo?
+|LogInfo or null
+|Data Transfer Object for metadata.
+
+|message
+|String
+|String not empty
+|The primary log message information.
+
+|tags
+|vararg LoggerTags
+|Zero or more LoggerTags
+|LoggerTags that should be included in the log message.
+|===
+
+*Return*
+
+None
+
+*Exceptions*
+
+None
+
+=== Logger.w(pf: PrivacyFlags, logInfo: LogInfo?, message: String, vararg tags: LoggerTags)
+
+Write a warning log message to the ITraceChannel.
+Built the log message as defined in the unit description.
+
+*Arguments*
+
+|===
+|name|value range |valid values | description
+
+|pf
+|PrivacyFlags
+|PrivacyFlags
+|Data security classification.
+
+|logInfo
+|LogInfo?
+|LogInfo or null
+|Data Transfer Object for metadata.
+
+|message
+|String
+|String not empty
+|The primary log message information.
+
+|tags
+|vararg LoggerTags
+|Zero or more LoggerTags
+|LoggerTags that should be included in the log message.
+|===
+
+*Return*
+
+None
+
+*Exceptions*
+
+None
+
+=== Logger.e(pf: PrivacyFlags, logInfo: LogInfo?, message: String, vararg tags: LoggerTags)
+
+Write a error log message to the ITraceChannel.
+Built the log message as defined in the unit description.
+
+*Arguments*
+
+|===
+|name|value range |valid values | description
+
+|pf
+|PrivacyFlags
+|PrivacyFlags
+|Data security classification.
+
+|logInfo
+|LogInfo?
+|LogInfo or null
+|Data Transfer Object for metadata.
+
+|message
+|String
+|String not empty
+|The primary log message information.
+
+|tags
+|vararg LoggerTags
+|Zero or more LoggerTags
+|LoggerTags that should be included in the log message.
+|===
+
+*Return*
+
+None
+
+*Exceptions*
+
+None
+
+=== Logger.ex(pf: PrivacyFlags, logInfo: LogInfo?, msg: String?, tr: Throwable, vararg tags: LoggerTags)
+
+Write a trace log message to the ITraceChannel that includes an exception stack trace.
+Built the log message as defined in the unit description.
+Use ThrowableExtension.toSimpleString() to convert the throwable to string.
+
+*Arguments*
+
+|===
+|name|value range |valid values | description
+
+|pf
+|PrivacyFlags
+|PrivacyFlags
+|Data security classification.
+
+|logInfo
+|LogInfo?
+|LogInfo or null
+|Data Transfer Object for metadata.
+
+|msg
+|String?
+|String or null
+|The primary log message information or null if only the exception should be logged.
+
+|tr
+|Throwable
+|Throwable
+|The throwable that should be logged.
+
+|tags
+|vararg LoggerTags
+|Zero or more LoggerTags
+|LoggerTags that should be included in the log message.
+|===
+
+*Return*
+
+None
+
+*Exceptions*
+
+None
+
+=== Logger.trimToken(token: String?): String
+
+Split the given Token and return the first and second part joined with a dot. +
+It returns an empty String if the given token String is null, empty or shorter than two.
+
+*Arguments*
+
+|===
+|name|value range |valid values | description
+
+|token
+|String
+|Valid String or null
+|A Token to cut off the signature part.
+|===
+
+*Return*
+
+|===
+|Type|value range |valid values | description
+
+|String
+|String
+|Valid String
+|Either an empty String or the given Token without signature.
+|===
+
+*Exceptions*
+
+None
+
+=== LogInfo.class(val bearer: String?, val requestId: String?)
+
+A Kotlin data class that will be used as Data Transfer Object for logging metadata.
+
+*Arguments*
+
+|===
+|name|value range |valid values | description
+
+|bearer
+|String?
+|String or null
+|The bearer representation that should be logged.
+
+|requestId
+|String?
+|String or null
+|The request id that should be logged.
+|===
+
+=== PrivacyFlags.class(val privacyFlag: PrivacyFlag)
+
+This enum class defines which message should be logged with which PrivacyFlag of the eso framework.
+
+*Arguments*
+
+|===
+|name|value range |valid values | description
+
+|privacyFlag
+|PrivacyFlag
+|PrivacyFlag
+|The PrivacyFlag that should be given to the eso framework for specific log messages.
+|===
+
+*Enums*
+
+|===
+|name|privacyFlag|description
+
+|SAFE
+|PrivacyFlag.NOT_CATEGORIZED
+|Should be used when the logged data does not match to any other PrivacyFlag.
+
+|TOKEN
+|PrivacyFlag.UNIQUE_ID
+|Should be used when a token used for authentication is logged.
+A token is a unique identifier for authentication with the backend.
+Therefore, it should be logged as UNIQUE_ID.
+
+|SESSION
+|PrivacyFlag.UNIQUE_ID
+|Should be used when a session is logged.
+A session is a unique identifier used to identify a session.
+Therefore, it should be logged as UNIQUE_ID.
+
+|UNDECIDED
+|PrivacyFlag.CATEGORY_UNDECIDED
+|Should be used if the logged data is unknown or the data has not been checked to which PrivacyFlag it belongs.
+|===
+
+=== LoggerTags.class(tag: String)
+
+This enum class defines the available tags that can be added to log messages.
+
+*Arguments*
+
+|===
+|name|value range |valid values | description
+
+|tag
+|String
+|String not empty
+|The LoggerTags as string representation.
+|===
+
+*Enums*
+
+|===
+|name|privacyFlag
+
+|PARSING
+|#parsing
+
+|JSON
+|#json
+
+|COOKIE
+|#cookie
+
+|TOKEN
+|#token
+
+|REQUEST
+|#request
+
+|RESPONSE
+|#response
+
+|LOGO
+|#logo
+
+|LOOKUP
+|#lookup
+
+|REGISTRATION
+|#registration
+
+|MEDIA
+|#media
+
+|NETWORK
+|#network
+
+|EXECUTOR
+|#executor
+
+|CONFIG
+|#config
+|===
+
+=== LoggerTags.toString()
+
+Overwrite the toString function for LoggerTags enums, so they return the string representation.
+
+*Arguments*
+
+None
+
+*Return*
+
+|===
+|Type|value range |valid values | description
+
+|Response
+|String
+|String not empty
+|The string representation of the enum.
+|===
+
+== Dependencies (Used Units, methods and properties)
+
+|===
+|Destination unit|Destination method/property |comment
+
+|link:unit_Data.adoc[Data]
+|ThrowableExtension.toSimpleString()
+|Convert throwable to easy readable and short strings.
+|===
+
+== Runtime View
+
+[dynamic_sequence=startup,unit=Logger,role=dynamic_sequence]
+=== Startup
+
+No explicit specification required, because startup logic exists.
+
+[dynamic_sequence=shutdown,unit=Logger,role=dynamic_sequence]
+=== Shutdown
+
+The classes are kotlin object's (Singleton) that will stay in the memory forever, so it can be reused.
+
+[dynamic_sequence=startup_after_s2r,unit=Logger,role=dynamic_sequence]
+=== Suspend
+
+Since this is a kotlin class without deep android references, no suspend state needs to be considered.
+
+[dynamic_sequence=resume,unit=Logger,role=dynamic_sequence]
+=== Resume
+
+Since this is a kotlin class without deep android references, no suspend state needs to be considered.
+
+=== Init logger and log some messages
+
+[plantuml,title="Init and log some messages",format="svg",id="init-and-log"]
+----
+participant "Arbitrary Unit" as caller
+participant "Logger" as logger <<unit>>
+participant "Framework" as fw
+
+caller -> logger: init()
+activate logger
+logger <-> fw: TraceClient.createTraceChannel()
+logger -> logger: Save ITraceChannel internally
+deactivate logger
+
+caller -> logger: t()
+activate logger
+logger -> logger: Built log message
+logger -> fw: log()
+deactivate logger
+
+caller -> logger: d()
+activate logger
+logger -> logger: Built log message
+logger -> fw: log()
+deactivate logger
+
+caller -> logger: i()
+activate logger
+logger -> logger: Built log message
+logger -> fw: log()
+deactivate logger
+
+caller -> logger: w()
+activate logger
+logger -> logger: Built log message
+logger -> fw: log()
+deactivate logger
+
+caller -> logger: e()
+activate logger
+logger -> logger: Built log message
+logger -> fw: log()
+deactivate logger
+----
+
+[[section-design-decisions]]
+== Design Decisions
+
+No further design decisions were made for the implementation of this unit other than those already mentioned in link:../../main.{type}[metadataservice_conradlib].
+
+include::../about-arc42.adoc[]

@@ -1,0 +1,46 @@
+// Generated build.gradle for clientinterface — Cariad Edition
+// Builds AIDL stubs from source (replaces aidl-generated-stubs.jar)
+
+plugins {
+    id 'com.android.library'
+    id 'kotlin-android'
+    id 'kotlin-parcelize'
+}
+
+android {
+    namespace 'technology.cariad.entertainment.metadataserviceclient'
+    compileSdk 34
+
+    buildFeatures {
+        buildConfig true
+        aidl true
+    }
+
+    defaultConfig {
+        minSdkVersion 33
+        targetSdkVersion 34
+
+        buildConfigField "String", "VERSION_NAME", "\"1.0.0-cariad\""
+    }
+
+    sourceSets {
+        main {
+            java.srcDirs += 'src/rpc/java'
+        }
+    }
+
+    compileOptions {
+        sourceCompatibility JavaVersion.VERSION_1_8
+        targetCompatibility JavaVersion.VERSION_1_8
+    }
+
+    kotlinOptions {
+        jvmTarget = '1.8'
+    }
+}
+
+dependencies {
+    implementation "org.jetbrains.kotlin:kotlin-stdlib"
+    implementation "io.reactivex.rxjava3:rxjava:3.1.5"
+}
+

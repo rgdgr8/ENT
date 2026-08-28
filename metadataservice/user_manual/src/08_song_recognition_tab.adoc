@@ -1,0 +1,19 @@
+include::config.adoc[]
+
+[[section-song_recognition_tab]]
+== Song Recognition Tab
+
+This tab is used in order to test Gracenote fingerprinting functionality.
+
+In order to test this functionality, these preconditions should be provided first:
+
+* gracenote_v1 should be enabled under disable reasons under CoreServices App
+* Radio/Tuner is functional and at least one radio station is receivable
+* Radio settings overlay is available and "Content cover preferred" is active
+* Audio is audible once a radio station is played and music is playing
+
+**Note**: It is also possible to test this functionality with playing a song via an attached USB-Stick containing audio files.
+
+After a radio station is audible, Start button can be clicked to see the radio station logo and metadata on the UI.
+
+image:{imgdir}/08_song_recognition_tab.png[]

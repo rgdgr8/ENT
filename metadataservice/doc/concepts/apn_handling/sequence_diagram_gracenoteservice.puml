@@ -1,0 +1,25 @@
+@startuml
+
+participant MetadataService as mds
+participant CoreServices as cs
+participant GracenoteService as gs
+
+activate mds
+activate cs
+activate gs
+
+mds -> cs: registerServiceListClient(clientId, callback)
+mds -> gs: init(storagePath, networkInterfacesMap)
+
+loop serviceList changed
+    cs --> mds: updateServiceList(serviceListEntries)
+    loop APN unchanged
+        alt
+            mds -> gs: startSongRecognition(apn, callback)
+        else
+            mds -> gs: doTextLookupForAlbum(artist, album, title, apn, callback)
+        end
+    end
+end
+
+@enduml

@@ -1,0 +1,63 @@
+// configure EN settings for asciidoc
+include::src/config.adoc[]
+
+:imgdir: ./images
+
+= MetadataService Demo Application User Manual
+TuÄŸba MahÃ§up <tugba.mahcup@esolutions.de>; Matthias StÃ¼hlinger <matthias.stuehlinger@comlet.de>
+v1, 2021-12-13: initial version including fixed review findings
+
+== Revision History
+
+[cols="8,10,16,40", options="header"]
+|===
+|Version |Date |Editor |Description
+|{revnumber} |{revdate} | TuÄŸba MahÃ§up, Matthias StÃ¼hlinger |{revremark}
+|===
+
+// numbering from here on
+:numbered:
+
+<<<
+// 1. Introduction to MetadataDService Demo App
+include::src/01_about_metadataservice_demo_app.adoc[]
+
+<<<
+// 2. Introduction to testing hardware
+include::src/02_about_test_setup_hardware.adoc[]
+
+<<<
+// 3. Useful adb commands for testing
+include::src/03_useful_adb_commands_for_testing.adoc[]
+
+<<<
+// 4. Setting backend and a valid VIN
+include::src/04_setting_backend_and_vin.adoc[]
+
+<<<
+// 5. Demo App Radio Station Data tab
+include::src/05_radio_station_data_tab.adoc[]
+
+<<<
+// 6. Demo App Radio Asia tab
+include::src/06_radio_asia_tab.adoc[]
+
+<<<
+// 7. Demo App Cover Art tab
+include::src/07_cover_art_tab.adoc[]
+
+<<<
+// 8. Demo App Song Recognition tab
+include::src/08_song_recognition_tab.adoc[]
+
+<<<
+// 9. Demo App Permissions tab
+include::src/09_permissions_tab.adoc[]
+
+<<<
+// 10. Demo App Settings tab
+include::src/10_settings_tab.adoc[]
+
+<<<
+// 11. Glossary
+include::src/11_glossary.adoc[]

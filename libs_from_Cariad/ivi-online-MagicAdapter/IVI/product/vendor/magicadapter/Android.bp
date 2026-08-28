@@ -1,0 +1,25 @@
+java_import {
+    name : "magicadapter.platform",
+    installable : false,
+    jars: ["oi_undexed_shadowed.jar"]
+}
+
+java_library {
+    name: "de.esolutions.magicadapter",
+    static_libs: ["magicadapter.platform"],
+    compile_dex : true,
+    installable : true,
+    vendor : true,
+    static_kotlin_stdlib: false,
+    provides_uses_lib: "de.esolutions.magicadapter",
+    required: ["de.esolutions.magicadapter_library.xml"],
+    sdk_version: "current",
+    stem : "oi_magic_adapter_library"
+}
+
+prebuilt_etc {
+    name: "de.esolutions.magicadapter_library.xml",
+    src: "de.esolutions.magicadapter_library.xml",
+    sub_dir: "permissions",
+    vendor : true
+}

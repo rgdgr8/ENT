@@ -1,0 +1,16 @@
+include::config.adoc[]
+
+[[section-radio_station_data_tab]]
+== Radio Station Data Tab
+
+This tab is used in order to test radio station data and logos (except Asia).
+One radio station can be selected from the drop-down list. After PLUS button (+) is clicked, function is triggered, radio station logo and metadata are received.
+If a radio station is already added, not possible to add it again.
+Previously added radio station can be removed with a long press on the entry.
+
+image:{imgdir}/05_radio_station_data_tab.png[]
+
+In order to see the detailed information of the selected radio station, it is enough to click on the entry on the UI.
+Another page is opened to see the details like the following:
+
+image:{imgdir}/05_radio_station_data_tab_details.png[]

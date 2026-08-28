@@ -1,0 +1,36 @@
+{
+  "Application" : {
+    "DigestType" : "SHA-256",
+    "DigestValue" : "AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA",
+    "Name" : "technology-cariad-entertainment-metadataservice"
+  },
+  "Domain" : {
+    "DomainName" : "android.0130",
+    "IPv6" : [
+      "fd53:7cb8:0383:0007:0000:0000:0000:0130"
+    ]
+  },
+  "ServerCapabilities" : [ ],
+  "ClientCapabilities" : [
+    {
+      "MOS#ttent-connectedradio_v2.codefault" : [
+        "outgoing"
+      ]
+    },
+    {
+      "MOS#ttent-gracenote_v1.codefault" : [
+        "outgoing"
+      ]
+    },
+    {
+      "MOS#ttent-gracenotelyrics_v1.codummy" : [
+        "outgoing"
+      ]
+    },
+    {
+      "MOS#ttent-hybridradiodata_v3.cologos" : [
+        "outgoing"
+      ]
+    }
+  ]
+}

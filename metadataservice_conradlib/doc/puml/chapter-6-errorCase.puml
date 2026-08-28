@@ -1,0 +1,27 @@
+@startuml
+title Error Case
+
+participant "metadataservice_app" as media
+participant "metadataservice_conradlib" as crc
+participant "ConnectedRadio_Backend" as crb
+
+media -> crc : getRadioStationData(IBearer, ETags, RadioStationDataCallback)
+crc -> crc : getRadioStationData(MediaRequestObject)
+crc -> crc : create new container or add to container
+crc -> crc : wait for other bearer requests
+crc -> crc : Check valid registration
+crc -> crb : request bearers as json
+activate crb
+crc <- crb : invalid response or network issues
+deactivate crb
+media <- crc : onComplete(CompleteStatus*, null)
+deactivate crc
+
+media -> media : wait the time from the CompleteStatus
+
+media -> crc : getRadioStationData(IBearer, ETags, RadioStationDataCallback)
+activate crc
+crc -> crc : run process again
+
+footer ~* CompleteStatus contain RetryBehavior and the time to wait
+@enduml

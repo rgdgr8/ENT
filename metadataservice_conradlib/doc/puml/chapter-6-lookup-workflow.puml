@@ -1,0 +1,29 @@
+@startuml
+
+title Lookup Workflow
+
+start
+
+if (Is shut up delay active?) then (Yes)
+    -Send error to MetaDataService
+    end
+endif
+
+if (Is registration expired?) then (Yes)
+    -Run registration
+endif
+
+-Request backend token
+-Start http request
+-Parse response
+-Send data to media
+
+if (Response contains logo information)
+    -Send complete to media
+else
+    -Add LogoJob to the queue
+endif
+
+stop
+
+@enduml

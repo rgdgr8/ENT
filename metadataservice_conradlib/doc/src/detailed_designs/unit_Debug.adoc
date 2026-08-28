@@ -1,0 +1,349 @@
+﻿include::../config.adoc[]
+//imagesdir must be overwritten, it is already included in the config.adoc
+:imagesdir: ../../images
+:hash: #
+
+= image:ESO_Logo_Colour_positive_RGB.png[eso_icon,350,350,float="right",align="center"] Design metadataservice_conradlib - Unit Debug
+:toc-title: Table of Contents
+
+'''
+
+// numbering from here on
+:numbered:
+:stem: latexmath
+
+
+[unit=Debug, role=unit]
+== <<Unit>> Debug
+This document specifies the design of the unit *Debug*, it is part of the link:../../main.{type}[metadataservice_conradlib].
+
+The debug unit is for better testing in the MetaDataService app, it is not costumer relevant.
+It should not send any backend requests, instead it must generate random or hardcoded data.
+Here we implement a controller that that uses some util classes to generate random values and give them to the callback.
+
+== Provided Interface (public methods and properties)
+
+=== DebugController.class(): DebugController
+
+This is the primary class of the unit, it has to implement the IController interface.
+
+*Arguments*
+
+None
+
+=== DebugController.setDebugConfig(debugConfig: DebugConfig)
+
+This is a setter for a DebugConfig instance.
+The function should save the instance privately for later use in getRadioStationData().
+
+*Arguments*
+
+|===
+|name|value range |valid values| description
+
+|debugConfig
+|DebugConfig
+|DebugConfig
+|The configuration that must be used in the getRadioStationData() function.
+|===
+
+*Return*
+
+None
+
+=== DebugController.getRadioStationData(mediaRequestObject: MediaRequestObject)
+
+This function has to call functions from the given callback as specified with random behavior and random data.
+It must use the settings from the given DebugConfig for better control.
+
+For a specified probability it has to answer requests with an error behavior,
+that means that no data callbacks are triggered and onComplete() contains a retry behavior of not-NONE.
+
+No matter how the random effect decides, the controller behavior must always be as specified.
+This means that the complete callback must always be called at the end.
+
+Between callback calls it has to sleep a random delay, the min and max delay is configured in the DebugConfig.
+
+*Arguments*
+
+|===
+|name|value range |valid values| description
+
+|mediaRequestObject
+|MediaRequestObject
+|MediaRequestObject
+|The request we received from the app.
+|===
+
+*Return*
+
+None
+
+=== DebugConfig.class()
+
+This is a class that contains many editable variables to configure the behavior of the DebugController.
+
+*Variables*
+
+|===
+|name|type|valid values|default|description
+
+|minDelay|Int|0 or more|0|Between every callback call, wait a random delay with a minimum of the here configured seconds.
+|maxDelay|Int|0 or more|1|Between every callback call, wait a random delay with a maximum of the here configured seconds.
+|sendError|Double|Percent value between 0 and 1|0.0|How many requests should be answered with error (no data and retry).
+|sendSLogo|Double|Percent value between 0 and 1|1.0|How many requests should receive slogo calls.
+|sendLogo|Double|Percent value between 0 and 1|1.0|How many requests should receive logo calls.
+|sendMetadata|Double|Percent value between 0 and 1|1.0|How many requests should receive metadata calls.
+|sendWebStreams|Double|Percent value between 0 and 1|1.0|How many requests should receive streams calls.
+|sendBearerList|Double|Percent value between 0 and 1|1.0|How many requests should receive bearer calls.
+|deleteSLogo|Boolean|true or false|false|If true it sends null to the slogo callback, otherwise random data.
+|deleteLogo|Boolean|true or false|false|If true it sends null to the logo callback, otherwise random data.
+|deleteMetadata|Boolean|true or false|false|If true it sends null to the metadata callback, otherwise random data.
+|deleteWebStreams|Boolean|true or false|false|If true it sends null to the streams callback, otherwise random data.
+|deleteBearerList|Boolean|true or false|false|If true it sends null to the bearer callback, otherwise random data.
+|expireInSeconds|Long|0 or more|86400L|The expiry that will be given to the callback via onComplete().
+|===
+
+=== DemoProviderIdentifier.getDemoObject(): ProviderIdentifier
+
+Generates a ProviderIdentifier instance.
+
+*Arguments*
+
+None
+
+*Return*
+
+|===
+|name|value range |valid values| description
+
+|Response
+|ProviderIdentifier
+|ProviderIdentifier
+|ProviderIdentifier with Origin.RADIOPLAYER as origin and DEBUG_STRING as external id.
+|===
+
+=== DemoCompleteStatus.getSuccessStatus(): CompleteStatus
+
+Generates a successful CompleteStatus instance.
+
+*Arguments*
+
+None
+
+*Return*
+
+|===
+|name|value range |valid values| description
+
+|Response
+|CompleteStatus
+|CompleteStatus
+|CompleteStatus with RetryBehavior.NONE and retry delay of null.
+|===
+
+=== DemoCompleteStatus.getErrorStatus(): CompleteStatus
+
+Generates a error CompleteStatus instance.
+
+*Arguments*
+
+None
+
+*Return*
+
+|===
+|name|value range |valid values| description
+
+|Response
+|CompleteStatus
+|CompleteStatus
+|CompleteStatus with RetryBehavior.ONCE and retry delay of 20L.
+|===
+
+=== DemoBearer.getDemoList(bearer: IBearer): List<IBearer>
+
+Wraps a given bearer into a bearer list.
+
+*Arguments*
+
+|===
+|name|value range |valid values| description
+
+|bearer
+|IBearer
+|IBearer
+|Bearer that as to be wrapped.
+|===
+
+*Return*
+
+|===
+|name|value range |valid values| description
+
+|Response
+|List<IBearer>
+|List<IBearer>
+|The given bearer in a bearer list.
+|===
+
+=== DemoStationLogo.getDemoObject(bearer: IBearer, fileExtension: String): StationLogo
+
+This function has to use android.graphics.Bitmap to render a random image.
+
+*Arguments*
+
+|===
+|name|value range |valid values| description
+
+|bearer
+|IBearer
+|IBearer
+|The bearer that must be written onto the image.
+
+|fileExtension
+|String
+|String
+|Generate an image with this type.
+|===
+
+*Return*
+
+|===
+|name|value range |valid values| description
+
+|Response
+|StationLogo
+|StationLogo
+|The randomly generated station logo.
+|===
+
+=== DemoStationMetadata.getDemoObject(providerIdentifiers: List<ProviderIdentifier>, bearerString: String): StationMetadata
+
+Initialize a station metadata instance by the given attributes.
+Add some arbitrary strings for the genres.
+
+*Arguments*
+
+|===
+|name|value range |valid values| description
+
+|providerIdentifiers
+|List<ProviderIdentifier>
+|List<ProviderIdentifier>
+|Write these providers into the response instance.
+
+|bearerString
+|String
+|String
+|Write this bearer representation into the station names and description.
+|===
+
+*Return*
+
+|===
+|name|value range |valid values| description
+
+|Response
+|StationMetadata
+|StationMetadata
+|A debug station metadata response.
+|===
+
+=== DemoWebStream.getDemoList(): List<WebStream>
+
+Initialize some WebStream instances for testing, one with quality high and one with quality low.
+
+*Arguments*
+
+None
+
+*Return*
+
+|===
+|name|value range |valid values| description
+
+|Response
+|List<WebStream>
+|List<WebStream>
+|The debug streams used for testing.
+|===
+
+== Dependencies (Used Units, methods and properties)
+
+This is an overview of the used methods and properties from other units.
+
+|===
+|Destination unit|Destination method/property |comment
+
+|link:unit_Data.adoc[Data]
+|MediaRequestObject.class
+|All IController instances receive there data throw a MediaRequestObject wrapper instance.
+
+|link:unit_IController.adoc[IController]
+|IController.class
+|DebugController is an instance of the IController interface, so it can be exchanged generically.
+
+|link:unit_IRadioStationDataCallback.adoc[IRadioStationDataCallback]
+|IRadioStationDataCallback.class
+|This interface is to send the data to the app.
+|===
+
+== Runtime View
+
+[dynamic_sequence=startup, unit=Debug, role=dynamic_sequence]
+=== Startup
+
+This unit has no explicit startup logic, the entry point is the DebugController class.
+
+[dynamic_sequence=shutdown, unit=Debug, role=dynamic_sequence]
+=== Shutdown
+
+The calling unit must simply remove all references to this instance,
+which causes the kotlin garbage collector to remove it from the heap.
+
+[dynamic_sequence=startup_after_s2r, unit=Debug, role=dynamic_sequence]
+=== Suspend
+
+Since this is a kotlin class without android references, no suspend state needs to be considered.
+
+[dynamic_sequence=resume, unit=Debug, role=dynamic_sequence]
+=== Resume
+
+Since this is a kotlin class without android references, no suspend state needs to be considered.
+
+=== Request RadioStationData from the DebugController
+
+[plantuml, title="getRadioStationData()", format="svg", id="getRadioStationData"]
+----
+participant "Arbitrary Unit" as caller
+participant "DebugController" as controller
+participant "IRadioStationDataCallback" as callback
+
+caller -> controller: setDebugConfig()
+
+caller <- callback: Initialize interface implementation
+
+caller -> controller: getRadioStationData()
+activate controller
+
+alt If randomizer decided error case
+controller -> callback: onComplete() with RetryBehavior
+else
+controller -> callback: onMetadata() with generated data
+controller -> callback: onLogo() with generated data
+controller -> callback: onSLogo() with generated data
+controller -> callback: onStreams() with generated data
+controller -> callback: onBearers() with generated data
+controller -> callback: onComplete() without RetryBehavior
+end
+
+deactivate controller
+----
+
+[[section-design-decisions]]
+== Design Decisions
+
+No further design decisions were made for the implementation of this unit other than those already mentioned in link:../../main.{type}[metadataservice_conradlib].
+
+include::../about-arc42.adoc[]

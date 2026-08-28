@@ -1,0 +1,36 @@
+include::config.adoc[]
+
+[[section-settings_tab]]
+== Settings Tab
+
+This tab is used in order to change the configuration of MetadataService application and overwrite the values if needed.
+
+* **XXX apk/lib version** info: Lists the current version information of the used APK and libraries
+
+=== Service section
+* **Online Data** switch: Online data queries can be enabled/disabled with this switch (e.g. to test only cached data in DB)
+* **Fake Service List / Network over D-Link** switch: APN1/APN2 is by-passed/considered and online connection is established only via D-Link or not
+* **Check Disable Reasons** switch: Disable reasons provided by CoreServices App are by-passed/considered
+* **Default Config** button: Initial values of all switches are set again (reset) when this button is clicked
+* **Delete Cache** button: All existing data cached in DB are deleted and application is restarted when this button is clicked
+* **Disable ESM** button: When clicked, ESM cache is disabled and erased then application is restarted and initialized with internal cache
+* **Enable ESM** button: When clicked, internal cache is disabled and erased then application is restarted and initialized with ESM cache
+
+=== Conrad Settings section
+* **Service List** drop-down list: ODP Demo/Approval/Live HCP3 service can be selected to overwrite the previously selected service from the CoreServices application menu
+* **Use Dev Token** switch: Conrad backend uses development OAuth2 tokens or not
+
+=== Gracenote Settings section
+* **Custom Position** drop-down list: In order to test Asia station logos, a location can be selected easily from this list
+* **Lat/Lng** text fields: When Custom Position is selected via the drop-down list above, these fields are automatically filled in according to the the longitude/latitude values of the selected location. New values can be set manually via keyboard input as well
+* **Set** button: Selected position is set to test Asia station logos
+* **Clear** button: Selected position is cleaned up, no location is selected
+
+=== Radio Demo Mode section
+
+This section is used to change initially set values for reply/retry mechanism.
+
+* **Enabled** switch: Following sliders/checkboxes are enabled to change the initial values or not
+* **Apply Config** button: New values which are set via the following sliders/checkboxes are considered by MetadataService application
+
+image:{imgdir}/10_settings_tab.png[]

@@ -1,0 +1,340 @@
+= How to search in logs?
+
+To find messages from ConRadClient within logs, you can search for the term  ``connectedradioclient``.
+
+Every message that can be assigned to a bearer contains this at the beginning of the message. You can also search for a bearer string to identify related messages and errors.
+
+== Recognizing errors by going through the process chain
+
+This chapter explains, how to go through the process chain, so you can see which messages are missing or incorrect.
+
+=== Initialization
+
+After ConRadClient initialization the class has to get a service config and a network object, check for following log messages.
+
+==== Service Config
+....
+Receive account manager config: {config} #config #TAConRadLib
+Receive endpoint config: {config} #config #TAConRadLib
+....
+
+What to do if the message does not exist:
+
+- Check the internet connection
+- Check the current status of service list in the CoreServices App
+- Check the current status of disabled reasons in the CoreService App
+- Set the backend in the MetaDataService app
+
+==== Network [[initialization_network]]
+
+....
+Receive new network. NetworkID: 100 #network
+Start ThreadPoolExecutor #executor
+....
+
+What to do if the message does not exist:
+
+- Check the internet connection
+
+=== Bearer request from media
+
+==== Receive requests from MetaDataService
+
+The process starts with the request from MetaDataService, this requests get logged with following message.
+
+....
+[{bearer}] Received MediaRequestObject: {object}
+....
+
+To find this message you can search for "Received MediaRequestObject" or after the bearer.
+If you can not find this message, connected radio did not get a request.
+
+What to do if the message does not exist:
+
+- Check if your internet ist enabled
+- Search for problems in MetaDataService
+- Be sure the tuner receive stations, or you choose a station correct from the drop-down menu in the MetaDataService app menu.
+
+==== Queue Worker
+
+Now a new LookupRequestJob gets added to the queue, search for this log message.
+
+....
+Add new LookupRequestJob to queue
+....
+
+What to do if the message does not exist:
+
+- Check for the log messages from chapter <<initialization_network>>
+
+==== Registration [[request_registration]]
+
+The program now checks for a valid cookie.
+
+....
+Check for valid session cookie
+....
+
+What to do if the message does not exist:
+
+- Check for the log messages from chapter <<initialization_network>>
+
+If the cookie is valid, this message gets logged:
+
+....
+Session cookie '{cookie_name}' is valid: {cookie_value}
+....
+
+If the server disables cookies, this message gets logged:
+
+....
+Session cookie is disabled
+....
+
+If none of the last two messages gets logged, the registration will be started and the following lines will get logged.
+
+....
+Start request to the registration endpoint
+Status: 200
+Headers: {headers}
+....
+
+What to do if the message does not exist:
+
+- Search for ``Can't receive token from CoreServices.``, if it exists:
+* Check the internet connection
+* Check the current status of the service list in the CoreServices or Magic
+* Check the current status of disabled reasons in the CoreServices or Magic
+* Set the backend in the MetaDataService app
+- Check the response status code of the response
+* Check if the Dev-Token is valid
+* Check the internet connection
+* Check if the server is available
+
+==== Lookup
+
+After the registration the job will be executed and following message gets outputted.
+
+....
+[{bearer}] Start request: {MediaRequestObject}
+....
+
+The following messages get logged if a server response is preserved.
+
+....
+[{bearer}] Status: {status}
+[{bearer}] Header: {headers}
+[{bearer}] Body: {body}
+....
+
+Here you can see the meaning of all lookup status codes.
+[%autowidth]
+|===
+| Status | Definition
+| 200 | Receive valid data from the backend.
+| 202 | No data is available at the backend at the moment. Receive retry-after header and request data again later.
+| 204 | No content for the requested bearer. Delete all cached data.
+| 207 | Receive multiple data with different status from the backend. (200, 202, 204, 304)
+| 304 | Not modified data. The current cached data is up-to-date.
+| 401, 403 | Token not valid for this backend, check core service settings.
+| 429, 503 | Server in maintenance mode. Do not request again in the near future.
+| 500, 502, 504 | Server error. Try it one more time, then let the server in peace.
+| else | Bad request with no retry.
+|===
+
+On status 200, you will see this message:
+
+....
+[{bearer}] Send metadata to media: {...}
+....
+
+What to do if the message does not exist:
+
+- Check the internet connection
+- Search for error messages related to #token, #parsing and #lookup
+- What does the response of the server say?
+
+==== Logo
+
+If the lookup request is successful and the server holds an image, this chapter will be executed.
+If this happens, you will see this log message:
+
+....
+Add new LogoRequestJob to queue
+....
+
+Now you will see that the process of <<request_registration>> gets repeated.
+
+If the client gets a response from the backend, you will see this message:
+
+....
+[{bearer}] Status: {status} {OK or response body}
+....
+
+What to do if the message does not exist:
+
+- Check the internet connection
+- Search for error messages related to #token and #logo
+
+Here you can see the meaning of all logo status codes.
+
+[%autowidth]
+|===
+| Status | Definition
+| 200 | Receive valid logo from the backend.
+| 202 | No logo available at the backend at the moment. Receive retry-after header and request again later.
+| 204 | No content for the requested bearer, delete cached logo.
+| 304 | Not modified data. The current cached data is up-to-date.
+| 401, 403 | Token not valid for this backend, check core service settings.
+| 429, 503 | Server in maintenance mode. Do not request again in the near future.
+| 500, 502, 504 | Server error. Try it one more time, then let the server in peace.
+| else | Bad request with no retry.
+|===
+
+If the status code is 200, you will see the following messages.
+
+....
+[{bearer}] Body size: {size} Byte
+[{bearer}] Headers: {headers}
+[{bearer}] Send logo to media: {logo}
+....
+
+What to do if the message does not exist:
+
+- Check the internet connection
+- Search for error messages related to #token and #logo
+- Always status 202 at the same logo -> Server problem
+
+== Hashtags
+To find messages from a certain type of process, you can search for the following keywords:
+
+[%autowidth]
+|===
+|Keyword |Description
+
+|#config
+|ConRadLib has received config values from media.
+
+|#cookie
+|These messages contain information about the session cookie, often they are related to #registration.
+
+|#executor
+|Information about the status of the ThreadPoolExecutor.
+If the Executor gets stopped, no new requests will be sent to the backend.
+
+|#json
+|This process works with received or to be sent json data.
+
+|#logo
+|These messages provide information about the receiving and processing of logo files.
+
+|#lookup
+|This tag is used for messages that contain information about look up requests.
+
+|#media
+|These messages are about data exchange with media.
+
+|#network
+|The network of the HttpClient has been changed.
+
+|#parsing
+|In this process runtime objects get converted to json or vice versa.
+
+|#registration
+|These messages provide information about the registration at the backend.
+
+|#request
+|When these messages get print out, http requests will be executed.
+
+|#response
+|Information about the response of http request performed before gets displayed here.
+
+|#token
+|Gives information about the token used to register at the backend, also see #registration.
+
+|#TAConRadLib
+|Information is relevant for e.solutions trace analyzer tool.
+
+|===
+
+== IRC (Infotainment Recorder)
+
+The irc is used to record errors in delivered cars without installing a trace logger in the customer's car.
+
+The messages are divided into several channels/entries in order to assign the messages to a specific processes.
+
+[%autowidth]
+|===
+| Name | Description
+
+|ConRadLibVersion
+|Only the currently used conrad version is saved here.
+
+|ConRadLibExceptions
+|This channel is the only one that stores text instead of numbers.
+Occurring exceptions are logged here, the maximum length of the message is 32 characters.
+
+|ConRadLibErrorRegistration
+|All messages related to registration requests are logged here. Also see ConRadLibExceptions.
+
+|ConRadLibErrorLookup
+|All messages related to lookup requests are logged here. Also see ConRadLibExceptions.
+
+|ConRadLibErrorLogo
+|All messages related to logo requests are logged here. Also see ConRadLibExceptions.
+
+|===
+
+To be as efficient as possible, nearly no text messages are stored, only error codes.
+
+[%autowidth]
+|===
+| Code | Identifier | Description
+
+|0
+|UNKNOWN
+|An error has occurred for which no status code exists, watch for other messages in the same entry/channel.
+
+|1
+|TOKEN
+|Couldn't get a token, error is probably with core services or the internet connection.
+
+|2
+|EMPTY_BODY
+|The Backend returned a valid status code but the body is empty.
+
+|3
+|INVALID_RESPONSE
+|The Backend returned a valid status code but the response/body is invalid.
+
+| >200
+|-
+|The backend returned an unforeseen or bad http status code, the stored code is the code returned by the server.
+
+|===
+
+The messages have a max length of 128 characters. The structure of the messages in ConRadLibExceptions is: [ErrorOrigin]=[Details]
+
+The following error origins exist.
+
+[%autowidth]
+|===
+| ErrorOrigin | Detail | Description
+
+|Registration
+|Exception
+|If OkHttp reports an error, it will be saved. Example message: "Registration=UnknownHostException-Host not found"
+
+|Lookup
+|Exception
+|If OkHttp reports an error, it will be saved. Example message: "Lookup=UnknownHostException-Host not found"
+
+|Logo
+|Exception
+|If OkHttp reports an error, it will be saved. Example message: "Logo=UnknownHostException-Host not found"
+
+|Parse
+|Input String
+|If the backend returns an invalid json or something else and this cannot be parsed. Example message: "Parse=tHiS iS A bAcKeNd rEsPoNsE"
+
+|===

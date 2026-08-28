@@ -1,0 +1,20 @@
+@startuml
+
+skinparam componentStyle uml2
+
+component GracenoteService as service
+
+node "MetadataService" <<extern>> as client_apps {
+}
+
+
+node "Gracenote Backends" <<extern>> as providers {
+}
+
+client_apps -> service : request
+service ..> client_apps : response
+
+service --> providers : request
+providers .> service : response
+
+@enduml

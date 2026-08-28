@@ -1,0 +1,76 @@
+@startuml
+
+skinparam linetype ortho
+
+component "Account Manager" as acc
+cloud Backend as server
+
+node metadataservice_app {
+    component metadataservice_app as mds
+
+    node metadataservice_conradlib {
+
+        node Api {
+            component GenericMoshiParser
+            component Http
+            component SystemPropertyReader
+        }
+
+        component Data
+
+        component Debug
+
+        node Backend {
+            component LogoCallback
+            component LookupCallback
+            component IController
+            component RequestController
+            component RegistrationFailureException
+            component ExecutorWorker
+            component PausableThreadPoolExecutor
+            component IJob
+            component LogoRequestJob
+            component LookupRequestJob
+            component RegistrationRequestJob
+            component HandleRegistration
+            component ServerDowntimeHandler
+            component LookupRequestContainer
+        }
+
+        component TokenHandler
+
+        node Media {
+            component ConRadClient
+            component IRadioStationDataCallback
+            component SendToMedia
+        }
+
+        component IRC
+        component Logger
+    }
+}
+
+mds -right- Media
+
+Media -right- Backend
+Media -up- Logger
+Media -up- IRC
+Media -down- Debug
+
+Backend -up- Logger
+Backend -up- IRC
+Backend -down- TokenHandler
+Backend -up- Data
+Backend -right- Api
+Backend -down- server
+
+TokenHandler -up- Logger
+TokenHandler -up- IRC
+TokenHandler -down- acc
+
+Debug -- Data
+
+Api -- Logger
+Api -- IRC
+
+@enduml

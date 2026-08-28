@@ -1,0 +1,48 @@
+{
+  "services": [
+    {
+      "serviceId": "connectedradio_v2",
+      "transactionTypeId": "TTENT-connectedradio_v2",
+      "operations": [
+        {
+          "operationId": "DEFAULT",
+          "operationTypeId": "TTENT-connectedradio_v2.CODEFAULT",
+          "authLevel": "T1x"
+        }
+      ]
+    },
+    {
+      "serviceId": "gracenote_v1",
+      "transactionTypeId": "TTENT-gracenote_v1",
+      "operations": [
+        {
+          "operationId": "DEFAULT",
+          "operationTypeId": "TTENT-gracenote_v1.CODEFAULT",
+          "authLevel": "T1x"
+        }
+      ]
+    },
+    {
+      "serviceId": "gracenotelyrics_v1",
+      "transactionTypeId": "TTENT-gracenotelyrics_v1",
+      "operations": [
+        {
+          "operationId": "DEFAULT",
+          "operationTypeId": "TTENT-gracenotelyrics_v1.CODummy",
+          "authLevel": "T1x"
+        }
+      ]
+    },
+    {
+      "serviceId": "hybridradiodata_v3",
+      "transactionTypeId": "TTENT-hybridradiodata_v3",
+      "operations": [
+        {
+          "operationId": "DEFAULT",
+          "operationTypeId": "TTENT-hybridradiodata_v3.COLogos",
+          "authLevel": "T1x"
+        }
+      ]
+    }
+  ]
+}

@@ -1,0 +1,21 @@
+@startuml
+
+Missing: station has never been requested or was evicted
+Incomplete: no or not all available station data received
+Complete: all available station data received
+Updating: fetching update - transient
+
+[*] --> Missing
+
+Missing --> Updating: client request
+
+Updating --> Incomplete: response retry
+Updating --> Complete: response ok
+
+Incomplete --> Updating: retry delay expired (retryAfter)
+Incomplete --> Missing: clean up
+
+Complete --> Updating: expiration date expired (validUntil)
+Complete --> Missing: clean up
+
+@enduml

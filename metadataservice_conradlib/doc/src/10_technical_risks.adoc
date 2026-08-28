@@ -1,0 +1,4 @@
+[[section-technical-risks]]
+== Risks and Technical Debts
+
+There are no risks or technical debts yet.

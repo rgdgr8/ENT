@@ -1,0 +1,586 @@
+// LOCAL BUILD: Removed Asciidoctor import - not needed for local builds
+// import org.asciidoctor.gradle.jvm.pdf.AsciidoctorPdfTask
+import groovy.json.JsonSlurper
+
+plugins {
+    id 'com.android.application'
+    id 'com.google.devtools.ksp'
+    id 'kotlin-android'
+    // Removed: id "de.esolutions.media-common"
+    id 'kotlin-parcelize'
+    // LOCAL BUILD: Removed maven-publish - not needed for local builds
+}
+
+def versionsJsonFile = new File("$projectDir/../deploy/versions.json")
+def json = new JsonSlurper().parseText(versionsJsonFile.text)
+def identityProp = project.findProperty("mds.identity")?.toString()?.toLowerCase()
+def mdsIdentity = identityProp ?: "new"
+def validIdentities = ["new"]
+if (!(mdsIdentity in validIdentities)) {
+    throw new GradleException("Unsupported mds.identity='${mdsIdentity}'. This branch supports only: new.")
+}
+
+def newApplicationId = "technology.cariad.entertainment.metadataservice"
+def legacyApplicationId = "de.esolutions.metadataservice"
+
+def appApplicationId = newApplicationId
+def useServicePermission = "${appApplicationId}.USE_SERVICE"
+def legacyUseServicePermission = "${legacyApplicationId}.USE_SERVICE"
+def aidlBindAction = "technology.cariad.entertainment.metadataserviceclient.api.IMetadataServiceAidl"
+def legacyAidlBindAction = "de.esolutions.metadataserviceclient.api.IMetadataServiceAidl"
+def imageProviderAuthority = "technology.cariad.entertainment.metadataservice.contentprovider.MetadataImageProvider"
+def legacyImageProviderAuthority = "${legacyApplicationId}.MetadataService.ImageProvider"
+def manifestImageProviderAuthorities = "${imageProviderAuthority};${legacyImageProviderAuthority}"
+def appClassName = "technology.cariad.entertainment.metadataservice.MetadataServiceApp"
+def serviceClassName = "technology.cariad.entertainment.metadataservice.service.MetadataService"
+def providerClassName = "technology.cariad.entertainment.metadataservice.contentprovider.MetadataImageProvider"
+
+def appVersion = json[appApplicationId] as String
+if (!appVersion) {
+    throw new GradleException("No version entry found in deploy/versions.json for '${appApplicationId}'.")
+}
+
+// Parse version string: "1.90-release" -> major=1, minor=90, patch=0, cluster=release
+def versionParts = appVersion.split("-")
+def clusterInfo = versionParts.length > 1 ? versionParts[1] : "release"
+def numericVersion = versionParts[0].split("\\.")
+
+def versionMajor = Integer.parseInt(numericVersion[0])
+def versionMinor = Integer.parseInt(numericVersion.length > 1 ? numericVersion[1] : "0")
+def versionPatch = Integer.parseInt(numericVersion.length > 2 ? numericVersion[2] : "0")
+
+def appVersionName = "$versionMajor.$versionMinor.$versionPatch-$clusterInfo"
+def appVersionCode = versionMajor * 10000 + versionMinor * 100 + versionPatch
+// Runtime profile selection.
+//   emu          : vanilla Android Automotive emulator. Conradlib, approval
+//                  endpoint, mock service list + disable reasons, baked-in test token,
+//                  DEV mode ON. Runs out of the box.
+//   icc          : real testbench with Magic running. Conradlib, real token,
+//                  real service list + disable reasons, LIVE mode.
+//   no-gn        : VW no-license fallback. Same runtime behavior as icc but
+//                  Gracenote license is explicitly disabled and runtime token
+//                  retrieval remains the default path.
+def mdsProfileProp = project.findProperty("mds.profile")?.toString()?.toLowerCase()
+def conradlibVariantProp = project.findProperty("conradlib.variant")?.toString()?.toLowerCase()
+def mdsProfile
+if (mdsProfileProp) {
+    mdsProfile = mdsProfileProp
+} else if (conradlibVariantProp == "default") {
+    mdsProfile = "icc"
+} else {
+    mdsProfile = "icc"
+}
+def validProfiles = ["emu", "icc", "no-gn"]
+if (!(mdsProfile in validProfiles)) {
+    throw new GradleException("Unsupported mds.profile='${mdsProfile}'. Use one of: ${validProfiles.join(', ')}.")
+}
+def conradlibVariant = "default"
+
+def profileLabel
+def archivesIdentityLabel = "tech-cariad"
+def defaultConradBackendUrl
+def defaultDevMode
+def defaultTokenOverrideEnabled
+def defaultUseRealServiceList
+def defaultUseRealDisableReasons
+def defaultConradTokenFile
+def conradTokenFile = new File("$projectDir/../../token/testtoken.txt")
+def gnLicenseVariant = System.env['GN_LICENSE_VARIANT'] ?: "VARIANT_OEM_AU"
+switch (mdsProfile) {
+    case "emu":
+        profileLabel = "EmuGeneric"
+        defaultConradBackendUrl = "https://connectedradio-v2.approval.car-cloud.org/"
+        defaultDevMode = true
+        defaultTokenOverrideEnabled = true
+        defaultUseRealServiceList = false
+        defaultUseRealDisableReasons = false
+        defaultConradTokenFile = conradTokenFile
+        break
+    case "icc":
+        profileLabel = "ICC"
+        defaultConradBackendUrl = "https://connectedradio-v2.approval.car-cloud.org/"
+        defaultDevMode = false
+        defaultTokenOverrideEnabled = false
+        defaultUseRealServiceList = true
+        defaultUseRealDisableReasons = true
+        defaultConradTokenFile = conradTokenFile
+        break
+    default: // no-gn
+        profileLabel = "NoGN"
+        defaultConradBackendUrl = "https://connectedradio-v2.approval.car-cloud.org/"
+        defaultDevMode = false
+        defaultTokenOverrideEnabled = false
+        defaultUseRealServiceList = true
+        defaultUseRealDisableReasons = true
+        defaultConradTokenFile = conradTokenFile
+        gnLicenseVariant = "NONE"
+        break
+}
+if (!defaultConradTokenFile.exists()) {
+    throw new RuntimeException("Missing default conrad token file: ${defaultConradTokenFile}")
+}
+def defaultConradToken = defaultConradTokenFile.text.trim()
+def quoteBuildConfigString = { value ->
+    def escaped = value.replace("\\", "\\\\").replace("\"", "\\\"")
+    return "\"${escaped}\""
+}
+
+def gnsdkArm64LibDir = file("$projectDir/../../gnsdk-auto-2.6.19.14264-20250729/lib/android_arm64-v8a")
+def gnsdkX8664LibDir = file("$projectDir/../../gnsdk-auto-2.6.19.14264-20250729/lib/android_x86_64")
+def generatedGnsdkJniLibsDir = file("$buildDir/generated/gnsdkJniLibs")
+
+def aidlPath = "../../esoSDK/aosp-artifacts/aidls"
+
+ext {
+    dagger_version = '2.49'
+    room_version = '2.5.1'
+    lifecycle_version = '2.5.1'
+}
+
+android {
+    namespace 'technology.cariad.entertainment.metadataservice'
+    android.ndkVersion "$ndk_version"
+    compileSdk 34
+    useLibrary 'android.car'
+    defaultConfig {
+        applicationId appApplicationId
+        minSdkVersion 33
+        targetSdkVersion 34
+        versionCode = appVersionCode
+        versionName = appVersionName
+        setProperty("archivesBaseName", "MetadataService-${profileLabel}-${archivesIdentityLabel}")
+        manifestPlaceholders = [
+            mdsUseServicePermission: useServicePermission,
+            mdsLegacyUseServicePermission: legacyUseServicePermission,
+            mdsAidlAction: aidlBindAction,
+            mdsLegacyAidlAction: legacyAidlBindAction,
+            mdsProviderAuthority: manifestImageProviderAuthorities,
+            mdsApplicationClass: appClassName,
+            mdsServiceClass: serviceClassName,
+            mdsProviderClass: providerClassName
+        ]
+
+        def gnLicenseEnabled = gnLicenseVariant != "NONE"
+        buildConfigField "boolean", "GN_LICENSE_ENABLED", "${gnLicenseEnabled}"
+        buildConfigField "String", "MDS_IDENTITY", quoteBuildConfigString(mdsIdentity)
+        buildConfigField "String", "USE_SERVICE_PERMISSION", quoteBuildConfigString(useServicePermission)
+        buildConfigField "String", "LEGACY_USE_SERVICE_PERMISSION", quoteBuildConfigString(legacyUseServicePermission)
+        buildConfigField "String", "METADATA_SERVICE_AIDL_ACTION", quoteBuildConfigString(aidlBindAction)
+        buildConfigField "String", "LEGACY_METADATA_SERVICE_AIDL_ACTION", quoteBuildConfigString(legacyAidlBindAction)
+        buildConfigField "String", "IMAGE_PROVIDER_AUTHORITY", quoteBuildConfigString(imageProviderAuthority)
+        buildConfigField "String", "LEGACY_IMAGE_PROVIDER_AUTHORITY", quoteBuildConfigString(legacyImageProviderAuthority)
+        buildConfigField "String", "MDS_PROFILE", "\"${mdsProfile}\""
+        buildConfigField "String", "CONRADLIB_VARIANT", "\"${conradlibVariant}\""
+        buildConfigField "String", "DEFAULT_CONRAD_BACKEND_URL", quoteBuildConfigString(defaultConradBackendUrl)
+        buildConfigField "String", "DEFAULT_CONRAD_TOKEN", quoteBuildConfigString(defaultConradToken)
+        buildConfigField "boolean", "DEFAULT_DEV_MODE", "${defaultDevMode}"
+        buildConfigField "boolean", "DEFAULT_TOKEN_OVERRIDE_ENABLED", "${defaultTokenOverrideEnabled}"
+        buildConfigField "boolean", "DEFAULT_USE_REAL_SERVICE_LIST", "${defaultUseRealServiceList}"
+        buildConfigField "boolean", "DEFAULT_USE_REAL_DISABLE_REASONS", "${defaultUseRealDisableReasons}"
+
+        testInstrumentationRunner "androidx.test.runner.AndroidJUnitRunner"
+
+        javaCompileOptions {
+            annotationProcessorOptions {
+                arguments = ["room.incremental": "true"]
+
+                if (!project.hasProperty("TARGET_NAME")) {
+                    arguments += ["room.schemaLocation": "$projectDir/schemas".toString()]
+                }
+            }
+        }
+
+        // include framework dependencies
+        testOptions {
+            unitTests.includeAndroidResources = true
+        }
+
+        compileOptions {
+            sourceCompatibility JavaVersion.VERSION_1_8
+            targetCompatibility JavaVersion.VERSION_1_8
+
+            kotlinOptions.freeCompilerArgs += [
+                    "-opt-in=kotlinx.coroutines.ExperimentalCoroutinesApi"
+            ]
+        }
+
+        kotlinOptions {
+            jvmTarget = "1.8"
+        }
+
+        buildFeatures {
+            buildConfig = true
+            aidl = true
+        }
+
+        buildFeatures {
+            buildConfig = true
+            aidl = true
+        }
+
+        // Native build configuration for Gracenote SDK (standalone without Conan)
+        externalNativeBuild {
+            cmake {
+                cppFlags "-std=c++14 -Wall" +
+                        " -Werror=address" +
+                        " -Werror=array-bounds" +
+                        " -Werror=uninitialized" +
+                        " -Werror=format" +
+                        " -Werror=format-security" +
+                        " -Werror=format-nonliteral" +
+                        " -Werror=undef" +
+                        " -ffunction-sections" +
+                        " -fdata-sections" +
+                        " -fstack-protector-strong" +
+                        " -Wa,--noexecstack" +
+                        " -O2" +
+                        " -D_FORTIFY_SOURCE=2" +
+                        " -Wall" +
+                        " -Wextra" +
+                        " -Werror" +
+                        " -Werror=address-of-temporary" +
+                        " -Werror=date-time" +
+                        " -Werror=int-to-pointer-cast" +
+                        " -Werror=null-dereference" +
+                        " -Werror=uninitialized" +
+                        " -Werror=return-type" +
+                        " -Werror=sequence-point" +
+                        " -Wcast-align" +
+                        " -Wfor-loop-analysis" +
+                        " -Wimplicit-fallthrough" +
+                        " -Woverlength-strings" +
+                        " -Wpointer-arith" +
+                        " -Wno-unused" +
+                        " -Wno-unused-parameter" +
+                        " -Wno-error=deprecated-declarations" +
+                        " -Wno-error=unused-command-line-argument" +
+                        " -Wdelete-non-virtual-dtor" +
+                        " -Werror=non-virtual-dtor" +
+                        " -Wsign-promo" +
+                        " -Wno-error=defaulted-function-deleted" +
+                        " -Wno-inconsistent-missing-override" +
+                        " -Wno-error=#warnings" +
+                        " -Wno-error=deprecated-copy-with-user-provided-copy" +
+                        " -Wno-error=missing-field-initializers" +
+                        " -Wl,-z,relro" +
+                        " -Wl,-z,now" +
+                        " -Wl,-z,noexecstack" +
+                        " -fPIC"
+
+                // add flag to set gracenote license for different oems, the env variables are defined
+                // in buildruns.yml and set by the build scripts
+                if (System.env['GN_LICENSE_VARIANT'] != null) {
+                    if (System.env['GN_LICENSE_VARIANT'] != "NONE") {
+                        cppFlags += " -D" + System.env['GN_LICENSE_VARIANT']
+                    }
+                }
+                // if no env variable for license variant is set at all, we are building locally using
+                // Android Studio without build scripts and therefore need to set a license manually
+                // for local builds using the AU license for dev drops
+                else {
+                    cppFlags += " -DVARIANT_OEM_AU"
+                }
+
+                cFlags "-Werror=implicit-function-declaration" +
+                        " -Werror=int-conversion" +
+                        " -Werror=pointer-to-int-cast"
+
+                arguments "-DANDROID_STL=c++_shared"
+            }
+        }
+
+        ndk {
+            // Build both arm64 and x86_64 so emulator can load native Gracenote JNI.
+            abiFilters 'arm64-v8a', 'x86_64'
+        }
+
+        lintOptions {
+            abortOnError false
+        }
+    }
+
+    // LOCAL BUILD: Disabled ABI splits (no native build)
+    /*
+    splits {
+        abi {
+            enable true
+            reset()
+            include "x86_64", "arm64-v8a"
+            universalApk true
+        }
+    }
+    */
+
+    testOptions {
+        unitTests.all {
+            ignoreFailures = true
+            jacoco {
+                includeNoLocationClasses = true
+                excludes = ['*']
+            }
+            jvmArgs = ["--add-opens=java.base/java.util=ALL-UNNAMED"]
+        }
+    }
+
+    sourceSets {
+        main {
+            aidl.srcDirs += "$aidlPath/aidl.navigation/navigation.positioninformation/aidl"
+            jniLibs.srcDirs += generatedGnsdkJniLibsDir
+        }
+        androidTest {
+            java.srcDirs += "$projectDir/src/testShared/java"
+            aidl.srcDirs += main.aidl.srcDirs
+        }
+        test {
+            java.srcDirs += "$projectDir/src/testShared/java"
+            aidl.srcDirs += main.aidl.srcDirs
+        }
+
+    }
+
+    buildTypes {
+        release {
+            minifyEnabled true
+            shrinkResources true
+            debuggable false
+            proguardFiles getDefaultProguardFile('proguard-android-optimize.txt'),
+                    'proguard-rules.pro',
+                    'proguard-rules-release.pro'
+        }
+
+        debug {
+            minifyEnabled false
+            shrinkResources false
+            debuggable true
+            testCoverageEnabled = true
+            signingConfig signingConfigs.debug
+            proguardFiles getDefaultProguardFile('proguard-android-optimize.txt'),
+                    'proguard-rules.pro',
+                    'proguard-rules-debug.pro'
+        }
+    }
+
+    flavorDimensions = ["release", "region"]
+    productFlavors {
+        create("dev") {
+            setDimension("release")
+        }
+
+        create("prod") {
+            isDefault = true
+            setDimension("release")
+        }
+
+        create("row") {
+            isDefault = true
+            setDimension("region")
+        }
+
+        create("cn") {
+            setDimension("region")
+        }
+    }
+
+    // Native build configuration (standalone without Conan)
+    externalNativeBuild {
+        cmake {
+            path 'src/main/cpp/CMakeLists.txt'
+
+            if (project.hasProperty("NATIVE_OUTPUT")) {
+                version "3.28.5"
+                buildStagingDirectory project.properties["NATIVE_OUTPUT"]
+            }
+        }
+    }
+
+    productFlavors {
+        dev {
+            buildFeatures {
+                viewBinding = true
+            }
+            // Dev builds ("Devstände") are always signed with the testkey,
+            // regardless of build type.
+            signingConfig signingConfigs.debug
+        }
+    }
+
+    packagingOptions {
+        // exclude from fw libraries
+        exclude 'META-INF/INDEX.LIST'
+        pickFirst "**/*.so"
+    }
+
+    signingConfigs {
+        debug {
+            storeFile file('../keystore/testkey.keystore')
+            storePassword 'android'
+            keyPassword 'android'
+            keyAlias 'testkey'
+        }
+    }
+}
+
+tasks.register("syncGnsdkArm64JniLibs", Copy) {
+    from(gnsdkArm64LibDir) {
+        include "*.so"
+    }
+    into new File(generatedGnsdkJniLibsDir, "arm64-v8a")
+}
+
+tasks.register("syncGnsdkX8664JniLibs", Copy) {
+    from(gnsdkX8664LibDir) {
+        include "*.so"
+    }
+    into new File(generatedGnsdkJniLibsDir, "x86_64")
+}
+
+tasks.named("preBuild") {
+    dependsOn("syncGnsdkArm64JniLibs")
+    dependsOn("syncGnsdkX8664JniLibs")
+}
+
+// transitive dependency override for OSS compliance
+configurations.configureEach {
+    resolutionStrategy {
+        force 'org.reactivestreams:reactive-streams:1.0.4'
+    }
+}
+
+// general - LOCAL BUILD: All eso.fw dependencies removed
+dependencies {
+    // Removed: implementation platform("de.esolutions.fw:esofw:$fw_core_version")
+    // Removed: compileOnly "de.esolutions.fw:fw_util_android_newstapi"
+    // Removed: compileOnly "de.esolutions.fw:fw_comm_android_newstapi"
+    // Removed: implementation "de.esolutions.fw:fw_util_android_support"
+    // Removed: implementation "de.esolutions.fw:fw_comm_android_support"
+
+    // Removed: compileOnly "de.esolutions.android.aosp:framework:$framework_jar_version"
+    // Removed: implementation "de.esolutions.fw:fw_tbirc_mmx"
+
+    // Removed: asi.diag.pers.Storage
+    // Removed: implementation "de.esolutions.fw:fw_android_asi_persistence_interface"
+    // Removed: implementation "de.esolutions.fw:fw_android_asi_persistence_client"
+    // Removed: implementation "de.esolutions.fw:fw_android_asi_common_interface"
+
+    implementation "org.jetbrains.kotlin:kotlin-stdlib-jdk8:$kotlin_version"
+    implementation "org.jetbrains.kotlin:kotlin-reflect:$kotlin_version"
+    implementation "org.jetbrains.kotlinx:kotlinx-coroutines-core:1.5.2"
+    implementation "androidx.preference:preference-ktx:1.1.1"
+
+    devImplementation "androidx.core:core-ktx:1.6.0"
+    devImplementation "org.jetbrains.kotlinx:kotlinx-coroutines-rx3:1.5.2"
+    devImplementation "com.google.android.material:material:1.4.0"
+    
+    // RxJava3 Android - required at runtime by metadataservice.aar
+    implementation "io.reactivex.rxjava3:rxjava:3.1.5"
+    implementation "io.reactivex.rxjava3:rxandroid:3.0.2"
+    
+    // OkHttp - required by conradlib for HTTP requests
+    implementation "com.squareup.okhttp3:okhttp:4.12.0"
+    implementation "com.squareup.okhttp3:okhttp-urlconnection:4.12.0"
+
+    // added for JDK9 annotations related errors
+    compileOnly 'javax.annotation:javax.annotation-api:1.3.2'
+
+    // Removed: esm - compileOnly files("../../esoSDK/aosp-artifacts/UNIT/eso/storagemanager/intermediates/com.volkswagenag.storagemanager.jar")
+}
+
+// Dagger
+dependencies {
+    implementation "com.google.dagger:dagger:$dagger_version"
+    implementation "com.google.dagger:dagger-android:$dagger_version"
+    implementation "com.google.dagger:dagger-android-support:$dagger_version"
+    ksp "org.jetbrains.kotlinx:kotlinx-metadata-jvm:0.5.0"
+    ksp "com.google.dagger:dagger-compiler:$dagger_version"
+    ksp "com.google.dagger:dagger-android-processor:$dagger_version"
+}
+
+// Room
+dependencies {
+    implementation "androidx.room:room-runtime:$room_version"
+    implementation "androidx.room:room-ktx:$room_version"
+    implementation "androidx.room:room-rxjava2:$room_version"
+    ksp "androidx.room:room-compiler:$room_version"
+    testImplementation "androidx.room:room-testing:$room_version"
+}
+
+// Lifecycle
+dependencies {
+    implementation "androidx.lifecycle:lifecycle-viewmodel:$lifecycle_version"
+    implementation "androidx.lifecycle:lifecycle-viewmodel-ktx:$lifecycle_version"
+}
+
+// Test
+dependencies {
+    testImplementation "junit:junit:4.13.2"
+    testImplementation "io.mockk:mockk:1.12.0"
+
+    // Robolectric environment
+    testImplementation "androidx.test:core:1.4.0"
+    testImplementation("org.robolectric:robolectric:4.3.1") {
+        exclude group: "com.google.auto.service", module: "auto-service"
+    }
+
+    testImplementation "org.jetbrains.kotlinx:kotlinx-coroutines-test:1.3.4"
+
+    testImplementation "nl.jqno.equalsverifier:equalsverifier:3.16"
+    // Removed: testImplementation "de.esolutions.fw:esofw_android_shaded"
+
+    // Removed: implementation "de.esolutions.fw:fw_android_asi_service_networkaccess_v2_android_interface"
+    // Removed: implementation "de.esolutions.fw:fw_android_asi_service_networkaccess_v2_android_client"
+
+    androidTestImplementation "androidx.test.ext:junit:1.1.3"
+    androidTestImplementation "androidx.test:runner:1.4.0"
+    androidTestImplementation "androidx.test:rules:1.4.0"
+}
+
+// aar - LOCAL BUILD: Using clientinterface as source module (built from AIDL + Kotlin sources)
+dependencies {
+    implementation project(':clientinterface')
+    // Removed external legacy gmdlib Maven dependency for local builds.
+    // LOCAL BUILD: Use conradlib as source module instead of AAR
+    rowImplementation project(':conradlib')
+}
+
+// MagicAdapter - LOCAL BUILD: Using local JARs
+dependencies {
+    compileOnly files('../../libs_from_Cariad/ivi-online-MagicAdapter/ESOSDK/magic_adapter_stapi.jar')
+    testImplementation files('../../libs_from_Cariad/ivi-online-MagicAdapter/ESOSDK/magic_adapter_stapi.jar')
+
+    compileOnly files('../../libs_from_Cariad/ivi-online-MagicAdapter/ESOSDK/oi.aidl.enabler.coreservices.jar')
+    testImplementation files('../../libs_from_Cariad/ivi-online-MagicAdapter/ESOSDK/oi.aidl.enabler.coreservices.jar')
+}
+
+task cppLint(type: Exec) {
+    group 'verification'
+    description 'run cpplint over all native c++ code in GracenoteService'
+
+    workingDir "src/main/cpp/gracenoteservice"
+
+    commandLine("python", "../../spice/cpplint/cpplint.py",
+            "--filter=-whitespace,-runtime/reference",
+            "--linelength=120",
+            "--repository=.", "--recursive",
+            ".")
+
+    ignoreExitValue true
+
+    ext.lintfile = new File('../spice/cpplint/codestyle.log')
+    standardOutput = new ByteArrayOutputStream();
+    errorOutput = new ByteArrayOutputStream()
+
+    doLast {
+        lintfile.text = errorOutput.toString() + standardOutput.toString()
+    }
+}
+
+// LOCAL BUILD: Removed publishing block - not needed for local builds and referenced eso.local Artifactory
+
+// LOCAL BUILD: Removed createUserManualPdf task - requires Asciidoctor plugin not available for local builds
+// task createUserManualPdf(type: AsciidoctorPdfTask, description: "create pdf from the asciidoc") { ... }
+
+// LOCAL BUILD: Removed all Conan-related tasks (fetchConanCerts, installConanProfiles, remoteConanClean, remoteConanAdd, remoteConanUser, fetchConanDependencies)
+// These are not needed for local builds without eso.local access
+
+// LOCAL BUILD: Removed oss {} and sbomConfig {} blocks
+// These require the media-common-gradle-plugin which is not available for local builds

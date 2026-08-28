@@ -1,0 +1,20 @@
+@startuml
+title Data Not Modified
+
+participant "metadataservice_app" as media
+participant "metadataservice_conradlib" as crc
+participant "ConnectedRadio_Backend" as crb
+
+media -> crc : getRadioStationData(IBearer, ETags, RadioStationDataCallback)
+crc -> crc : getRadioStationData(MediaRequestObject)
+crc -> crc : create new container or add to container
+crc -> crc : wait for other bearer requests
+crc -> crc : Check valid registration
+crc -> crb : request bearers as json
+activate crb
+crc <- crb : receive data as json
+deactivate crb
+crc -> crc : parseJson
+media <- crc : onComplete(CompleteStatus, expiryDate)
+deactivate crc
+@enduml

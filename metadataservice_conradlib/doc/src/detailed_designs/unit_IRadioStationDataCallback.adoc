@@ -1,0 +1,229 @@
+﻿include::../config.adoc[]
+//imagesdir must be overwritten, it is already included in the config.adoc
+:imagesdir: ../../images
+:hash: #
+
+= image:ESO_Logo_Colour_positive_RGB.png[eso_icon,350,350,float="right",align="center"] Design metadataservice_conradlib - Unit IRadioStationDataCallback
+:toc-title: Table of Contents
+
+'''
+
+// numbering from here on
+:numbered:
+:stem: latexmath
+
+
+[unit=IRadioStationDataCallback, role=unit]
+== <<Unit>> IRadioStationDataCallback
+This document specifies the design of the unit *IRadioStationDataCallback*, it is part of the link:../../main.{type}[metadataservice_conradlib].
+
+This callback interface is used to give the requested data to the MetaDataService.
+
+== Provided Interface (public methods and properties)
+
+=== IRadioStationDataCallback.onMetadata(etag: String?, metadata: StationMetadata?)
+
+Called if an answer from the backend was received, the function reports the station metadata about the requested bearer.
+
+*Arguments*
+
+|===
+|name|value range |valid values | description
+
+|etag
+|String?
+|String or null
+|The etag received from the backend or null if no data is available.
+
+|metadata
+|StationMetadata?
+|StationMetadata or null
+|The station metadata received from the backend or null if no data is available.
+|===
+
+*Return*
+
+None
+
+=== IRadioStationDataCallback.onLogo(etag: String?, logo: StationLogo?)
+
+Called if an answer from the backend was received, the function reports the big logo from the requested bearer.
+
+*Arguments*
+
+|===
+|name|value range |valid values | description
+
+|etag
+|String?
+|String or null
+|The etag received from the backend or null if no data is available.
+
+|logo
+|StationLogo?
+|StationLogo or null
+|The logo data received from the backend or null if no logo not exists.
+|===
+
+*Return*
+
+None
+
+=== IRadioStationDataCallback.onSLogo(etag: String?, logo: StationLogo?)
+
+Called if an answer from the backend was received, the function reports the small logo from the requested bearer.
+
+*Arguments*
+
+|===
+|name|value range |valid values | description
+
+|etag
+|String?
+|String or null
+|The etag received from the backend or null if no data is available.
+
+|logo
+|StationLogo?
+|StationLogo or null
+|The logo data received from the backend or null if no logo not exists.
+|===
+
+*Return*
+
+None
+
+=== IRadioStationDataCallback.onStreams(etag: String?, streams: List<WebStream>?)
+
+Called if an answer from the backend was received, the function reports the streams from the requested bearer.
+
+*Arguments*
+
+|===
+|name|value range |valid values | description
+
+|etag
+|String?
+|String or null
+|The etag received from the backend or null if no data is available.
+
+|streams
+|List<WebStream>?
+|List<WebStream> or null
+|The stream data received from the backend or null if bearer not found.
+|===
+
+*Return*
+
+None
+
+=== IRadioStationDataCallback.onBearers(etag: String?, streams: List<IBearer>?)
+
+Called if an answer from the backend was received, the function reports the alternative bearers from the requested bearer.
+
+*Arguments*
+
+|===
+|name|value range |valid values | description
+
+|etag
+|String?
+|String or null
+|The etag received from the backend or null if no data is available.
+
+|streams
+|List<IBearer>?
+|List<IBearer> or null
+|The alternative bearers received from the backend or null if bearer not found.
+|===
+
+*Return*
+
+None
+
+=== IRadioStationDataCallback.onComplete(status: CompleteStatus, expirationDate: Long?)
+
+It must always call this function after a bearer request finishes
+(regardless of whether this is successful or faulty).
+
+If expirationDate is null the bearer will be requested at the next client request.
+Should only send expirationDate, if the request was successfully.
+
+*Arguments*
+
+|===
+|name|value range |valid values | unit | description
+
+|status
+|CompleteStatus
+|CompleteStatus-Instance
+|n/a
+|Defines the retry behavior of the MDS.
+
+|expirationDate
+|Long?
+|1 or more, null
+|UTC timestamp in seconds
+|How long the MetaDataService should cache the data, without requesting again at the connected radio client.
+|===
+
+*Return*
+
+None
+
+== Dependencies (Used Units, methods and properties)
+
+This is an overview of the used methods and properties from other units.
+
+|===
+|Destination unit|Destination method/property |comment
+
+|link:unit_Data.adoc[Data]
+|StationMetadata.class
+|StationMetadata that should be given to the MetaDataService.
+
+|link:unit_Data.adoc[Data]
+|StationLogo.class
+|StationLogo that should be given to the MetaDataService.
+
+|link:unit_Data.adoc[Data]
+|WebStream.class
+|WebStream that should be given to the MetaDataService.
+
+|link:unit_Data.adoc[Data]
+|IBearer.class
+|IBearer that should be given to the MetaDataService.
+
+|link:unit_Data.adoc[Data]
+|CompleteStatus.class
+|CompleteStatus that defines the retry behavior of the MetaDataService.
+|===
+
+== Runtime View
+
+[dynamic_sequence=startup, unit=IRadioStationDataCallback, role=dynamic_sequence]
+=== Startup
+
+This is only a kotlin interface without any logic.
+
+[dynamic_sequence=shutdown, unit=IRadioStationDataCallback, role=dynamic_sequence]
+=== Shutdown
+
+This is only a kotlin interface without any logic.
+
+[dynamic_sequence=startup_after_s2r, unit=IRadioStationDataCallback, role=dynamic_sequence]
+=== Suspend
+
+This is only a kotlin interface without any logic.
+
+[dynamic_sequence=resume, unit=IRadioStationDataCallback, role=dynamic_sequence]
+=== Resume
+
+This is only a kotlin interface without any logic.
+
+[[section-design-decisions]]
+== Design Decisions
+
+No further design decisions were made for the implementation of this unit other than those already mentioned in link:../../main.{type}[metadataservice_conradlib].
+
+include::../about-arc42.adoc[]

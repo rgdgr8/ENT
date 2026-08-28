@@ -1,0 +1,74 @@
+@startuml
+
+skinparam componentStyle uml2
+
+component metadataservice_app{
+    component "Common" as common
+    component "Service"as service
+    component "Domain" as domain
+    component "Repository" as repository
+    component "Data" as data
+    component "ContentProvider" as content_provider
+    component "GracenoteService" as gracenote_service
+
+    content_provider .> service
+
+    service ..> domain
+    domain ..> repository
+    repository ..> data
+    data ..> gracenote_service
+
+
+    component "Util"  <<dev>> as util_dev
+    component "View" <<dev>> as view_dev
+    component "Model" <<dev>> as model_dev
+
+    view_dev .> model_dev
+    view_dev ..> util_dev
+    model_dev ..> util_dev
+}
+
+
+interface "IMetadataServiceAidl" as metadata_service_aidl
+model_dev .up.> metadata_service_aidl
+service <.up. metadata_service_aidl
+
+
+actor "Tester" as tester
+tester ..> view_dev
+
+interface "ExtendedStorageManager" as extended_storage
+service .up.> extended_storage
+
+interface "ContentProvider" as content_provider_if
+content_provider <.up.> content_provider_if
+
+interface "IPositionInformation" as pos_info
+common ..> pos_info
+
+interface "ServiceListApi" as service_list
+common .> service_list :\t
+
+interface "DisableReasonsApi" as disable_reasons
+common .> disable_reasons : \t\t\t\t\t\t
+
+interface "Persistence" as persistence
+common ..> persistence
+
+interface "GracenoteSDK" as gracenote
+gracenote_service ..> gracenote
+
+interface "Local Filesystem" as filesystem
+data ...> filesystem
+content_provider ..> filesystem
+
+interface "Audio Device" as audio_device
+data ...> audio_device
+
+interface "ConnectedRadioClient" as conrad
+data ...> conrad
+
+interface "GMDClient" as gmd
+data ...> gmd
+
+@enduml

@@ -1,0 +1,554 @@
+{
+    "Diagram": "MetadataService",
+    "Contributors": [
+        "sebastian.kiesel@esolutions.de",
+        "matthias.stuehlinger@esolutions.de",
+        "michael.irsiegler@esolutions.de",
+        "karthik.shankaranarayana@esolutions.de",
+        "sudeep.huddar@esolutions.de"
+    ],
+    "FreeTextAnnotations": [
+        "Authentication on https connection are handled by lib from gracenote.",
+        "Authentication on https connection are handled by lib conradlib"
+    ],
+    "interfaces": {
+        "technology.cariad.entertainment.metadataserviceclient.api.IMetadataServiceAid (1)": {
+            "technology": "Android Service Consumption",
+            "dataSanityIsGuaranteedFromSender": false,
+            "dataSanityIsCheckedAtReceiver": true,
+            "sourceAuthenticatedBy": "ANDROID_SYSTEM",
+            "services": [
+                "technology.cariad.entertainment.metadataservice.service.MetadataService"
+            ],
+            "serviceProtocol": "AIDL",
+            "customAttributes": [
+                "can request:",
+                "- data textual radio -> ConnectedRadio",
+                "- textual for media -> Gracenote Backend",
+                "- based on audio signal currently playing -> Android (media, radio) system get audio schnipsel",
+                "metadata for radio stations, songs, coverart"
+            ],
+            "assets": {
+                "GDPR": "metadata for radio stations, songs",
+                "INT": "metadata for radio stations, songs, coverart"
+            },
+            "src": "Client(s)",
+            "dst": "MetadataService"
+        },
+        "technology.cariad.entertainment.metadataserviceclient.api.IMetadataServiceAid (2)": {
+            "technology": "Android Service Provision",
+            "dataSanityIsGuaranteedFromSender": true,
+            "dataSanityIsCheckedAtReceiver": false,
+            "destinationAuthenticatedBy": "ANDROID_SYSTEM",
+            "services": [
+                "technology.cariad.entertainment.metadataservice.service.MetadataService"
+            ],
+            "serviceProtocol": "AIDL",
+            "customAttributes": [
+                "protected by technology.cariad.entertainment.metadataservice.USE_SERVICE",
+                "protection: signature/privileged",
+                "provide: text metadata",
+                "provide: lyrics",
+                "provide: URL for radio stations, getting from conradlib",
+                "request"
+            ],
+            "assets": {
+                "INT": "request"
+            },
+            "src": "MetadataService",
+            "dst": "Client(s)"
+        },
+        "File Read (1)": {
+            "technology": "File Read",
+            "dataSanityIsCheckedAtReceiver": false,
+            "OutOfScope": true,
+            "reasonOos": "informational purpose of getting files provider",
+            "customAttributes": [
+                "reading cover arts"
+            ],
+            "assets": {
+                "GDPR": "cover arts (user related)",
+                "CONF": "cover arts (gracenote requirement)"
+            },
+            "src": "metadataservice-data",
+            "dst": "Client(s)"
+        },
+        "android.media.MediaRecorder (1)": {
+            "technology": "Android Service Consumption",
+            "dataSanityIsGuaranteedFromSender": true,
+            "dataSanityIsCheckedAtReceiver": false,
+            "sourceAuthenticatedBy": "ANDROID_SYSTEM",
+            "serviceProtocol": "AIDL",
+            "customAttributes": [
+                "only protocol related data, request audio snippet",
+                "protected by android.permission.CAPTURE_AUDIO_OUTPUT"
+            ],
+            "assets": {
+                "INT": "request audio snippet"
+            },
+            "src": "MetadataService",
+            "dst": "media, radio"
+        },
+        "File Write": {
+            "technology": "File Write",
+            "dataSanityIsGuaranteedFromSender": false,
+            "sourceAuthenticatedBy": "NO_ONE",
+            "OutOfScope": true,
+            "reasonOos": "informational purpose of getting files provider",
+            "customAttributes": [
+                "authentication process handled by harman",
+                "storing cover arts"
+            ],
+            "assets": {
+                "GDPR": "cover arts (user related)",
+                "CONF": "cover arts (gracenote requirement)"
+            },
+            "src": "MetadataService",
+            "dst": "metadataservice-data"
+        },
+        "File Read (2)": {
+            "technology": "File Read",
+            "dataSanityIsCheckedAtReceiver": false,
+            "OutOfScope": true,
+            "reasonOos": "informational purpose of getting files provider",
+            "customAttributes": [
+                "authentication process handled by harman, no other process have write access to the folder, it is created by harman, location can be different",
+                "reading cover arts"
+            ],
+            "assets": {
+                "GDPR": "cover arts (user related)",
+                "CONF": "cover arts (gracenote requirement)"
+            },
+            "src": "metadataservice-data",
+            "dst": "MetadataService"
+        },
+        "HTTPS (1)": {
+            "technology": "HTTPS",
+            "OutOfScope": true,
+            "reasonOos": "communication is handled by gracenote sdk, not esolutions component",
+            "src": "gracenote-sdk",
+            "dst": "Gracenote Backend"
+        },
+        "HTTPS (2)": {
+            "technology": "HTTPS",
+            "OutOfScope": true,
+            "reasonOos": "communication is handled by gracenote sdk, not esolutions component",
+            "src": "Gracenote Backend",
+            "dst": "gracenote-sdk"
+        },
+        "vendor.coreservices.systemservice.{ServiceListApiCallback, DisableReasonsApiCallback, TrustStoreCallback}": {
+            "technology": "Function Call",
+            "dataSanityIsGuaranteedFromSender": false,
+            "dataSanityIsCheckedAtReceiver": true,
+            "customAttributes": [
+                "provide service list, disabled reasons",
+                "URLs, api endpoints",
+                "protected by technology.cariad.magic.service.permission.ALL",
+                "TrustStoreCallback: pem format -> certificates"
+            ],
+            "assets": {
+                "INT": "provide service list, disabled reasons, certificates"
+            },
+            "src": "MagicAdapter",
+            "dst": "MetadataService"
+        },
+        "File Read (3)": {
+            "technology": "File Read",
+            "dataSanityIsCheckedAtReceiver": false,
+            "destinationAuthenticatedBy": "ANDROID_SYSTEM",
+            "customAttributes": [
+                "reading assets (e.g. truststore)"
+            ],
+            "assets": {
+                "INT": "reading assets (e.g. truststore)"
+            },
+            "src": "/product/priv-app/",
+            "dst": "MetadataService"
+        },
+        "technology.cariad.entertainment.metadataservice.contentprovider.MetadataImageProvider": {
+            "technology": "Android Content Provider Read",
+            "dataSanityIsGuaranteedFromSender": true,
+            "dataSanityIsCheckedAtReceiver": false,
+            "destinationAuthenticatedBy": "LINUX_KERNEL",
+            "readProtection": "PERMISSION",
+            "customAttributes": [
+                "provide url to file system",
+                "clients will checked for permissions to request the URI",
+                "clients provide e.g. name of songs/album",
+                "protected by technology.cariad.entertainment.metadataservice.USE_SERVICE",
+                "authority: technology.cariad.entertainment.metadataservice.MetadataService.ImageProvider"
+            ],
+            "src": "MetadataService",
+            "dst": "Client(s)"
+        },
+        "android.media.MediaRecorder (2)": {
+            "technology": "Android Service Provision",
+            "dataSanityIsGuaranteedFromSender": false,
+            "dataSanityIsCheckedAtReceiver": false,
+            "destinationAuthenticatedBy": "ANDROID_SYSTEM",
+            "serviceProtocol": "AIDL",
+            "customAttributes": [
+                "provide sound data for searching meta data forwarded to Gracenote",
+                "protected by android.permission.CAPTURE_AUDIO_OUTPUT"
+            ],
+            "src": "media, radio",
+            "dst": "MetadataService"
+        },
+        "android.net.ConnectivityManager (1)": {
+            "technology": "Android Service Consumption",
+            "dataSanityIsGuaranteedFromSender": true,
+            "dataSanityIsCheckedAtReceiver": false,
+            "sourceAuthenticatedBy": "ANDROID_SYSTEM",
+            "serviceProtocol": "AIDL",
+            "customAttributes": [
+                "protected by android.permission.CHANGE_NETWORK_STATE",
+                "protected by android.permission.INTERNET"
+            ],
+            "src": "MetadataService",
+            "dst": "Android System"
+        },
+        "android.net.ConnectivityManager (2)": {
+            "technology": "Android Service Provision",
+            "dataSanityIsGuaranteedFromSender": false,
+            "dataSanityIsCheckedAtReceiver": true,
+            "destinationAuthenticatedBy": "ANDROID_SYSTEM",
+            "serviceProtocol": "AIDL",
+            "customAttributes": [
+                "provide network interfaces for connecting to backend",
+                "protected by android.permission.CHANGE_NETWORK_STATE",
+                "protected by android.permission.INTERNET"
+            ],
+            "assets": {
+                "INT": "provide network interfaces for connecting to backend"
+            },
+            "src": "Android System",
+            "dst": "MetadataService"
+        },
+        "com.vwg.hcp3.nav.positioninformation.IPositionInformation (1)": {
+            "technology": "Android Service Provision",
+            "dataSanityIsGuaranteedFromSender": false,
+            "dataSanityIsCheckedAtReceiver": true,
+            "destinationAuthenticatedBy": "ANDROID_SYSTEM",
+            "services": [
+                "de.eso.navi.headless.positioninformation.PositionInformationAidlImpl"
+            ],
+            "serviceProtocol": "AIDL",
+            "customAttributes": [
+                "protected by com.volkswagenag.nav.NAV_CORE_USER",
+                "protected by android.permission.ACCESS_FINE_LOCATION",
+                "protected by android.permission.ACCESS_BACKGROUND_LOCATION",
+                "position of car (e.g., GPS coordinates)"
+            ],
+            "assets": {
+                "GDPR": "position of car"
+            },
+            "src": "Navi",
+            "dst": "MetadataService"
+        },
+        "com.vwg.hcp3.nav.positioninformation.IPositionInformation (2)": {
+            "technology": "Android Service Consumption",
+            "dataSanityIsGuaranteedFromSender": true,
+            "dataSanityIsCheckedAtReceiver": false,
+            "sourceAuthenticatedBy": "ANDROID_SYSTEM",
+            "services": [
+                "de.eso.navi.headless.positioninformation.PositionInformationAidlImpl"
+            ],
+            "serviceProtocol": "AIDL",
+            "customAttributes": [
+                "protected by com.volkswagenag.nav.NAV_CORE_USER",
+                "protected by android.permission.ACCESS_FINE_LOCATION",
+                "protected by android.permission.ACCESS_BACKGROUND_LOCATION",
+                "only Callback registration"
+            ],
+            "assets": {
+                "INT": "callback registration"
+            },
+            "src": "MetadataService",
+            "dst": "Navi"
+        },
+        "Function Call (1)": {
+            "technology": "Function Call",
+            "dataSanityIsGuaranteedFromSender": false,
+            "customAttributes": [
+                "e.g. mobile country code"
+            ],
+            "assets": {
+                "INT": "mobile country code"
+            },
+            "src": "MetadataService",
+            "dst": "metadataservice_conradlib"
+        },
+        "Function Call (2)": {
+            "technology": "Function Call",
+            "dataSanityIsCheckedAtReceiver": false,
+            "customAttributes": [
+                "provide URL for radio stations, will be forwarded to radio client"
+            ],
+            "assets": {
+                "INT": "URL for radio stations"
+            },
+            "src": "metadataservice_conradlib",
+            "dst": "MetadataService"
+        },
+        "Function Call (4)": {
+            "technology": "Function Call",
+            "dataSanityIsGuaranteedFromSender": false,
+            "dataSanityIsCheckedAtReceiver": false,
+            "customAttributes": [
+                "provide base URLs (received by coreservices/magicadapter)",
+                "gmd lib add relative URL path, adapt e.g. artist id"
+            ],
+            "assets": {
+                "INT": "base URLs, gmd lib add relative URL path, adapt e.g. artist id"
+            },
+            "src": "MetadataService",
+            "dst": "metadataservice_gmdlib"
+        },
+        "Function Call (3)": {
+            "technology": "Function Call",
+            "dataSanityIsGuaranteedFromSender": false,
+            "dataSanityIsCheckedAtReceiver": false,
+            "customAttributes": [
+                "metadata information"
+            ],
+            "assets": {
+                "INT": "metadata information"
+            },
+            "src": "metadataservice_gmdlib",
+            "dst": "MetadataService"
+        },
+        "MOBILE_COUNTRY_CODE": {
+            "technology": "Android Service Consumption",
+            "dataSanityIsCheckedAtReceiver": false,
+            "serviceProtocol": "AIDL",
+            "dataSanityIsGuaranteedFromSender": true,
+            "customAttributes": [
+                "Retrieval of Mobile Country Code",
+                "Permission : android.car.permission.CAR_VENDOR_EXTENSION"
+            ],
+            "assets": {
+                "INT": "Mobile Country Code"
+            },
+            "src": "android_VHAL",
+            "dst": "MetadataService"
+        },
+        "FunctionCall (1)": {
+            "technology": "Function Call",
+            "dataSanityIsGuaranteedFromSender": true,
+            "customAttributes": [
+                "metdataservice is configuring 3 things:",
+                "TLS version to 1.2 and 1.3",
+                "which trust store will be used",
+                "if TLS is enabled"
+            ],
+            "assets": {
+                "INT": "TLS configs"
+            },
+            "src": "MetadataService",
+            "dst": "gracenote-sdk"
+        },
+        "FunctionCall (2)": {
+            "technology": "Function Call",
+            "dataSanityIsCheckedAtReceiver": true,
+            "customAttributes": [
+                "metadata: e.g. coverart, title, artist"
+            ],
+            "assets": {
+                "GDPR": "metadata: e.g. coverart, title, artist"
+            },
+            "src": "gracenote-sdk",
+            "dst": "MetadataService"
+        },
+        "demo_activity": {
+            "technology": "Android Service Consumption",
+            "dataSanityIsGuaranteedFromSender": false,
+            "serviceProtocol": "AIDL",
+            "customAttributes": [
+                "Activity in side MetadataService (own_service) representing a engineering services for verifying functionality"
+            ],
+            "debug": {
+                "condition": "DEV only",
+                "testcase": "https://polarion-hcp3.eso.local/polarion/redirect/project/OI_Global_CLU51/workitem?id=OIG-65236"
+            },
+            "src": "MetadataService",
+            "dst": "MetadataServiceDEMO"
+        },
+        "android_sharedPerf": {
+            "technology": "File Read",
+            "destinationAuthenticatedBy": "ANDROID_SYSTEM",
+            "dataSanityIsCheckedAtReceiver": false,
+            "customAttributes": [
+                "used for demo activity settings"
+            ],
+            "debug": {
+                "condition": "DEV only",
+                "testcase": "https://polarion-hcp3.eso.local/polarion/redirect/project/OI_Global_CLU51/workitem?id=OIG-65236"
+            },
+            "src": "Android System",
+            "dst": "MetadataService"
+        }
+    },
+    "components": {
+        "MetadataService": {
+            "componentType": "Own_Service",
+            "securityClassification": "medium",
+            "vm": "IVI",
+            "modules": [
+                "perforce-swarm.eso.local:8443/files/oi/metadataservice/metadataservice_app",
+                "perforce-swarm.eso.local:8443/files/oi/metadataservice/metadataservice_app/metadataservice",
+                "perforce-swarm.eso.local:8443/files/oi/metadataservice/metadataservice_app/gracenoteservice"
+            ],
+            "apks": [
+                "MetadataService-prod-arm64-v8a-release-unsigned.apk"
+            ],
+            "customAttributes": [
+                "provides Radio and Music metadata",
+                "Low Secutity and Safety, but contractually it could potentially cause financial harm",
+                "gracenote certificate is stored in the apk",
+                "gracenote_sdk also SWE but delivered from Gracenote"
+            ]
+        },
+        "MetadataServiceDEMO": {
+            "componentType": "Own_Service",
+            "vm": "IVI",
+            "apks": [
+                "MetadataService-prod-arm64-v8a-release-unsigned.apk"
+            ],
+            "debug": {
+                "condition": "DEV only",
+                "testcase": "https://polarion-hcp3.eso.local/polarion/redirect/project/OI_Global_CLU51/workitem?id=OIG-65236"
+            },
+            "securityClassification": "medium",
+            "customAttributes": [
+                "used for testing and demonstration"
+            ]
+        },
+        "NetworkManager": {
+            "componentType": "Service",
+            "securityClassification": "low",
+            "vm": "UNKNOWN",
+            "customAttributes": [
+                "located in ConMod"
+            ]
+        },
+        "Client(s)": {
+            "componentType": "Application",
+            "securityClassification": "medium",
+            "vm": "IVI",
+            "customAttributes": [
+                "They have to handle the licensed data and should reasonably securely handle it",
+                "Low Secutity and Safety, but contractually it could potentially cause financial harm",
+                "Provides: HCPG-64 - metadataservice_clientinterface (as client libraries/SDK)",
+                "current radio(eso) and media(harman), erlebnis innenraum (audi)"
+            ]
+        },
+        "metadataservice-data": {
+            "shared": true,
+            "componentType": "File_System",
+            "storesCredentials": false,
+            "signed": false,
+            "removableStorage": false,
+            "storesLogData": false,
+            "encrypted": true,
+            "reasonOos": "informational purpose of getting files provider",
+            "vm": "IVI",
+            "writeAccess": true,
+            "OutOfScope": true,
+            "customAttributes": [
+                "stored in the ESM",
+                "stores big files in order to share them with the clients via descriptors (FileProvider API)",
+                "Shared to a limited audience, only clients explicitly allowed to access certain files",
+                "stores a database containing the local config (e. g. connection handling behavior, text based, no authentication data ...)",
+                "Clients get read only permissions",
+                "actual path -> path provided by lib from harman",
+                "stores data in /data/vendor/extended-storage/metadataservice-data/** -> encrypted by standard Android filesystem encryption"
+            ]
+        },
+        "gracenote-sdk": {
+            "componentType": "Service",
+            "securityClassification": "medium",
+            "vm": "IVI",
+            "customAttributes": [
+                "licensing done by CARIAD",
+                "actually lib that handles the communication to the gracenote backend",
+                "sdk provided by CARIAD"
+            ]
+        },
+        "Gracenote Backend": {
+            "componentType": "Service",
+            "vm": "OUTSIDE_OF_UNIT",
+            "OutOfScope": true,
+            "reasonOos": "communication is handled by gracenote sdk, not esolutions component"
+        },
+        "MagicAdapter": {
+            "componentType": "Service",
+            "securityClassification": "medium",
+            "vm": "IVI",
+            "customAttributes": [
+                "provided Service: ServicelistAPI; DisabledReasonAPI"
+            ]
+        },
+        "/product/priv-app/": {
+            "shared": false,
+            "componentType": "File_System",
+            "storesCredentials": false,
+            "signed": true,
+            "removableStorage": false,
+            "storesLogData": false,
+            "encrypted": false,
+            "vm": "IVI",
+            "writeAccess": false,
+            "customAttributes": [
+                "installed place",
+                "protected by secure boot"
+            ]
+        },
+        "Android System": {
+            "componentType": "Android_System",
+            "vm": "IVI",
+            "customAttributes": [
+                "AndroidService",
+                "provides login OAuth2 token for ConRad Backend",
+                "handled by metadataservice_conradlib"
+            ]
+        },
+        "media, radio": {
+            "componentType": "Android_System",
+            "vm": "IVI"
+        },
+        "Navi": {
+            "componentType": "Service",
+            "securityClassification": "medium",
+            "vm": "IVI",
+            "customAttributes": [
+                "used to retrieve position of car"
+            ]
+        },
+        "metadataservice_conradlib": {
+            "componentType": "Service",
+            "securityClassification": "high",
+            "vm": "IVI",
+            "customAttributes": [
+                "lib included in and used solely by Metadata Service (Media)",
+                "communicates with ConnectedRadio_Backend"
+            ]
+        },
+        "metadataservice_gmdlib": {
+            "componentType": "Service",
+            "securityClassification": "medium",
+            "vm": "IVI",
+            "customAttributes": [
+                "lib included in and used solely by Metadata Service (Media)",
+                "communicates with GMD Backend"
+            ]
+        },
+        "android_VHAL": {
+            "componentType": "Android_System",
+            "vm": "IVI",
+            "customAttributes": [
+                "abstraction for vehicle properties"
+            ]
+        }
+    }
+}
+

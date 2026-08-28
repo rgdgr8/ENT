@@ -1,0 +1,242 @@
+﻿include::../config.adoc[]
+//imagesdir must be overwritten, it is already included in the config.adoc
+:imagesdir: ../../images
+:hash: #
+
+= image:ESO_Logo_Colour_positive_RGB.png[eso_icon,350,350,float="right",align="center"] Design metadataservice_conradlib - Unit ExecutorWorker
+:toc-title: Table of Contents
+
+'''
+
+// numbering from here on
+:numbered:
+:stem: latexmath
+
+[unit=ExecutorWorker, role=unit]
+== <<Unit>> ExecutorWorker
+This document specifies the design of the unit *ExecutorWorker*, it is part of the link:../../main.{type}[metadataservice_conradlib].
+
+This class should be a Kotlin object (Singleton) and wrap an instance of link:unit_PausableThreadPoolExecutor.adoc[PausableThreadPoolExecutor].
+The PausableThreadPoolExecutor must be initialed with following parameters:
+
+- corePoolSize: 1
+- maximumPoolSize: 1
+- keepAliveTime: 0L
+- unit: No Matter
+- blockingQueue: LinkedBlockingQueue.class
+
+== Provided Interface (public methods and properties)
+
+=== ExecutorWorker.start()
+
+Wrapper around the PausableThreadPoolExecutor.resume() function.
+
+*Arguments*
+
+None
+
+*Return*
+
+None
+
+*Exceptions*
+
+None
+
+=== ExecutorWorker.stop()
+
+Wrapper around the PausableThreadPoolExecutor.pause() function.
+
+*Arguments*
+
+None
+
+*Return*
+
+None
+
+*Exceptions*
+
+None
+
+=== ExecutorWorker.enqueue(job: Runnable)
+
+Submit a job onto the PausableThreadPoolExecutor instance by calling submit() on it.
+
+*Arguments*
+
+|===
+|name|value range |valid values | description
+
+|job
+|Runnable
+|Runnable-Instance
+|The Runnable instance that should be executed by the executor later.
+
+|===
+
+*Return*
+
+None
+
+*Exceptions*
+
+None
+
+=== ExecutorWorker.isPaused(): Boolean
+
+Wrapper around the PausableThreadPoolExecutor.isPaused() function.
+
+*Arguments*
+
+None
+
+*Return*
+
+|===
+|Name|value range |valid values| description
+
+|Response
+|Boolean
+|true, false
+|Returns true if PausableThreadPoolExecutor.isPaused() returns true, otherwise false.
+|===
+
+*Exceptions*
+
+None
+
+== Dependencies (Used Units, methods and properties)
+This is an overview of the used methods and properties from other units.
+
+|===
+|Destination unit|Destination method/property |comment
+
+|link:unit_PausableThreadPoolExecutor.adoc[PausableThreadPoolExecutor]
+|PausableThreadPoolExecutor.resume()
+|Remove the blocked state from the executor.
+
+|link:unit_PausableThreadPoolExecutor.adoc[PausableThreadPoolExecutor]
+|PausableThreadPoolExecutor.stop()
+|Block the start of new jobs on the executor.
+
+|link:unit_PausableThreadPoolExecutor.adoc[PausableThreadPoolExecutor]
+|PausableThreadPoolExecutor.submit()
+|Add a new Runnable to the executor queue.
+
+|link:unit_PausableThreadPoolExecutor.adoc[PausableThreadPoolExecutor]
+|PausableThreadPoolExecutor.isPaused()
+|Check if the executor is paused.
+
+|===
+
+== Runtime View
+
+[dynamic_sequence=startup, unit=ExecutorWorker, role=dynamic_sequence]
+=== Startup
+
+At startup, it should initialize a new instance of PausableThreadPoolExecutor and save it internally.
+The required parameter values are defined in capital 1.
+
+[dynamic_sequence=shutdown, unit=ExecutorWorker, role=dynamic_sequence]
+=== Shutdown
+
+Because this is a Kotlin object (Singleton), there is no shutdown for it.
+The executor should remain forever so that future requests can be processed easily.
+The thread is automatically terminated during app shutdown, nothing needs to be done.
+
+[dynamic_sequence=startup_after_s2r, unit=ExecutorWorker, role=dynamic_sequence]
+=== Suspend
+
+Since this is a kotlin class without android references, no suspend state needs to be considered.
+
+[dynamic_sequence=resume, unit=ExecutorWorker, role=dynamic_sequence]
+=== Resume
+
+Since this is a kotlin class without android references, no suspend state needs to be considered.
+
+=== Start ExecutorWorker
+
+[plantuml, title="ExecutorWorker Start", format="svg", id="ExecutorWorker-Start"]
+----
+participant "Arbitrary Unit" as caller
+participant "ExecutorWorker" as worker <<unit>>
+participant "PausableThreadPoolExecutor" as executor <<unit>>
+
+caller -> worker: start()
+activate worker
+worker -> executor: resume()
+deactivate worker
+----
+
+=== Stop ExecutorWorker
+
+[plantuml, title="ExecutorWorker Stop", format="svg", id="ExecutorWorker-Stop"]
+----
+participant "Arbitrary Unit" as caller
+participant "ExecutorWorker" as worker <<unit>>
+participant "PausableThreadPoolExecutor" as executor <<unit>>
+
+caller -> worker: stop()
+activate worker
+worker -> executor: pause()
+deactivate worker
+----
+
+=== Enqueue new Job
+
+[plantuml, title="ExecutorWorker Enqueue", format="svg", id="ExecutorWorker-Enqueue"]
+----
+participant "Arbitrary Unit" as caller
+participant "ExecutorWorker" as worker <<unit>>
+participant "PausableThreadPoolExecutor" as executor <<unit>>
+
+caller -> worker: enqueue()
+activate worker
+worker -> executor: submit()
+deactivate worker
+----
+
+=== Request if the ExecutorWorker is paused
+
+[plantuml, title="ExecutorWorker isPaused", format="svg", id="ExecutorWorker-Enqueue"]
+----
+participant "Arbitrary Unit" as caller
+participant "ExecutorWorker" as worker <<unit>>
+participant "PausableThreadPoolExecutor" as executor <<unit>>
+
+caller -> worker: isPaused()
+activate worker
+worker -> executor: isPaused()
+worker <- executor: true/false
+caller <- worker: true/false
+deactivate worker
+----
+
+== Design Decisions
+
+=== One worker vs multiple worker
+
+A decision had to be made how much worker we should use for the backend requests.
+
+==== Option 1: One worker
+
+Only one worker and a queue for all jobs.
+
+==== Option 2: Multiple worker
+
+Multiple worker with only one queue or a separate queue for every worker.
+
+==== Option 3: Special worker for every job
+
+Special worker with separate queues for dedicated jobs.
+
+==== Conclusion:
+
+On the one hand we want to process the jobs quickly and on the other hand we want to prevent race conditions.
+In every multi-worker scenario we have to deal with job synchronization, especially with the registration job, the cookie handling and the server downtime handling. +
+For these reasons we decided to use only one worker and create blocking calls like the registration to ensure we use always a correct config from the backend
+and have a valid cookie stored.
+For all other requests we use the parallel http request worker from OkHttp with separate callbacks to parallelize the backend requests.
+
+include::../about-arc42.adoc[]

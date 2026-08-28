@@ -1,0 +1,5 @@
+<?xml version="1.0" encoding="utf-8"?>
+<permissions>
+    <library name="de.esolutions.magicadapter"
+            file="/vendor/framework/oi_magic_adapter_library.jar" dependency="technology.cariad.magicclient"/>
+</permissions>

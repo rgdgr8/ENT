@@ -1,0 +1,30 @@
+<?xml version="1.0" encoding="utf-8"?>
+<vector xmlns:android="http://schemas.android.com/apk/res/android"
+    android:width="108dp"
+    android:height="108dp"
+    android:viewportWidth="500"
+    android:viewportHeight="500">
+    <!-- CariadRadioMast icon - radio tower with signal waves -->
+    <!-- Scaled and centered for adaptive icon (safe zone is center 66dp of 108dp) -->
+    
+    <!-- Left signal waves -->
+    <path
+        android:fillColor="#1EEF97"
+        android:pathData="M136.3,172.3l-8.49,-8.49C117.62,174.02 112,187.58 112,202c0,14.42 5.62,27.98 15.82,38.18l8.48,-8.48c-7.93,-7.93 -12.3,-18.48 -12.3,-29.7c0,-11.22 4.37,-21.77 12.3,-29.7z" />
+    <path
+        android:fillColor="#1EEF97"
+        android:pathData="M144.78,180.79c-5.67,5.67 -8.79,13.2 -8.79,21.21c0,8.01 3.12,15.55 8.79,21.21l8.49,-8.48A17.88,17.88 0,0 1,148 202c0,-4.81 1.87,-9.33 5.27,-12.73l-8.49,-8.48z" />
+    
+    <!-- Right signal waves -->
+    <path
+        android:fillColor="#1EEF97"
+        android:pathData="M372.18,163.81l-8.49,8.49c7.93,7.93 12.3,18.48 12.3,29.7s-4.37,21.77 -12.3,29.7l8.49,8.49c10.2,-10.22 15.82,-23.78 15.82,-38.2s-5.62,-27.98 -15.82,-38.18z" />
+    <path
+        android:fillColor="#1EEF97"
+        android:pathData="M355.21,180.78l-8.49,8.48c3.4,3.4 5.27,7.92 5.27,12.73s-1.87,9.33 -5.27,12.73l8.49,8.48c5.67,-5.66 8.79,-13.2 8.79,-21.21s-3.12,-15.55 -8.79,-21.21z" />
+    
+    <!-- Radio tower -->
+    <path
+        android:fillColor="#1EEF97"
+        android:pathData="M244,142h12v222h12V202h31.11l-6.69,37.96 11.82,2.08 14.59,-82.72 -11.82,-2.08 -5.78,32.76H268v-54c0,-3.31 -2.69,-6 -6,-6h-6V82h-12v48h-6c-3.31,0 -6,2.69 -6,6v54h-33.23l-5.78,-32.77 -11.82,2.08 14.59,82.72 11.82,-2.08 -6.69,-37.95H232v198h-78v12h192v-12H244V142z" />
+</vector>

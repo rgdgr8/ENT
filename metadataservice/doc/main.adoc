@@ -1,0 +1,103 @@
+// configure EN settings for asciidoc
+include::src/config.adoc[]
+
+// generated images
+:imagesdir: .images
+:imagesoutdir: .images
+
+= MetadataService Architecture Documentation
+Matthias Stühlinger <matthias.stuehlinger@comlet.de>; Sebastian Kiesel <sebastian.kiesel@esolutions.de>
+v29, 2024-07-04: Gracenote proxy server / country code
+
+== Revision History
+
+[cols="8,10,16,40", options="header"]
+|===
+|Version |Date |Editor |Description
+|1 |2020-03-27 | Tuğba Mahçup, Matthias Stühlinger | initial version
+|2 |2020-05-22 | Matthias Stühlinger| radio station data caching architecture; +
+                                      custom bearer string format
+|3 |2020-06-04 | Matthias Stühlinger | added description of station data lifecycle
+|4 |2020-06-12 | Tuğba Mahçup | cover art lookup data and image caching architecture
+|5 |2020-07-27 | Tuğba Mahçup | added quality flag into Stream table and updated Entity Relationship Diagram
+|6 |2020-08-13 | Tuğba Mahçup | added LifeCycleData table, adapted domain and database layers of cover art lookup
+|7 |2020-08-26 | Tuğba Mahçup | adapted database schema of station data for LifeCycleData changes; +
+                                added description of cover art lookup lifecycle; +
+                                updated document in general according to the latest status
+|8 |2020-10-20 | Matthias Stühlinger | provider_identifier cleanup from Stream, Image and Metadata tables; +
+                                       added new StationProviderIdentifier junction table; +
+                                       to represent a list of providers in Station table
+|9 |2020-10-21 | Tuğba Mahçup | removed mime_type and bitrate_kbps fields from Stream table, mime_type from Image table;
+                                MimeType table completely
+|10 |2020-10-27 | Matthias Stühlinger | updated ER-Diagram with position attribute for stream table
+|11 |2020-11-04 | Tuğba Mahçup, Matthias Stühlinger | Adapted to integration of Harman Extended Storage Framework; updated building block view, runtime view, solution strategy and design decisions
+|12 |2020-11-19 | Matthias Stühlinger | adapted chapters System Scope and Context, and Building Block View to integration of CoreServices
+|13 |2020-11-19 | Matthias Stühlinger | added section Security to chapter Concepts including custom permission
+|14 |2021-03-04 | Matthias Stühlinger | added default privacy flags to tracing section in concepts
+|15 |2021-03-19 | Matthias Stühlinger | added section for Song Recognition to chapter Runtime View
+|16 |2021-03-23 | Tuğba Mahçup | added permission and error handling to chapter Concepts
+|17 |2021-05-11 | Matthias Stühlinger | extended section Online Data Availability in chapter Concepts by network handling
+|18 |2021-07-22 | Matthias Stühlinger | updated chapter concepts with changed song recognition permission handling
+|19 |2021-08-03 | Matthias Stühlinger | updated permission name in chapter Concepts
+|20 |2022-05-25 | Matthias Stühlinger | refined building block view; minor updates to various chapters
+|21 |2022-08-03 | Sebastian Kiesel | refined according to global architecture document
+|22 |2022-11-10 | Matthias Stühlinger | added status update to song recognition sequence chart
+|23 |2023-06-26 | Matthias Stühlinger | lyrics feature implementation
+|24 |2023-12-07 | Sebastian Kiesel | Updated chapter "10.3. Technical Guidelines Checklist"
+|25 |2023-12-13 | Matthias Stühlinger | GMD service implementation
+|26 |2023-12-20 | Sebastian Kiesel | Updated documentation regarding lyrics / GMD functionality
+|27 |2023-12-20 | Matthias Stühlinger | SWE refactoring; merge documentation of mds_metadataservice and mds_gracenoteservice into metadataservice_app
+|28 |2024-07-03 | Matthias Stühlinger, Sebastian Kiesel | Added detailed design for unit RadioStationDataRepository
+|{revnumber} |{revdate} | Matthias Stühlinger |{revremark}
+|===
+
+// numbering from here on
+:numbered:
+
+<<<
+// 1. Introduction and Goals
+include::src/01_introduction_and_goals.adoc[]
+
+<<<
+// 2. Architecture Constraints
+include::src/02_architecture_constraints.adoc[]
+
+<<<
+// 3. System Scope and Context
+include::src/03_system_scope_and_context.adoc[]
+
+<<<
+// 4. Solution Strategy
+include::src/04_solution_strategy.adoc[]
+
+<<<
+// 5. Building Block View
+include::src/05_building_block_view.adoc[]
+
+<<<
+// 6. Runtime View
+include::src/06_runtime_view.adoc[]
+
+<<<
+// 7. Deployment View
+include::src/07_deployment_view.adoc[]
+
+<<<
+// 8. Concepts
+include::src/08_concepts.adoc[]
+
+<<<
+// 9. Design Decisions
+include::src/09_design_decisions.adoc[]
+
+<<<
+// 10. Quality Scenarios
+include::src/10_quality_scenarios.adoc[]
+
+<<<
+// 11. Technical Risks
+include::src/11_technical_risks.adoc[]
+
+<<<
+// 12. Glossary
+include::src/12_glossary.adoc[]

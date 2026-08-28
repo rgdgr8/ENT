@@ -1,0 +1,50 @@
+Documentation entry point: see doc/README.md
+
+#Tools
+
+##Windows
+
+Android Studio 3.6.3                https://developer.android.com/studio/
+Android SDK for Android 10 (API29)  from SDK Manager integrated in Android Studio
+Android NDK Side by side            from SDK Manager integrated in Android Studio
+JRE/JDK Version 8+                  bundled with Android Studio
+CMake 3.10.2+                       from SDK Manager integrated in Android Studio
+Swig 4+                             tbd; http://www.swig.org/download.html
+
+##Linux
+
+Android Studio 3.6.3                https://developer.android.com/studio/
+Android SDK for Android 10 (API29)  imported into mainline from //hcp3/common/sysint_androidsdk/
+Android NDK for Android 10 (R21)    imported into mainline from //hcp3/common/sysint_androidndk/
+JRE/JDK Version 8+                  imported into mainline from //hcp3/common/sysint_jdkivi/
+CMake 3.12.3                        imported into mainline from //hcp3/common/sysint_cmake/main_sysint_cmake/
+Swig 4+                             tbd; http://www.swig.org/download.html
+
+
+#Setup
+
+##Artifactory SSL Certificate
+
+Once a common Java environment is used, this step shouldn't be necessary anymore (at least on Linux).
+
+SSL certificate can be fetched using any browser.
+Can be imported into the JRE/JDK default certificate store:
+
+    Cert store location:    .\Android Studio\jre\jre\lib\security\cacerts (same structure under Linux)
+    Import command: keytool -keystore cacerts -importcert -file desrvaf01_eso_local.crt -alias esoArtifactory
+
+##Artifactory Credentials
+
+Artifactory credentials can be provided via System Properties read from a gradle.properties file in the user local gradle cache:
+
+Create empty file gradle.properties in C:\Users\[user]\.gradle or $HOME/.gradle
+Edit file and add the following two lines:
+
+systemProp.artifactory_user=[your username]
+systemProp.artifactory_password=[your api key/password]
+
+Fill in your own username and api key/password without brackets.
+
+Using an api key over the domain password should be prefered, as it can be easily revoked and doesn't have to be changed on a regular basis.
+An api key can be generated in the Artifactory user profile settings (Authentication Settings -> API Key.
+

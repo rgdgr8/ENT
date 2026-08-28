@@ -1,0 +1,32 @@
+[[section-setting_backend_and_vin]]
+== Setting a Backend and a Valid VIN
+
+In order to test station data and song recognition functionalities, a VIN should be set on the target by following these steps:
+
+* Select All apps > CoreServices
+* Click on VIN and set a valid VIN (for Asia a separate VIN should be used)
+* Click on SAVE CAR SETTINGS button
+
+A valid backend can be set by following these steps:
+
+* Select All apps > CoreServices
+* Click on the menu button on the top left
+* Select BackendSettings
+* Select ODP CN Approval/TUI (for Asia only)
+* Select ODP Demo/Approval HCP3 (for all)
+* Click on SAVE CAR SETTINGS button
+
+After the backend is selected, a few service list entries should be available in the ServiceList.
+
+* Select All apps > CoreServices
+* Click on the menu button on the top left
+* Select ServiceList
+* **gracenote_v1** should be available for cover art and song recognition functionalities
+* **connectedradio_v2** should be available for station data functionality
+* **hybridradiodata_v3** should be available for Asia station data functionality
+
+For a more detailed overview about CoreServices configuration and their usage please check the following link:
+
+https://group-cip.audi.de/wiki/display/AHCP/(OnlineEnabler)+Documents
+
+

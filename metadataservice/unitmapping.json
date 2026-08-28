@@ -1,0 +1,580 @@
+{
+    "sourceFolder": [
+        "app/src/main/java/technology/cariad/entertainment/metadataservice/",
+        "app/src/row/java/technology/cariad/entertainment/metadataservice/",
+        "app/src/cn/java/technology/cariad/entertainment/metadataservice/",
+        "app/src/prod/java/technology/cariad/entertainment/metadataservice/",
+        "app/src/prodCn/java/technology/cariad/entertainment/metadataservice/",
+        "app/src/dev/java/technology/cariad/entertainment/metadataservice/",
+        "app/src/devRow/java/technology/cariad/entertainment/metadataservice/",
+        "app/src/devCn/java/technology/cariad/entertainment/metadataservice/",
+        "app/src/main/cpp"
+    ],
+    "testFolder": [
+        "app/src/test/java/technology/cariad/entertainment/metadataservice/",
+        "app/src/androidTest/java/technology/cariad/entertainment/metadataservice/",
+        "app/src/testShared/java/technology/cariad/entertainment/metadataservice/",
+        "app/src/testRow/java/technology/cariad/entertainment/metadataservice/"
+    ],
+    "sourceFilePattern": [
+        ".*\\.kt$", ",.*\\.cxx$", ".*\\.hxx$", ".*\\.h$", ".*\\.cpp$"
+    ],
+    "ruleset": [
+        {
+            "unit": "Demo",
+            "pattern": [
+                ".*/dev"
+            ],
+            "notest": "This code is only for demonstration/testing purpose during development, i.e. this unit is not integrated in any production software."
+        }, {
+            "unit": "MetadataService",
+            "pattern": [
+                ".*MetadataServiceApp",
+                ".*/service/MetadataService",
+                ".*/service/AccessManager",
+                ".*(prod|main).*/service/AppComponentBuilder",
+                ".*/service/ClientManager",
+                ".*/service/ClientDeathHandler",
+                ".*(prod|main).*/service/DomainComponentBuilder",
+                ".*/service/config/ModuleConfig",
+                ".*(prod|main).*/service/config/DemoConfigProvider",
+                ".*/service/coverart/TextBasedCoverArtLookupFactory",
+                ".*/service/radiostationasia/RetrieveRadioStationAsiaFactory",
+                ".*/service/radiostationdata/RetrieveRadioStationDataFactory",
+                ".*/service/songinfo/RetrieveSongInfoFactory",
+                ".*/service/musicmetadata/RetrieveAlbumMetadataFactory",
+                ".*/service/musicmetadata/RetrieveArtistMetadataFactory",
+                ".*/service/musicmetadata/RetrieveRecordingMetadataByIdFactory",
+                ".*/service/musicmetadata/RetrieveRecordingMetadataByNameFactory",
+                ".*/service/mapper/.*"
+            ],
+            "testPattern": [
+                ".*MetadataServiceApp(Test|AndroidTest)",
+                ".*/service/MetadataService(Test|AndroidTest)",
+                ".*/service/AccessManager(Test|AndroidTest)",
+                ".*/service/AppComponentBuilder(Test|AndroidTest)",
+                ".*/service/ClientManager(Test|AndroidTest)",
+                ".*/service/ClientDeathHandler(Test|AndroidTest)",
+                ".*/service/DomainComponentBuilder(Test|AndroidTest)",
+                ".*/service/config/ModuleConfig(Test|AndroidTest)",
+                ".*/service/config/DemoConfigProvider(Test|AndroidTest)",
+                ".*/service/coverart/TextBasedCoverArtLookupFactory(Test|AndroidTest)",
+                ".*/service/radiostationasia/RetrieveRadioStationAsiaFactory(Test|AndroidTest)",
+                ".*/service/radiostationdata/RetrieveRadioStationDataFactory(Test|AndroidTest)",
+                ".*/service/songinfo/RetrieveSongInfoFactory(Test|AndroidTest)",
+                ".*/service/mapper/.*(Test|AndroidTest)"
+            ],
+            "justifyCoverage": "This unit is also tested by the integration tests via Metadata-Service TestApp."
+        }, {
+            "unit": "MetadataServiceDI",
+            "pattern": [
+                ".*(prod|main).*/service/di/.*"
+            ],
+            "testPattern": [
+                ".*/service/di/.*(Test|AndroidTest)"
+            ],
+            "notest": "This unit does only contain a static configuration with low complexity. Thus the qualification is done by code review."
+        }, {
+            "unit": "ImageProvider",
+            "pattern": [
+                ".*/contentprovider/MetadataImageProvider",
+                ".*/contentprovider/PathConfigParser",
+                ".*/contentprovider/UriPathMapper"
+            ],
+            "testPattern": [
+                ".*/contentprovider/MetadataImageProvider(Test|AndroidTest)",
+                ".*/contentprovider/PathConfigParser(Test|AndroidTest)",
+                ".*/contentprovider/UriPathMapper(Test|AndroidTest)"
+            ],
+            "justifyCoverage": "This unit is also tested by the integration tests via Metadata-Service TestApp."
+        }, {
+            "unit": "CommonUtility",
+            "pattern": [
+                ".*(prod|main).*/metadataservice/common.*"
+            ],
+            "testPattern": [
+                ".*/metadataservice/common.*(Test|AndroidTest)"
+            ]
+        }, {
+            "unit": "CommonDomain",
+            "pattern": [
+                ".*/domain/ITimeProvider",
+                ".*/domain/IImageDataStore",
+                ".*/domain/IMutableOnlineStateProvider",
+                ".*/domain/IOnlineService",
+                ".*/domain/IOnlineStateProvider",
+                ".*/domain/IMutableConfigurationProvider",
+                ".*/domain/IConfigurationProvider",
+                ".*/domain/usecase/IUseCase",
+                ".*/domain/value/RetryStrategy",
+                ".*/domain/value/ServiceIdentifier",
+                ".*/domain/entity/ImageEntity",
+                ".*/domain/entity/ProviderIdentifierEntity",
+                ".*/domain/entity/ExternalIdentifierEntity",
+                ".*/domain/entity/LifeCycleDataEntity",
+                ".*/domain/common/Mapper"
+            ],
+            "testPattern": [
+                ".*/domain/ITimeProvider(Test|AndroidTest)",
+                ".*/domain/IImageDataStore(Test|AndroidTest)",
+                ".*/domain/IMutableOnlineStateProvider(Test|AndroidTest)",
+                ".*/domain/IOnlineService(Test|AndroidTest)",
+                ".*/domain/IOnlineStateProvider(Test|AndroidTest)",
+                ".*/domain/IMutableConfigurationProvider(Test|AndroidTest)",
+                ".*/domain/IConfigurationProvider(Test|AndroidTest)",
+                ".*/domain/usecase/IUseCase(Test|AndroidTest)",
+                ".*/domain/value/RetryStrategy(Test|AndroidTest)",
+                ".*/domain/value/ServiceIdentifier(Test|AndroidTest)",
+                ".*/domain/entity/ImageEntity(Test|AndroidTest)",
+                ".*/domain/entity/ProviderIdentifierEntity(Test|AndroidTest)",
+                ".*/domain/entity/ExternalIdentifierEntity(Test|AndroidTest)",
+                ".*/domain/entity/LifeCycleDataEntity(Test|AndroidTest)",
+                ".*/domain/common/Mapper(Test|AndroidTest)"
+            ]
+        }, {
+            "unit": "RadioStationDomain",
+            "pattern": [
+                ".*/domain/IRadioStationDataProvider",
+                ".*/domain/IRadioStationDataRepository",
+                ".*/domain/IRadioStationDataStore",
+                ".*/domain/usecase/RetrieveRadioStationLogo",
+                ".*/domain/entity/BearerListEntity",
+                ".*/domain/entity/DabBearerEntity",
+                ".*/domain/entity/ETagsEntity",
+                ".*/domain/entity/FmRdsBearerEntity",
+                ".*/domain/entity/IBearerEntity",
+                ".*/domain/entity/IbocBearerEntity",
+                ".*/domain/entity/StationEntity",
+                ".*/domain/entity/StationMetadataEntity",
+                ".*/domain/entity/StationStreamEntity",
+                ".*/domain/entity/StationStreamListEntity"
+            ],
+            "testPattern": [
+                ".*/domain/IRadioStationDataProvider(Test|AndroidTest)",
+                ".*/domain/IRadioStationDataRepository(Test|AndroidTest)",
+                ".*/domain/IRadioStationDataStore(Test|AndroidTest)",
+                ".*/domain/usecase/RetrieveRadioStationLogo(Test|AndroidTest)",
+                ".*/domain/entity/BearerListEntity(Test|AndroidTest)",
+                ".*/domain/entity/DabBearerEntity(Test|AndroidTest)",
+                ".*/domain/entity/ETagsEntity(Test|AndroidTest)",
+                ".*/domain/entity/FmRdsBearerEntity(Test|AndroidTest)",
+                ".*/domain/entity/IBearerEntity(Test|AndroidTest)",
+                ".*/domain/entity/IbocBearerEntity(Test|AndroidTest)",
+                ".*/domain/entity/StationEntity(Test|AndroidTest)",
+                ".*/domain/entity/StationMetadataEntity(Test|AndroidTest)",
+                ".*/domain/entity/StationStreamEntity(Test|AndroidTest)",
+                ".*/domain/entity/StationStreamListEntity(Test|AndroidTest)"
+            ],
+            "notest": "This unit does only contain a interface defintion. Thus the qualification is done by code review."
+        }, {
+            "unit": "RadioStationAsiaDomain",
+            "pattern": [
+                ".*/domain/IRadioStationDataAsiaProvider",
+                ".*/domain/IRadioStationDataAsiaRepository",
+                ".*/domain/entity/BearerAsiaEntity",
+                ".*/domain/entity/StationAsiaEntity",
+                ".*/domain/usecase/RetrieveRadioStationAsia"
+            ],
+            "testPattern": [
+                ".*/domain/IRadioStationDataAsiaProvider(Test|AndroidTest)",
+                ".*/domain/IRadioStationDataAsiaRepository(Test|AndroidTest)",
+                ".*/domain/entity/BearerAsiaEntity(Test|AndroidTest)",
+                ".*/domain/entity/StationAsiaEntity(Test|AndroidTest)",
+                ".*/domain/usecase/RetrieveRadioStationAsia(Test|AndroidTest)"
+            ],
+            "notest": "This unit does only contain a static configuration with low complexity. Thus the qualification is done by code review."
+        }, {
+            "unit": "CoverArtLookupDomain",
+            "pattern": [
+                ".*/domain/ICoverArtDataStore",
+                ".*/domain/ICoverArtProvider",
+                ".*/domain/ICoverArtRepository",
+                ".*/domain/entity/CoverArtRequestDataEntity",
+                ".*/domain/usecase/TextBasedCoverArtLookup"
+            ],
+            "testPattern": [
+                ".*/domain/ICoverArtDataStore(Test|AndroidTest)",
+                ".*/domain/ICoverArtProvider(Test|AndroidTest)",
+                ".*/domain/ICoverArtRepository(Test|AndroidTest)",
+                ".*/domain/entity/SongInfoEntity(Test|AndroidTest)",
+                ".*/domain/entity/CoverArtRequestDataEntity(Test|AndroidTest)",
+                ".*/domain/usecase/TextBasedCoverArtLookup(Test|AndroidTest)"
+            ]
+        }, {
+            "unit": "SongInfoDomain",
+            "pattern": [
+                ".*/domain/ISongInfoProvider",
+                ".*/domain/ISongInfoRepository",
+                ".*/domain/usecase/RetrieveSongInfo",
+                ".*/domain/entity/SongInfoEntity"
+            ],
+            "testPattern": [
+                ".*/domain/ISongInfoProvider(Test|AndroidTest)",
+                ".*/domain/ISongInfoRepository(Test|AndroidTest)",
+                ".*/domain/usecase/RetrieveSongInfo(Test|AndroidTest)"
+            ],
+            "notest": "This unit does only contain a interface defintion. Thus the qualification is done by code review."
+        }, {
+            "unit": "SongLyricsDomain",
+            "pattern": [
+                ".*/domain/ISongLyricsProvider",
+                ".*/domain/ISongLyricsRepository",
+                ".*/domain/usecase/RetrieveSongLyrics",
+                ".*/domain/entity/SongLyricsEntity"
+            ],
+            "testPattern": [
+                ".*/domain/ISongLyricsProvider(Test|AndroidTest)",
+                ".*/domain/ISongLyricsRepository(Test|AndroidTest)",
+                ".*/domain/usecase/RetrieveSongLyrics(Test|AndroidTest)"
+            ],
+            "notest": "This unit does only contain a interface defintion. Thus the qualification is done by code review."
+        }, {
+            "unit": "MusicMetadataDomain",
+            "pattern": [
+                ".*/domain/IMusicMetadataProvider",
+                ".*/domain/IMusicMetadataRepository",
+                ".*/domain/usecase/RetrieveAlbumMetadataById",
+                ".*/domain/usecase/RetrieveArtistMetadataById",
+                ".*/domain/usecase/RetrieveRecordingMetadataById",
+                ".*/domain/usecase/RetrieveRecordingMetadataByName",
+                ".*/domain/entity/MusicMetadataEntity",
+                ".*/domain/value/MusicMetadataErrorType"
+            ],
+            "testPattern": [
+                ".*/domain/ISongLyricsProvider(Test|AndroidTest)",
+                ".*/domain/ISongLyricsRepository(Test|AndroidTest)",
+                ".*/domain/usecase/RetrieveSongLyrics(Test|AndroidTest)"
+            ],
+            "notest": "This unit does only contain a interface defintion. Thus the qualification is done by code review."
+        }, {
+            "unit": "CommonRepository",
+            "pattern": [
+                ".*/repository/RepositoryUtils"
+            ],
+            "testPattern": [
+                ".*/repository/RepositoryUtils(Test|AndroidTest)"
+            ],
+            "notest": "This unit has a low complexity and does only contain utilities. Thus the qualification is done by code review."
+        }, {
+            "unit": "RadioStationDataRepository",
+            "pattern": [
+                ".*/repository/RadioStationDataRepository",
+                ".*/repository/RadioStationRequest",
+                ".*/repository/RequestLogic"
+            ],
+            "testPattern": [
+                ".*/repository/RadioStationDataRepository(Test|AndroidTest)",
+                ".*/repository/RadioStationRequest(Test|AndroidTest)",
+                ".*/repository/RequestLogic(Test|AndroidTest)"
+            ]
+        }, {
+            "unit": "RadioStationDataAsiaRepository",
+            "pattern": [
+                ".*/repository/RadioStationDataAsiaRepository"
+            ],
+            "testPattern": [
+                ".*/repository/RadioStationDataAsiaRepository(Test|AndroidTest)"
+            ]
+        }, {
+            "unit": "SongInfoRepository",
+            "pattern": [
+                ".*/repository/SongInfoRepository"
+            ],
+            "testPattern": [
+                ".*/repository/SongInfoRepository(Test|AndroidTest)"
+            ]
+        }, {
+            "unit": "SongLyricsRepository",
+            "pattern": [
+                ".*/repository/SongLyricsRepository"
+            ],
+            "testPattern": [
+                ".*/repository/SongLyricsRepository(Test|AndroidTest)"
+            ]
+        }, {
+            "unit": "MusicMetadataRepository",
+            "pattern": [
+                ".*/repository/MusicMetadataRepository"
+            ],
+            "testPattern": [
+                ".*/repository/MusicMetadataRepository(Test|AndroidTest)"
+            ]
+        }, {
+            "unit": "CoverArtRepository",
+            "pattern": [
+                ".*/repository/CoverArtRepository"
+            ],
+            "testPattern": [
+                ".*/repository/CoverArtRepository(Test|AndroidTest)"
+            ]
+        }, {
+            "unit": "CommonProvider",
+            "pattern": [
+                ".*/data/mapper/.*",
+                ".*/provider/DispatcherProvider",
+                ".*/provider/GnServiceRequestNr"
+            ],
+            "testPattern": [
+                ".*/data/mapper/.*(Test|AndroidTest)",
+                ".*/provider/DispatcherProvider(Test|AndroidTest)",
+                ".*/provider/GnServiceRequestNr(Test|AndroidTest)"
+            ]
+        }, {
+            "unit": "RadioStationDataProvider",
+            "pattern": [
+                ".*/provider/RadioStationDataProvider"
+            ],
+            "testPattern": [
+                ".*/provider/RadioStationDataProvider(Test|AndroidTest)"
+            ]
+        }, {
+            "unit": "RadioStationDataAsiaProvider",
+            "pattern": [
+                ".*/provider/RadioStationDataAsiaProvider"
+            ],
+            "testPattern": [
+                ".*/provider/RadioStationDataAsiaProvider(Test|AndroidTest)"
+            ]
+        }, {
+            "unit": "CoverArtProvider",
+            "pattern": [
+                ".*/provider/CoverArtProvider", ".*/provider/GraceNoteService"
+            ],
+            "testPattern": [
+                ".*/provider/CoverArtProvider(Test|AndroidTest)",
+                ".*/provider/GraceNoteService(Test|AndroidTest)"
+            ]
+        }, {
+            "unit": "SongInfoProvider",
+            "pattern": [
+                ".*/data/provider/songinfo/.*"
+            ],
+            "testPattern": [
+                ".*/data/provider/songinfo/.*"
+            ],
+            "justifyCoverage": "This unit is also tested by the integration tests via Metadata-Service TestApp."
+        }, {
+            "unit": "SongLyricsProvider",
+            "pattern": [
+                ".*/data/provider/SongLyricsProvider"
+            ],
+            "testPattern": [
+                ".*/data/provider/SongLyricsProvider(Test|AndroidTest)"
+            ],
+            "justifyCoverage": "This unit is also tested by the integration tests via Metadata-Service TestApp."
+        }, {
+            "unit": "MusicMetadataProvider",
+            "pattern": [
+                ".*/data/provider/MusicMetadataProvider"
+            ],
+            "testPattern": [
+                ".*/data/provider/MusicMetadataProvider(Test|AndroidTest)"
+            ],
+            "justifyCoverage": "This unit is also tested by the integration tests via Metadata-Service TestApp."
+        }, {
+            "unit": "TimeProvider",
+            "pattern": [
+                ".*/provider/TimeProvider"
+            ],
+            "testPattern": [
+                ".*/provider/TimeProvider(Test|AndroidTest)"
+            ],
+            "notest": "This unit is only a wrapper with low complexity to get the current system time. Thus the qualification is done by code review."
+        }, {
+            "unit": "ConfigurationProvider",
+            "pattern": [
+                ".*/provider/ConfigurationProvider"
+            ],
+            "testPattern": [
+                ".*/provider/ConfigurationProvider(Test|AndroidTest)"
+            ]
+        }, {
+            "unit": "OnlineStateProvider",
+            "pattern": [
+                ".*/provider/OnlineStateProvider",
+                ".*/provider/OnlineState",
+                ".*/provider/onlinestate/*"
+            ],
+            "testPattern": [
+                ".*/provider/OnlineStateProvider(Test|AndroidTest)"
+            ]
+        }, {
+            "unit": "CommonDataStore",
+            "pattern": [
+                ".*/database/CachingDatabase.*",
+                ".*/database/DatabaseConstants",
+                ".*/database/converter/.*",
+                ".*/database/dao/BaseDao",
+                ".*/database/dao/GenreDao",
+                ".*/database/dao/ImageDao",
+                ".*/database/dao/LifeCycleDataDao",
+                ".*/database/dao/ProviderIdentifierDao",
+                ".*/database/entity/GenreEntry",
+                ".*/database/entity/ImageEntry",
+                ".*/database/entity/LifeCycleDataEntry",
+                ".*/database/entity/ProviderIdentifierEntry"
+            ],
+            "testPattern": [
+                ".*/database/CachingDatabase.*(Test|AndroidTest)",
+                ".*/database/DatabaseConstants(Test|AndroidTest)",
+                ".*/database/converter/.*(Test|AndroidTest)",
+                ".*/database/dao/BaseDao(Test|AndroidTest)",
+                ".*/database/dao/GenreDao(Test|AndroidTest)",
+                ".*/database/dao/ImageDao(Test|AndroidTest)",
+                ".*/database/dao/LifeCycleDataDao(Test|AndroidTest)",
+                ".*/database/dao/ProviderIdentifierDao(Test|AndroidTest)",
+                ".*/database/entity/GenreEntry(Test|AndroidTest)",
+                ".*/database/entity/ImageEntry(Test|AndroidTest)",
+                ".*/database/entity/LifeCycleDataEntry(Test|AndroidTest)",
+                ".*/database/entity/ProviderIdentifierEntry(Test|AndroidTest)"
+            ]
+        }, {
+            "unit": "RadioStationDataStore",
+            "pattern": [
+                ".*/datastore/RadioStationDataStore",
+                ".*/datastore/radiostation/.*",
+                ".*/database/dao/BearerDao",
+                ".*/database/dao/ETagsDao",
+                ".*/database/dao/RadioStationDao",
+                ".*/database/dao/StationDao",
+                ".*/database/dao/StationGenreRankDao",
+                ".*/database/dao/StationImageDao",
+                ".*/database/dao/StationMetadataDao",
+                ".*/database/dao/StationProviderIdentifierDao",
+                ".*/database/dao/StreamDao",
+                ".*/database/entity/BearerEntry",
+                ".*/database/entity/ETagsEntry",
+                ".*/database/entity/StationEntry",
+                ".*/database/entity/StationGenreRankEntry",
+                ".*/database/entity/StationMetadataEntry",
+                ".*/database/entity/StationProviderIdentifierEntry",
+                ".*/database/entity/StreamEntry?",
+                ".*/database/pojo/CompleteRadioStation?",
+                ".*/database/trigger/StationGenreRankTrigger",
+                ".*/database/trigger/StationImageTrigger",
+                ".*/database/trigger/StationProviderIdentifierTrigger",
+                ".*/database/trigger/StationTrigger"
+            ],
+            "testPattern": [
+                ".*/datastore/RadioStationDataStore(Test|AndroidTest)",
+                ".*/datastore/radiostation/.*(Test|AndroidTest)",
+                ".*/database/dao/BearerDao(Test|AndroidTest)",
+                ".*/database/dao/ETagsDao(Test|AndroidTest)",
+                ".*/database/dao/RadioStationDao(Test|AndroidTest)",
+                ".*/database/dao/StationDao(Test|AndroidTest)",
+                ".*/database/dao/StationGenreRankDao(Test|AndroidTest)",
+                ".*/database/dao/StationImageDao(Test|AndroidTest)",
+                ".*/database/dao/StationMetadataDao(Test|AndroidTest)",
+                ".*/database/dao/StationProviderIdentifierDao(Test|AndroidTest)",
+                ".*/database/dao/StreamDao(Test|AndroidTest)",
+                ".*/database/entity/BearerEntry(Test|AndroidTest)",
+                ".*/database/entity/ETagsEntry(Test|AndroidTest)",
+                ".*/database/entity/StationEntry(Test|AndroidTest)",
+                ".*/database/entity/StationGenreRankEntry(Test|AndroidTest)",
+                ".*/database/entity/StationMetadataEntry(Test|AndroidTest)",
+                ".*/database/entity/StationProviderIdentifierEntry(Test|AndroidTest)",
+                ".*/database/entity/StreamEntry(Test|AndroidTest)",
+                ".*/database/pojo/CompleteRadioStation(Test|AndroidTest)",
+                ".*/database/trigger/StationGenreRankTrigger(Test|AndroidTest)",
+                ".*/database/trigger/StationImageTrigger(Test|AndroidTest)",
+                ".*/database/trigger/StationProviderIdentifierTrigger(Test|AndroidTest)",
+                ".*/database/trigger/StationTrigger(Test|AndroidTest)"
+            ]
+        }, {
+            "unit": "CoverArtDataStore",
+            "pattern": [
+                ".*/datastore/CoverArtDataStore",
+                ".*/datastore/coverart/.*",
+                ".*/database/dao/AlbumDao",
+                ".*/database/dao/ArtistDao",
+                ".*/database/dao/CoverArtLookupDao",
+                ".*/database/entity/AlbumEntry",
+                ".*/database/entity/ArtistEntry",
+                ".*/database/entity/CoverArtLookupEntry",
+                ".*/database/entity/StationImageEntry",
+                ".*/database/pojo/CoverArtLookupWithImageAndLifeCycleData",
+                ".*/database/trigger/CoverArtLookupTrigger"
+            ],
+            "testPattern": [
+                ".*/datastore/CoverArtDataStore(Test|AndroidTest)",
+                ".*/datastore/coverart/.*(Test|AndroidTest)",
+                ".*/database/dao/AlbumDao(Test|AndroidTest)",
+                ".*/database/dao/ArtistDao(Test|AndroidTest)",
+                ".*/database/dao/CoverArtLookupDao(Test|AndroidTest)",
+                ".*/database/entity/AlbumEntry(Test|AndroidTest)",
+                ".*/database/entity/ArtistEntry(Test|AndroidTest)",
+                ".*/database/entity/CoverArtLookupEntry(Test|AndroidTest)",
+                ".*/database/entity/StationImageEntry(Test|AndroidTest)",
+                ".*/database/pojo/CoverArtLookupWithImageAndLifeCycleData(Test|AndroidTest)",
+                ".*/database/trigger/CoverArtLookupTrigger(Test|AndroidTest)"
+            ]
+        }, {
+            "unit": "ImageDataStore",
+            "pattern": [
+                ".*/filesystem/ImageDataStore", ".*/filesystem/TemporaryImageDataStore"
+            ],
+            "testPattern": [
+                ".*/filesystem/ImageDataStore(Test|AndroidTest)",
+                ".*/filesystem/TemporaryImageDataStore(Test|AndroidTest)"
+            ],
+            "justifyCoverage": "This unit is also tested by the integration tests via Metadata-Service TestApp."
+        }, {
+            "unit": "GracenoteService",
+            "pattern": [
+                ".*/data/provider/gracenote/.*"
+            ],
+            "testPattern": [
+                ".*/data/provider/gracenote/.*"
+            ],
+            "justifyCoverage": "This unit is also tested by the integration tests via Metadata-Service TestApp."
+        }, {
+            "unit": "Event",
+            "pattern": [
+                "gnservice\/event\/.*"
+            ],
+            "notest": "Legacy-Code, which is in series production since MIB2P CLU24 as well as since MIB3 CLU31, i.e. it is in the field for more than 6 years. This is considered as sufficient qualification."
+        }, {
+            "unit": "Helper",
+            "pattern": [
+                "gnservice\/helper\/.*"
+            ],
+            "notest": "Legacy-Code, which is in series production since MIB2P CLU24 as well as since MIB3 CLU31, i.e. it is in the field for more than 6 years. This is considered as sufficient qualification."
+        }, {
+            "unit": "RadioResultDataBase",
+            "pattern": [
+                "gnservice\/radioresultdb\/.*"
+            ],
+            "notest": "Legacy-Code, which is in series production since MIB2P CLU24 as well as since MIB3 CLU31, i.e. it is in the field for more than 6 years. This is considered as sufficient qualification."
+        }, {
+            "unit": "ResultDataBase",
+            "pattern": [
+                "gnservice\/resultdb\/.*"
+            ],
+            "notest": "Legacy-Code, which is in series production since MIB2P CLU24 as well as since MIB3 CLU31, i.e. it is in the field for more than 6 years. This is considered as sufficient qualification."
+        }, {
+            "unit": "Requests",
+            "pattern": [
+                "gnservice\/request\/.*"
+            ],
+            "notest": "Legacy-Code, which is in series production since MIB2P CLU24 as well as since MIB3 CLU31, i.e. it is in the field for more than 6 years. This is considered as sufficient qualification."
+        }, {
+            "unit": "User",
+            "pattern": [
+                "gnservice\/user\/.*"
+            ],
+            "notest": "Legacy-Code, which is in series production since MIB2P CLU24 as well as since MIB3 CLU31, i.e. it is in the field for more than 6 years. This is considered as sufficient qualification."
+        }, {
+            "unit": "Service",
+            "pattern": [
+                "gnservice\/GnService"
+            ],
+            "notest": "Mostly Legacy-Code which is in series production since MIB2P CLU24 as well as since MIB3 CLU31, i.e. it is in the field for more than 6 years. In addition Android adaptations have been applied for which unit tests are being written at the moment."
+        }, {
+            "unit": "JNI-Interface",
+            "pattern": [
+                "gnservice-lib"
+            ],
+            "notest": "JNI-interface only which is tested implicitly by Metadata-Service TestApp, i.e. as part of the integration tests."
+        }
+    ]
+}

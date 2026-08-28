@@ -1,0 +1,55 @@
+include::config.adoc[]
+
+[[section-system-scope-and-context]]
+== System Scope and Context
+
+=== Business Context
+
+Metadata-Service App is an Android application developed by e.solutions GmbH running on the in-car infotainment system of vehicles.
+
+[plantuml, business_context, png, align="center"]
+....
+include::{pumldir}/business_context.puml[]
+....
+
+==== Client Apps
+
+Clients request metadata, station logos, lyrics and cover arts from MetadataService.
+Additionally they can control the audio stream fingerprinting to get notified whenever information for a newly detected track becomes available.
+Communication from clients to Metadata-Service App is done via remote procedure calls and responses are provided asynchronously via callback again over RPC.
+
+==== Metadata Providers
+
+Requests from clients are directly answered by MetadataService whenever possible, otherwise the request is forwarded to an appropriate back-end.
+The communication with the metadata providers internally also uses an asynchronous interface similar to the way the client side interface works.
+
+==== Service Configuration
+
+The functionality offered by MetadataService can be dynamically controlled through a set of configuration parameters configured either in the car or retrieved from a back-end.
+The service requests this configuration and applies it internally by enabling or disabling certain features for its clients.
+
+==== Vehicle Information
+
+In order to fulfill certain requests, MetadataService has to know the current geo location of the car.
+
+=== Technical Context
+
+[plantuml, technical_context, png, align="center"]
+....
+include::{pumldir}/technical_context.puml[]
+....
+
+Metadata-Service App offers an AIDL interface for clients to send requests to and register callbacks to be notified of results or updates to the underlying data sources.
+Image files are retrieved over a separate channel, namely a custom ContentProvider which extends the Android ContentProvider base class.
+This component takes URIs as inputs and provides access to the corresponding resources.
+
+MetadataService utilizes multiple metadata providers, whose interfaces are not homogeneous.
+The Gracenote SDK is a standard C++ library, while the Conrad-/GMD-Client offers a public Kotlin interface for its users to retrieve data over.
+
+In order to dynamically enable or disable functionality of the Metadata-Service App remotely, the service registers itself to two AIDL services hosted by the CoreServices App. +
+The ServiceListApi service controls the overall availability of sub-services.
+If the service list doesn't contain an entry for a specific service, or if the service is disabled, the corresponding functionality has to be completely disabled. +
+The DisableReasonsApi service provides reasons for temporary restrictions or unavailability of sub-services. Depending on the specific disable reasons, limited functionality can still be offered by a service.
+For example offline data can still be provided in case an online connection is not available.
+
+The Navigation App offers an AIDL interface providing continuous updates of the cars current geo location. With this information radio station data in the Asia region can be requested via the GracenoteService.

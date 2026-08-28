@@ -1,0 +1,25 @@
+@startuml
+skinparam componentStyle uml2
+
+actor "Customer" as customer #fff
+
+node "Vehicle" as vehicle {
+    component "Tuner/Radio/HMI" as tu #fff
+    component "Core Services or Magic" as cs #fff
+
+    node "metadataservice_app" as media {
+        component "metadataservice_conradlib" as crc
+    }
+}
+
+cloud "ConnectedRadio_Backend" <<Server>> as crb #fff {
+}
+
+customer <.left.> tu
+tu <..> media
+
+media <..> crc
+crc <..> cs
+crc <.right.> crb
+
+@enduml

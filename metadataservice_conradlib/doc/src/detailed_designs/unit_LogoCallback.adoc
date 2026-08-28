@@ -1,0 +1,230 @@
+include::../config.adoc[]
+//imagesdir must be overwritten, it is already included in the config.adoc
+:imagesdir: ../../images
+:hash: #
+
+= image:ESO_Logo_Colour_positive_RGB.png[eso_icon,350,350,float="right",align="center"] Design metadataservice_conradlib - Unit LogoCallback
+:toc-title: Table of Contents
+
+'''
+
+// numbering from here on
+:numbered:
+:stem: latexmath
+
+
+[unit=LogoCallback,role=unit]
+== <<Unit>> LogoCallback
+
+This document specifies the design of the unit *LogoCallback*, it is part of the link:../../main.{type}[metadataservice_conradlib].
+
+The unit is responsible to evaluate the response from the backend and passes this information to link:unit_SendToMedia.adoc[SendToMedia].
+
+This class implements the okhttp3.Callback interface, the implemented functions will be called by the okhttp threads after finishing the request process.
+
+== Provided Interface (public methods and properties)
+
+=== LogoCallback.class(bearer: String, callback: IRadioStationDataCallback): LogoCallback
+
+The constructor receives some information about the request and has to save it for later processing.
+
+*Arguments*
+
+|===
+|name|value range |valid values  | description
+
+|bearer
+|String
+|String that contains a bearer representation.
+|The bearer that was requested in the http request.
+
+|callback
+|IRadioStationDataCallback
+|IRadioStationDataCallback
+|Callback that should receive the result.
+|===
+
+=== LogoCallback.onFailure(call: Call, e: IOException)
+
+If it is not possible to send the request because of network problems, this callback will be triggered from OkHttp.
+The function has to trigger SendToMedia.error with RetryBehavior.DELAYED for the given bearer.
+
+*Arguments*
+
+|===
+|name|value range |valid values | description
+
+|call
+|okhttp3.Call
+|okhttp3.Call
+|Information about the OkHTTP request call.
+
+|e
+|java.io.IOException
+|java.io.IOException
+|The exception that occurred while sending the request.
+|===
+
+*Return*
+
+None
+
+*Exceptions*
+
+None
+
+=== LogoCallback.onResponse(call: Call, response: Response)
+
+This function will be triggered if the client receives a response from the backend, it contains the primary logic of this unit.
+
+The function must handle the response by this status code behaviors:
+
+- 200 - See successful response behavior definition
+- 204 - Call SendToMedia.deleteLogo()
+- 304 - Call SendToMedia.notModified()
+- 429/503 - See error retry after response definition
+- else - See error retry after response definition but skip step 1
+
+Successful response behavior:
+
+1. Parse the response body by StationLogo.createFromBackendData()
+- If it fails or no content then call SendToMedia.error() with RetryBehavior.ONCE
+- Requires the content-disposition and content-type header as parameter
+2. Call SendToMedia.logo()
+- Read the ETag header to use it as parameter
+
+Error retry after response behavior:
+
+1. If Retry-After header is available then call ServerDowntimeHandler.setServerDowntime() with the header value
+2. Trigger SendToMedia.retryAfterOrBackendPreferences() by the delay given in the Retry-After header or otherwise use the default retryDelay of 30L. Also use the backend preferred retryBehavior (if not available use RetryBehavior.NONE) and contentExpiry if available.
+
+*Arguments*
+
+|===
+|name|value range |valid values| description
+
+|call
+|okhttp3.Call
+|okhttp3.Call
+|Information about the OkHTTP request call.
+
+|response
+|okhttp3.Response
+|okhttp3.Response
+|The response instance that contains the data from the backend.
+|===
+
+*Return*
+
+None
+
+*Exceptions*
+
+None
+
+== Dependencies (Used Units, methods and properties)
+
+|===
+|Destination unit|Destination method/property |comment
+
+|link:unit_SendToMedia.adoc[SendToMedia]
+|SendToMedia.error()
+SendToMedia.retryAfterOrBackendPreferences()
+SendToMedia.notModified()
+SendToMedia.deleteLogo()
+SendToMedia.logo()
+|Send the result for one specific bearer to the callback.
+
+|link:unit_ServerDowntimeHandler.adoc[ServerDowntimeHandler]
+|ServerDowntimeHandler.setServerDowntime()
+|Mark the server as down for a specific time interval.
+
+|link:unit_Data.adoc[Data]
+|StationLogo.createFromBackendData()
+|Parse the backend response to data transfer objects.
+
+|link:unit_Data.adoc[Data]
+|Config.getBackendPreferredRetryBehavior()
+Config.getBackendPreferredContentExpiry()
+|Get the backend preferred retryBehavior and contentExpiry
+|===
+
+== Runtime View
+
+[dynamic_sequence=startup,unit=LogoCallback,role=dynamic_sequence]
+=== Startup
+
+No explicit specification required, because no startup logic exists.
+The logic of the unit is defined in the functions.
+
+[dynamic_sequence=shutdown,unit=LogoCallback,role=dynamic_sequence]
+=== Shutdown
+
+The calling unit must simply remove all references to this instance, which causes the kotlin garbage collector to remove it from the heap.
+
+[dynamic_sequence=startup_after_s2r,unit=LogoCallback,role=dynamic_sequence]
+=== Suspend
+
+Since this is a kotlin class without android references, no suspend state needs to be considered.
+
+[dynamic_sequence=resume,unit=LogoCallback,role=dynamic_sequence]
+=== Resume
+
+Since this is a kotlin class without android references, no suspend state needs to be considered.
+
+=== Response handling
+
+[plantuml, title="onResponse()", format="svg", id="onResponse"]
+----
+participant "Arbitrary Unit" as caller
+participant "LogoCallback" as callback <<unit>>
+participant "SendToMedia" as media <<unit>>
+participant "StationLogo" as data <<unit>>
+participant "ServerDowntimeHandler" as downtime <<unit>>
+
+caller -> callback
+activate callback
+
+alt Status code is 200
+callback <-> data: createFromBackendData()
+callback -> media: logo()
+
+else Status code is 204
+callback -> media: deleteLogo()
+
+else Status code is 304
+callback -> media: notModified()
+
+else Status code is 429 or 503
+alt Retry-After header is set in response
+callback -> downtime: setServerDowntime()
+end
+callback -> media: retryAfterOrBackendPreferences()
+
+else
+callback -> media: retryAfterOrBackendPreferences()
+
+end
+deactivate callback
+----
+
+=== Error handling
+
+[plantuml, title="onFailure()", format="svg", id="onFailure"]
+----
+participant "Arbitrary Unit" as caller
+participant "LogoCallback" as callback <<unit>>
+participant "SendToMedia" as media <<unit>>
+
+caller -> callback
+activate callback
+callback -> media: error()
+deactivate callback
+----
+
+[[section-design-decisions]]
+== Design Decisions
+
+No further design decisions were made for the implementation of this unit other than those already mentioned in link:../../main.{type}[metadataservice_conradlib].
+
+include::../about-arc42.adoc[]

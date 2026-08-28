@@ -1,0 +1,296 @@
+include::../config.adoc[]
+//imagesdir must be overwritten, it is already included in the config.adoc
+:imagesdir: ../../images
+:hash: #
+
+= image:ESO_Logo_Colour_positive_RGB.png[eso_icon,350,350,float="right",align="center"] Design metadataservice_conradlib - Unit LogoRequestJob
+:toc-title: Table of Contents
+
+'''
+
+// numbering from here on
+:numbered:
+:stem: latexmath
+
+
+[unit=LogoRequestJob,role=unit]
+== <<Unit>> LogoRequestJob
+
+This document specifies the design of the unit *LogoRequestJob*, it is part of the link:../../main.{type}[metadataservice_conradlib].
+
+This job class is responsible to send and evaluate requests to the logo endpoint,
+the endpoint is responsible to receive radio logos as image files.
+The class has to implement the link:unit_IJob.adoc[IJob] interface.
+
+== Provided Interface (public methods and properties)
+
+=== LogoRequestJob.class(mediaRequestObject: MediaRequestObject, registrationHandler: HandleRegistration, tokenHandler: TokenHandler): LogoRequestJob
+
+The constructor receives the data and handler instances that are required to send backend requests that meet the requirements.
+
+*Arguments*
+
+|===
+|name|value range |valid values | description
+
+|mediaRequestObject
+|MediaRequestObject
+|MediaRequestObject
+|Data that must be included in the request.
+
+|registrationHandler
+|HandleRegistration
+|HandleRegistration
+|The handler that must be used to ensure the registration is still valid.
+
+|container
+|TokenHandler
+|TokenHandler
+|The handler that must be used to receive tokens for backend requests.
+|===
+
+=== LogoRequestJob.run()
+
+This function runs the primary job logic, it has to do the following:
+
+1. Check if link:unit_ServerDowntimeHandler.adoc[ServerDowntimeHandler.getRemainingDowntime()] reports downtime
+- Call SendToMedia.retryAfter()
+- Return this function
+2. Use HandleRegistration.ensureRegistration() to ensure the registration is valid
+- On RegistrationFailureException call SendToMedia.error() with RetryBehavior.DELAYED if responseCode is null, else call SendToMedia.retryAfterOrBackendPreferences() with the backend preferred retryBehavior and contentExpiry. Use retryBehavior.EXPONENTIAL as a fallback if no backend preferred retryBehavior is available. On other exceptions call SendToMedia.error() with RetryBehavior.EXPONENTIAL.
+- Return this function on exception
+3. Use the link:unit_TokenHandler.adoc[TokenHandler.getToken()] to receive a backend token
+- If it fails then use SendToMedia.error() and return this function
+4. Build the request headers
+- Set RequestHeader.accept to "image/*"
+- Set RequestHeader.mcc to the MCC from the bearer of the MediaRequestObject
+- Set RequestHeader.ifNoneMatch to the logoETag from the MediaRequestObject
+5. Build the request url and replace the bearer placeholder by String.replaceEsoUrlPlaceholder()
+6. Build LogoCallback by the information from MediaRequestObject
+7. Start async request to the backend by Http.enqueueGet
+
+The function has to guarantee that the callback will be executed or the bearer will directly be answered at SendToMedia.
+
+*Arguments*
+
+None
+
+*Return*
+
+None
+
+*Exceptions*
+
+None
+
+*Special attributes*
+
+** async: Starts async http request, the result must be handled by a callback.
+
+== Dependencies (Used Units, methods and properties)
+
+This is an overview of the used methods and properties from other units.
+
+|===
+|Destination unit|Destination method/property |comment
+
+|link:unit_ServerDowntimeHandler.adoc[ServerDowntimeHandler]
+|ServerDowntimeHandler.getRemainingDowntime()
+|Check if the server is currently marked as down.
+
+|link:unit_TokenHandler.adoc[TokenHandler]
+|TokenHandler.getToken()
+|Receive a backend token from the account manager.
+
+|link:unit_HandleRegistration.adoc[HandleRegistration]
+|HandleRegistration.ensureRegistration()
+|Check if the registration is valid, otherwise run a new registration.
+
+|link:unit_Http.adoc[Http]
+|Http.enqueueGet()
+|Execute a get request to the backend.
+
+|link:unit_Http.adoc[Http]
+|Http.generateRequestID()
+|Generate a request id that should be logged and sent to the backend.
+
+|link:unit_SendToMedia.adoc[SendToMedia]
+|SendToMedia.retryAfter(), SendToMedia.retryAfterOrBackendPreferences() and SendToMedia.error()
+|If the request failed, it must send the error result to the app.
+
+|link:unit_LogoCallback.adoc[LogoCallback]
+|LogoCallback.class
+|The callback that should handle the result of the logo request.
+
+|link:unit_Data.adoc[Data]
+|Config.endpointConfig.url and Config.apiEndpoints.logo
+|Configuration that must be used to build the request url.
+
+|link:unit_Data.adoc[Data]
+|String.replaceEsoUrlPlaceholder()
+|Extension function that could be used to replace the bearer placeholder in the url.
+
+|link:unit_Data.adoc[Data]
+|Config.getBackendPreferredRetryBehavior()
+Config.getBackendPreferredContentExpiry()
+|Get the backend preferred retryBehavior and contentExpiry
+|===
+
+== Runtime View
+
+[dynamic_sequence=startup,unit=LogoRequestJob,role=dynamic_sequence]
+=== Startup
+
+No explicit specification required, because no startup logic exists.
+The job logic will start by the run() function.
+
+[dynamic_sequence=shutdown,unit=LogoRequestJob,role=dynamic_sequence]
+=== Shutdown
+
+The calling unit must simply remove all references to this instance,
+which causes the kotlin garbage collector to remove it from the heap.
+
+[dynamic_sequence=startup_after_s2r,unit=LogoRequestJob,role=dynamic_sequence]
+=== Suspend
+
+Since this is a kotlin class without android references, no suspend state needs to be considered.
+
+[dynamic_sequence=resume,unit=LogoRequestJob,role=dynamic_sequence]
+=== Resume
+
+Since this is a kotlin class without android references, no suspend state needs to be considered.
+
+=== Create logo request for the backend
+
+[plantuml, title="run()", format="svg", id="run"]
+----
+
+participant "Arbitrary Unit" as caller
+participant "LogoRequestJob" as job <<unit>>
+participant "ServerDowntimeHandler" as downtime <<unit>>
+participant "HandleRegistration" as registration <<unit>>
+participant "TokenHandler" as token <<unit>>
+participant "Http" as http <<unit>>
+
+caller -> job: run()
+activate job
+
+job -> downtime: getRemainingDowntime()
+activate downtime
+job <- downtime: null
+deactivate downtime
+
+job -> registration: ensureRegistration()
+activate registration
+deactivate registration
+
+job -> token: getToken()
+activate token
+job <- token: String including backend token
+deactivate token
+
+job -> job: Build request headers
+job -> job: Build request url
+
+job --> http: enqueueGet()
+deactivate job
+activate http
+----
+
+=== Handle server downtime
+
+[plantuml, title="run() but server has downtime", format="svg", id="run-downtime"]
+----
+
+participant "Arbitrary Unit" as caller
+participant "LogoRequestJob" as job <<unit>>
+participant "ServerDowntimeHandler" as downtime <<unit>>
+participant "SendToMedia" as media <<unit>>
+
+caller -> job: run()
+activate job
+
+job -> downtime: getRemainingDowntime()
+activate downtime
+job <- downtime: 1 or more
+deactivate downtime
+
+job -> media: retryAfter()
+deactivate job
+----
+
+=== Handle registration failure
+
+[plantuml, title="run() but registration failure", format="svg", id="run-registration-failure"]
+----
+
+participant "Arbitrary Unit" as caller
+participant "LogoRequestJob" as job <<unit>>
+participant "ServerDowntimeHandler" as downtime <<unit>>
+participant "HandleRegistration" as registration <<unit>>
+participant "SendToMedia" as media <<unit>>
+participant "Data" as data <<unit>>
+
+caller -> job: run()
+
+
+job -> downtime: getRemainingDowntime()
+activate downtime
+job <- downtime: null
+deactivate downtime
+
+job -> registration: ensureRegistration()
+activate registration
+job <- registration: Throw RegistrationFailureException
+deactivate registration
+
+alt exception.responseCode == null
+    job -> media: error(RetryBehavior.DELAYED)
+    job -> caller: return
+else
+    job -> data: getBackendPreferredRetryBehavior(responseCode, RetryBehavior.EXPONENTIAL)
+    job -> data: getBackendPreferredContentExpiry(responseCode)
+    job -> media: retryAfterOrBackendPreferences()
+    job -> caller: return
+end
+----
+
+=== Handle token errors
+
+[plantuml, title="run() but token handler failure", format="svg", id="run-token-failure"]
+----
+
+participant "Arbitrary Unit" as caller
+participant "LogoRequestJob" as job <<unit>>
+participant "ServerDowntimeHandler" as downtime <<unit>>
+participant "HandleRegistration" as registration <<unit>>
+participant "TokenHandler" as token <<unit>>
+participant "SendToMedia" as media <<unit>>
+
+caller -> job: run()
+activate job
+
+job -> downtime: getRemainingDowntime()
+activate downtime
+job <- downtime: null
+deactivate downtime
+
+job -> registration: ensureRegistration()
+activate registration
+deactivate registration
+
+job -> token: getToken()
+activate token
+job <- token : null
+deactivate token
+
+job -> media: error(RetryBehavior.DELAYED)
+deactivate job
+----
+
+[[section-design-decisions]]
+== Design Decisions
+
+No further design decisions were made for the implementation of this unit other than those already mentioned in link:../../main.{type}[metadataservice_conradlib].
+
+include::../about-arc42.adoc[]

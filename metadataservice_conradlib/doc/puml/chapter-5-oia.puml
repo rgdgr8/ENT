@@ -1,0 +1,19 @@
+@startuml
+skinparam componentStyle uml2
+
+    component "metadataservice_app" as mds {
+        component "metadataservice_conradlib" as crc
+    }
+    cloud "ConnectedRadio_Backend" as crb
+    component "Magic Adapter" as adapter
+    component "Magic" as magic
+    component "Android Account Manager" as aam
+
+    mds <-- adapter
+    adapter <-- magic
+
+    crc <-- aam
+    aam <-- magic
+
+    crc <-left-> crb
+@enduml

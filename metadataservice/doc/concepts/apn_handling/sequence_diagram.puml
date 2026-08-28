@@ -1,0 +1,27 @@
+@startuml
+
+participant MetadataService as mds
+participant CoreServices as cs
+participant GracenoteService as gn
+participant ConRadClient as cc
+
+activate mds
+activate gn
+activate cs
+activate cc
+
+mds -> cs: registerServiceListClient(clientId, callback) **[1]**
+
+cs -> mds: registerServiceListClient ack **[2]**
+
+opt no apn status change
+    cs -> mds: updateServiceList(List<ServiceListEntry> entries) **[3]**
+    mds -> mds: evaluate **apn** value change **[4]**
+else apn status change
+    cs -> mds: updateServiceList(List<ServiceListEntry> entries) **[5]**
+    mds -> mds: evaluate **apn** value change **[5]**
+    mds -> gn: apnStatusChanged(data) **[7]**
+    mds -> cc: apnStatutsChanged(data) **[8]**
+end
+
+@enduml

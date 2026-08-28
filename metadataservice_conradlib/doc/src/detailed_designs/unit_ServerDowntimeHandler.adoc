@@ -1,0 +1,179 @@
+include::../config.adoc[]
+//imagesdir must be overwritten, it is already included in the config.adoc
+:imagesdir: ../../images
+:hash: #
+
+= image:ESO_Logo_Colour_positive_RGB.png[eso_icon,350,350,float="right",align="center"] Design metadataservice_conradlib - Unit ServerDowntimeHandler
+:toc-title: Table of Contents
+
+'''
+
+// numbering from here on
+:numbered:
+:stem: latexmath
+
+
+[unit=ServerDowntimeHandler, role=unit]
+== <<Unit>> ServerDowntimeHandler
+This document specifies the design of the unit *ServerDowntimeHandler*, it is part of the link:../../main.{type}[metadataservice_conradlib].
+
+This class is implemented as kotlin object (Singleton),
+it is a middleware that checks if the server has downtime and would no longer like request from clients,
+The HTTP callback decides, if a downtime is currently taking place and reports it to this class.
+
+== Provided Interface (public methods and properties)
+
+=== ServerDowntimeHandler.handleResponse(retryAfter: Long?)
+
+Handles the response from the server and sets the server downtime if a 'Retry-After' header is present. This function is intended to be used for status codes 429 (Too Many Requests) and 503 (Service Unavailable).
+
+*Arguments*
+
+|===
+|name|value range |valid values |resolution |unit | description
+
+|seconds
+|Long
+|1 or more
+|+-1
+|Seconds
+|Duration how long the middleware should mark the backend as not available.
+
+|===
+
+*Return*
+
+None
+
+*Exceptions*
+
+None
+
+=== ServerDowntimeHandler.setServerDowntime(seconds: Long)
+
+Mark the backend as not available for the given duration.
+
+*Arguments*
+
+|===
+|name|value range |valid values |resolution |unit | description
+
+|seconds
+|Long
+|1 or more
+|+-1
+|Seconds
+|Duration how long the middleware should mark the backend as not available.
+
+|===
+
+*Return*
+
+None
+
+*Exceptions*
+
+None
+
+=== ServerDowntimeHandler.getRemainingDowntime(): Long?
+
+Check if the backend is currently marked as down and return the remaining downtime for this client.
+
+*Arguments*
+
+None
+
+*Return*
+
+|===
+|Type|value range |valid values |resolution |unit | description
+
+|Response
+|Long or null
+|1 or more, null
+|+-1
+|Seconds
+|Returns the remaining downtime or null, if no downtime was reported.
+|===
+
+*Exceptions*
+
+None
+
+== Dependencies (Used Units, methods and properties)
+
+This unit has no dependencies to other units, it is completely independent.
+
+== Runtime View
+
+[dynamic_sequence=startup, unit=ServerDowntimeHandler, role=dynamic_sequence]
+=== Startup
+
+No explicit specification required, because no constructor or startup logic exists.
+
+[dynamic_sequence=shutdown, unit=ServerDowntimeHandler, role=dynamic_sequence]
+=== Shutdown
+
+This class is a kotlin object (Singleton) that will stay in the memory forever, so it can be reused.
+
+[dynamic_sequence=startup_after_s2r, unit=ServerDowntimeHandler, role=dynamic_sequence]
+=== Suspend
+
+Since this is a kotlin class without deep android references, no suspend state needs to be considered.
+
+[dynamic_sequence=resume, unit=ServerDowntimeHandler, role=dynamic_sequence]
+=== Resume
+
+Since this is a kotlin class without deep android references, no suspend state needs to be considered.
+
+=== Return no server downtime
+
+[plantuml, title="No Server Downtime", format="svg", id="ServerDowntimeHandler-No-Downtime"]
+----
+participant "Arbitrary Unit" as caller
+participant "ServerDowntimeHandler" as handler <<unit>>
+
+caller -> handler: getRemainingDowntime()
+activate handler
+caller <- handler: null
+deactivate handler
+----
+
+=== Return active server downtime
+
+[plantuml, title="Active Server Downtime", format="svg", id="ServerDowntimeHandler-Active-Downtime"]
+----
+participant "Arbitrary Unit" as caller
+participant "ServerDowntimeHandler" as handler <<unit>>
+
+caller -> handler: setServerDowntime(10)
+caller -> caller: Wait 5 seconds
+
+caller -> handler: getRemainingDowntime()
+activate handler
+caller <- handler: "5"
+deactivate handler
+----
+
+=== Expired server downtime
+
+[plantuml, title="Expired Server Downtime", format="svg", id="ServerDowntimeHandler-Expired-Downtime"]
+----
+participant "Arbitrary Unit" as caller
+participant "ServerDowntimeHandler" as handler <<unit>>
+
+caller -> handler: setServerDowntime(10)
+caller -> caller: Wait 15 seconds
+
+caller -> handler: getRemainingDowntime()
+activate handler
+caller <- handler: null
+deactivate handler
+----
+
+[[section-design-decisions]]
+== Design Decisions
+
+No further design decisions were made for the implementation of this unit other than those already mentioned in link:../../main.{type}[metadataservice_conradlib].
+
+include::../about-arc42.adoc[]

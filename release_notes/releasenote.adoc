@@ -1,0 +1,50 @@
+= Releasenotes ivi.metadataservice.app
+
+== Contact
+[#contact-cariad.contact]
+----
+christian.winter@cariad.technology
+----
+[#contact-supplier.contact]
+----
+ext.group.Media.OI-MetadataService@esolutions.de
+----
+
+== Known Issues
+ * The update of the "gracenote truststore" via Magic-Adapter is kept activated as agreed with Cariad even if the "gracenote truststore" is not integrated on Magic side
+   ** Thus always the fallback trustore which is installed as asset of the Metadata-Service App is used
+   ** Corresponding errors / warnings might be seen in the trace which must be accepted
+ * Please delete the cache of the Metadata-Service App after updating to version >= "1.2.12-MAIN"
+   ** This must only be done once to fix an access right issue
+   ** This could be done manually by connectiong to the target via ADB or via factory settings
+ * GMD-Functionality is not enabled in Service configuration at the OEM-Backend -> Thus it could not be tested at all
+
+== Config
+ * The usage of "AudioSource.REMOTE_SUBMIX" has been de-activated as per Cariad request to workaround audio stuttering with active song recognition
+   ** The Android bug is known and has already been reported to Google, see https://partnerissuetracker.corp.google.com/issues/390580815
+ * In case the End-2-End "Online" connection is not working, parts can be skipped for testing via "Metadata Demo Activity" (Open App -> Tab "Settings Tab") as follows:
+   ** "Check Disabled Reasons": disabled
+   ** "Network over D-Link": enabled (Hint: An USB2Ethernet D-Link adapter must be connected and activated)
+   ** "Online data": enabled
+ * The Gracenote Online functionality is available as per Gracenote license file provided per brand
+
+== Dependencies
+ * Metadata-Service Clientinterface Version: 11.1.0
+ * e.solutions ConradLib: OI_2025-10-28-113620
+ * e.solutions GMDLib: 2025_10_28-125437-OI-MAIN
+ * Supply / Beistellung: GNSDK for Automotive 2.6.19.14264 incl. clientID
+ * Supply / Beistellung: Gracenote backend certificate file 'truststore_gracenote.pem" from 2024-09-17
+ * Supply / Beistellung: sSOA manifest 24w15.4
+ * Only limited support / functionality possible in EMU / SIMU environment
+
+== Summary of the testreport
+[#recap-testreport]
+----
+e.solutions Metadata-Service App has been tested against regression and regarding functionality as far as possible in the current software release.
+----
+
+== Testdata summary
+[#stats-testreport]
+----
+See corresponding subchapter "ivi.metadataservice.app" in chapter "Executed Tests".
+----

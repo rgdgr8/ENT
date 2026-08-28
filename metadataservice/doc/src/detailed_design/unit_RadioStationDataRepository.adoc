@@ -1,0 +1,169 @@
+include::../config.adoc[]
+//imagesdir must be overwritten, it is already included in the config.adoc
+:imagesdir: ./../../images
+:pumldir: ./../../puml
+:hash: #
+
+= image:ESO_Logo_Colour_positive_RGB.png[eso_icon,350,350,float="right",align="center"] Design Metadata-Service App - Unit RadioStationDataRepository
+:toc-title: Table of Contents
+
+***
+
+// numbering from here on
+:numbered:
+:stem: latexmath
+
+[unit=RadioStationDataRepository, role=unit]
+== <<Unit>> RadioStationDataRepository
+This document specifies the design of the unit *RadioStationDataRepository*.
+It is part of the link:../../main.pdf[metadataservice_app].
+
+It shall coordinate the fetching, caching and updating of radio station data.
+
+== Provided Interface (public methods and properties)
+
+===  RadioStationDataRepository.retrieveRadioStationData(IBearerEntity bearer, ETagsEntity etags)
+The purpose of the function 'retrieveRadioStationData' is to retrieve radio station data based on the provided bearer and etags entities. 
+It does this by creating a 'RadioStationRequest' object and using it to perform a station request based on the given parameters. 
+The function returns a flow of 'StationEntity' objects.
+
+*Arguments*
+
+|===
+|name | valid values | description
+
+| bearer
+| IBearerEntity instance
+| Represents the bearer entity for the radio station data request
+
+| etags
+| ETagsEntity enum value
+| Represents the ETags entity for the radio station data request
+|===
+
+*Return*
+
+|===
+|Type | valid values | description
+| Flow<StationEntity>
+| Flow<StationEntity> instance
+| Flow emitting the radio station data.
+|===
+
+*Exceptions*
+
+This function does not explicitly throw any exceptions. However, it is possible that exceptions may be thrown by the underlying 'RadioStationRequest' object or the 'onlineStateProvider' flow if they encounter any issues during their operations.
+
+*Special attributes*
+
+|===
+|async |timing behavior
+|result is emitted via the returned flow
+|no guarantees, data is published as it becomes available from database/online backend
+|===
+
+===  RadioStationRequest.stationRequest(IBearerEntity bearer, ETagsEntity etags, Boolean onlineLookup)
+The function 'stationRequest' is responsible for requesting station data for a given bearer. It returns a flow of StationEntity as they become available. The function takes three parameters: bearer, eTags, and onlineLookup. The bearer represents the station to request data for, eTags contains the ETags from a previous response for the same bearer, and onlineLookup is a boolean indicating whether the request should be made online or offline. If onlineLookup is true, the function will request data from the online source, otherwise it will use the cached data.
+
+*Arguments*
+
+|===
+|name | valid values | description
+
+| bearer
+| IBearerEntity instance
+| Station bearer
+
+| etags
+| ETagsEntity enum value
+| The e-tags from a previous response for the same bearer to compare with the new data.
+
+| onlineLookup
+| true or false
+| Online or offline lookup
+|===
+
+*Return*
+
+|===
+|Type | valid values | description
+
+| Flow<StationEntity>
+| Flow<StationEntity> instance
+| Flow emitting the radio station data.
+|===
+
+*Exceptions*
+
+The function 'stationRequest' does not explicitly throw any exceptions. However, if there is an issue with the provided IRadioStationDataProvider or IRadioStationDataStore, or if the ITimeProvider provides incorrect time values, the function may behave unpredictably or throw exceptions.
+
+*Special attributes*
+
+|===
+|async |timing behavior
+|result is emitted via the returned flow
+|no guarantees, data is published as it becomes available from database/online backend
+|===
+
+== Dependencies (Used Units, methods and properties)
+
+|===
+|Destination unit|Destination interface |comment
+
+|RadioStationDomain
+|IRadioStationDataProvider
+|Provider for radio station data e.g. via online backend
+
+|RadioStationDomain
+|IRadioStationDataStore
+|Local storage of radio station data
+
+|CommonDomain
+|ITimeProvider
+|Provides the current time
+
+|CommonDomain
+|IOnlineStateProvider
+|Provides information about the current network configuration
+|===
+
+== Runtime View
+
+[dynamicAspectName=startup, unitName=RadioStationDataRepository, role=dynamicAspectName]
+=== Startup
+The RequestLogic class is a Kotlin object and does not have a traditional initialization process.
+However, the logger instance is created during the class loading process.
+
+[dynamicAspectName=shutdown, unitName=RadioStationDataRepository, role=dynamicAspectName]
+=== Shutdown
+As the RequestLogic class is a singleton, it will not be garbage collected until the application shuts down.
+Therefore, there is no specific shutdown process for this class.
+
+[dynamicAspectName=suspend, unitName=RadioStationDataRepository, role=dynamicAspectName]
+=== Suspend
+This unit does not have a dedicated suspend behavior
+
+[dynamicAspectName=resume, unitName=RadioStationDataRepository, role=dynamicAspectName]
+=== Resume
+This unit does not have a dedicated resume behavior
+
+[dynamicAspectName=normalUC1, unitName=RadioStationDataRepository, role=dynamicAspectName]
+
+=== Normal operation use case #1
+A caller passes a StationBearer and an ETag.
+If radio station data for this Bearer is stored in the RadioStationDataStore, it is returned to the caller.
+If no data is available from the DataStore or if it is outdated, the request is forwarded to the RadioStationDataProvider.
+Results from the DataProvider are both stored in the DataStore as well as passed back to the caller.
+
+[dynamicAspectName=errorHandling1, unitName=RadioStationDataRepository, role=dynamicAspectName]
+=== Error handling use case #1
+Any errors are handled within the unit and not directly communicated.
+In case an error occurs either no result or an empty result are provided.
+
+
+[[section-design-decisions]]
+== Design Decisions
+The implementation processes the request and forwards it to the lower layers of the software stack.
+Results are passed back to the caller.
+
+include::../about-arc42.adoc[]

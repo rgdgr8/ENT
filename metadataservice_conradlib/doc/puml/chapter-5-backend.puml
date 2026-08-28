@@ -1,0 +1,110 @@
+@startuml
+
+skinparam linetype ortho
+
+component "Account Manager" as acc
+cloud Backend as server
+
+node metadataservice_app {
+    component metadataservice_app as mds
+
+    node metadataservice_conradlib {
+
+        node Api {
+        }
+
+        component Data
+
+        component Debug
+
+        node Backend {
+
+            component IJob
+            component ServerDowntimeHandler
+
+            node Controller {
+                component IController
+                component RequestController
+            }
+
+            node Registration {
+                component RegistrationRequestJob
+                component HandleRegistration
+                component RegistrationFailureException
+            }
+
+            together {
+                node Lookup {
+                    component LookupRequestContainer
+                    component LookupRequestJob
+                    component LookupCallback
+                }
+
+                node Logo {
+                    component LogoRequestJob
+                    component LogoCallback
+                }
+            }
+
+            node Worker {
+                component ExecutorWorker
+                component PausableThreadPoolExecutor
+            }
+        }
+
+        component TokenHandler
+
+        node Media {
+        }
+
+        component IRC
+        component Logger
+    }
+}
+
+Controller -down- Lookup
+Controller -left- Worker
+Controller --- Registration
+
+RequestController -- IController
+
+Lookup --- Media
+Lookup --- ServerDowntimeHandler
+Lookup -down- Logo
+Lookup -right- Registration
+Lookup --- Api
+Lookup -left- Worker
+
+LookupRequestContainer -- LookupRequestJob
+
+LookupRequestJob -- IJob
+LookupRequestJob -- LookupCallback
+
+Logo --- Media
+Logo -right- Registration
+Logo --- ServerDowntimeHandler
+
+LogoRequestJob -- IJob
+LogoRequestJob -- LogoCallback
+
+Registration --- Api
+Registration --- ServerDowntimeHandler
+
+RegistrationRequestJob -- IJob
+RegistrationRequestJob -- HandleRegistration
+
+HandleRegistration -- RegistrationFailureException
+
+ExecutorWorker -- PausableThreadPoolExecutor
+
+Backend -- Logger
+Backend -- Data
+Backend -- IRC
+Backend -- TokenHandler
+
+Api -- server
+mds -- Media
+Media -- Debug
+TokenHandler -- acc
+
+@enduml

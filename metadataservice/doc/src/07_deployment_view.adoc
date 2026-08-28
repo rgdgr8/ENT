@@ -1,0 +1,10 @@
+[[section-deployment-view]]
+== Deployment View
+
+The Metadata-Service apk is pre-installed in the priv-app folder of the Android IVI product partition.
+Updates may be delivered via the Audi/Harman PlayStore. (Not a requirement so far.)
+
+The apk is loaded by the Android operating system when the first client tries to access it (binds to it).
+Alternatively as priv-app it might request the permission to be a persistent service, in which case it will be started at some point during the Android boot process.
+
+Metadata-Service App is used by other entertainment (radio and media) apps running on the HCP3 Android IVI system.

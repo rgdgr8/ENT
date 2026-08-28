@@ -1,0 +1,49 @@
+﻿[[section-architecture-constraints]]
+== Architecture Constraints
+
+This chapter lists constraints that need to be taking into account during the design and implementation of this project. +
+It is divided in technical and organizational constraints, as well as general conventions that have to be followed. 
+
+=== Technical Constraints
+
+[options="header",cols="1,1"]
+|===
+|Constraint | Description   
+//-------------
+|Android privileged app | In order to gain access to permissions and APIs not available to standard Android apps, Metadata-Service App has to be a privileged app.
+|Prefer existing Android APIs or technologies| OEM requested to rely on the Android framework and use the recommended solutions wherever possible. This especially applies to interfaces with the outside world.
+|Implemented primarily in Kotlin | Google named Kotlin as the preferred language for Android app development.
+|Implemented in C++ | C++14 Standard is used for this project
+|Android JNI C++ | GracenoteService is a C++ library which needs to be integrated via JNI
+|Android NDK| Android NDK provided by Google's Android SDK is used to built GracenoteService as a C++ library
+|Limited hardware resources | Especially flash memory usage both from capacity and durability standpoint has to be considered carefully. Processing power and RAM should not be a major limiting factor for the provided functionality. Both should still be consumed responsibly. Estimations for flash memory usage are available in an external excel sheet (https://sharepoint.eso.local/sites/projects/hcp3/_layouts/15/DocIdRedir.aspx?ID=ESOPR-70177485-3674[HCP3_eMMC_MetadataService_App_Use_Cases])
+|Limited mobile data volume | Unnecessary requests to any back-end service over the Internet should be avoided.
+|===
+
+=== Organizational Constraints
+
+[options="header",cols="1,1"]
+|===
+|Convention | Description
+//-------------
+|Team | Sebastian Kiesel (Project Manager), Matthias Stühlinger (MetadataService), Yazdan Sharifi (MetadataService), Michael Irsiegler (GracenoteService), Artem Moskalenko (Gracenote-/MetadataService)
+|Process Model | aSPICE, SAFe
+|Development Tools | PlantUML and AsciiDoc for documentation, AndroidStudio IDE for C++ source code and Android Studio for Java/Kotlin source code. Project must be buildable without IDE
+|Version Control System | Perforce contains the projects' source files. Artifactory is used to retrieve scripts or binaries from other teams within e.solutions, Gerrit is the Harman version control system used to integrate external deliveries into the HCP3 images
+|Test Tools | Unit tests with Catch2 for C++ sources and JUnit for Kotlin sources. MockK framework is used for mocking in unit tests. JaCoCo / LCOV is used to generated branch coverage (C1) reports for the unit tests
+|Static Analyzer | Klocwork for C++, Java and Kotlin; additionally Detekt for Kotlin; additionally cpplint for C++
+|Code Review Infrastructure | Perforce Swarm; includes both automated checking of quality gates (compilation errors, test coverage and static code analyzer result) and peer reviews
+|Continuous Integration | Jenkins; e.solutions integration server. Hosting or interfacing with the version control systems, static code analyzer and code review infrastructure
+|Source Code Formatting | Detekt and cpplint enforcing the e.solutions style guides
+|===
+
+=== Conventions
+
+[options="header",cols="1,1"]
+|===
+|Convention | Description   
+//-------------
+|Architecture Documentation | English arc42 template version 7.0 in AsciiDoc format following the HCP3 Southside Architecture Guidelines. Diagram notation as described in "Archicture Notation" guide.
+|Coding Guidelines | The C++ coding guidelines are based on Google's C++ code guide, including adaptations from e.solutions. The rules for Kotlin are based on the official Kotlin guidelines and Google's additions specifically for Android development. Kotlin tries to push a single consistent coding style, aiming to prevent the multitude of different styles that have arisen for e.g. Java or C++.
+|Language | The project language is English. This includes all documentation, source code and comments.
+|===

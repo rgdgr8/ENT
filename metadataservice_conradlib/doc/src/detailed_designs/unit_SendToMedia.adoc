@@ -1,0 +1,888 @@
+include::../config.adoc[]
+//imagesdir must be overwritten, it is already included in the config.adoc
+:imagesdir: ../../images
+:hash: #
+
+= image:ESO_Logo_Colour_positive_RGB.png[eso_icon,350,350,float="right",align="center"] Design metadataservice_conradlib - Unit SendToMedia
+:toc-title: Table of Contents
+
+'''
+
+// numbering from here on
+:numbered:
+:stem: latexmath
+
+
+[unit=SendToMedia,role=unit]
+== <<Unit>> SendToMedia
+
+This document specifies the design of the unit *SendToMedia*, it is part of the link:../../main.{type}[metadataservice_conradlib].
+
+This kotlin object (Singleton) is responsible to format data into the given link:unit_IRadioStationDataCallback.adoc[IRadioStationDataCallback] format and gives the data to the interface by function calls.
+
+== Provided Interface (public methods and properties)
+
+=== SendToMedia.metadata(logInfo: LogInfo?, mcc: String?, eTags: ETagResult?, data: DataObject, callback: IRadioStationDataCallback)
+
+Uses following functions to create data holder objects and call the related callback functions:
+
+- IRadioStationDataCallback.onMetadata
+* ProviderIdentifier.createListFromBackendData
+* StationMetadata.createFromBackendData
+
+- IRadioStationDataCallback.onStreams
+* WebStream.createListFromBackendData
+
+- IRadioStationDataCallback.onBearers
+* IBearer.createListFromBackendData
+
+In case the backend does not send a stream or bearer, the related callback should not get triggered.
+If the backend does not send a list, the variable of the data holder is null.
+
+*Arguments*
+
+|===
+|name|value range |valid values | description
+
+|logInfo
+|LogInfo?
+|LogInfo or null
+|The log info that should be used to write logs or null if not available.
+
+|mcc
+|String?
+|The MCC as String or null if no MCC got sent.
+|The mcc string used for the lookup request, to generate the bearer instances.
+
+|eTags
+|ETagResult?
+|ETagResult or null
+|The ETags received from the backend or null if not available.
+
+|data
+|DataObject
+|DataObject-Instance
+|The station data recieved from the backend.
+
+|callback
+|IRadioStationDataCallback
+|IRadioStationDataCallback-Instance
+|The callback to whom the data should be given.
+|===
+
+*Return*
+
+None
+
+*Exceptions*
+
+None
+
+=== SendToMedia.logo(logInfo: LogInfo?, etag: String?, stationLogo: StationLogo, callback: IRadioStationDataCallback, contentExpiry: Long?)
+
+Send the received logo to the callback via the onLogo function and finish the process with onComplete.
+
+Call the onComplete with
+
+- CompleteStatus
+* retry = RetryBehavior.NONE
+* retryDelaySeconds = null
+- expirationDate
+* Current UTC time + contentExpiry
+
+*Arguments*
+
+|===
+|name|value range |valid values | description
+
+|logInfo
+|LogInfo?
+|LogInfo or null
+|The log info that should be used to write logs or null if not available.
+
+|etag
+|String?
+|ETag String or null
+|The ETag string received from the backend or null if not available.
+
+|stationLogo
+|StationLogo
+|StationLogo-Instance
+|The logo data that should be sent to the callback.
+
+|callback
+|IRadioStationDataCallback
+|IRadioStationDataCallback-Instance
+|The callback to whom the data should be given.
+
+|contentExpiry
+|Long?
+|Long or null
+|The backend preferred content expiry that shall be sent to media.
+|===
+
+*Return*
+
+None
+
+*Exceptions*
+
+None
+
+=== SendToMedia.deleteLogo(logInfo: LogInfo?, callback: IRadioStationDataCallback, contentExpiry: Long?)
+
+Call this function if the backend explicitly answers with no logo available.
+Then call the onLogo and onSLogo function with etag and logo of null.
+
+After this finish the process by calling onComplete with
+
+- CompleteStatus
+* retry = RetryBehavior.NONE
+* retryDelaySeconds = null
+- expirationDate
+* Current UTC time + contentExpiry
+
+*Arguments*
+
+|===
+|name|value range |valid values | description
+
+|logInfo
+|LogInfo?
+|LogInfo or null
+|The log info that should be used to write logs or null if not available.
+
+|callback
+|IRadioStationDataCallback
+|IRadioStationDataCallback-Instance
+|The callback to whom the data should be given.
+
+|contentExpiry
+|Long?
+|Long or null
+|The backend preferred content expiry that shall be sent to media.
+
+|===
+
+*Return*
+
+None
+
+*Exceptions*
+
+None
+
+=== SendToMedia.noContentForAll(map: Map<String, MediaRequestObject>, requestId: String?, contentExpiry: Long?)
+
+Call the SendToMedia.noContent function for every map entry,
+to do this we have to create new LogInfo object by bearer key and request id.
+
+*Arguments*
+
+|===
+|name|value range |valid values | description
+
+|map
+|Map<String, MediaRequestObject>
+|Map<String, MediaRequestObject>
+|Key is the string presentation of the bearer and value the MediaRequestObject.
+
+|requestId
+|String?
+|Request id or null
+|Request id that got sent to the backend or null if not available.
+
+|contentExpiry
+|Long?
+|Long or null
+|The backend preferred content expiry that shall be sent to media.
+|===
+
+*Return*
+
+None
+
+*Exceptions*
+
+None
+
+=== SendToMedia.noContent(logInfo: LogInfo?, callback: IRadioStationDataCallback, contentExpiry: Long?)
+
+Call this function if the backend explicitly answered with no content found.
+
+Then call every data callback with etag and data of null:
+
+- onMetadata
+- onLogo
+- onSLogo
+- onBearers
+- onStreams
+
+After this finish the process by calling onComplete with
+
+- CompleteStatus
+* retry = RetryBehavior.NONE
+* retryDelaySeconds = null
+- expirationDate
+* Current UTC time + contentExpiry
+
+*Arguments*
+
+|===
+|name|value range |valid values | description
+
+|logInfo
+|LogInfo?
+|LogInfo or null
+|The log info that should be used to write logs or null if not available.
+
+|callback
+|IRadioStationDataCallback
+|IRadioStationDataCallback-Instance
+|The callback to whom the data should be given.
+
+|contentExpiry
+|Long?
+|Long or null
+|The backend preferred content expiry that shall be sent to media.
+|===
+
+*Return*
+
+None
+
+*Exceptions*
+
+None
+
+=== SendToMedia.errorForAll(retryBehavior: RetryBehavior, map: Map<String, MediaRequestObject>, requestId: String?)
+
+Call the SendToMedia.error function for every map entry,
+to do this we have to create new LogInfo object by bearer key and request id.
+
+*Arguments*
+
+|===
+|name|value range |valid values | description
+
+|retryBehavior
+|RetryBehavior
+|RetryBehavior
+|The retry behavior that should be sent to the callback.
+
+|map
+|Map<String, MediaRequestObject>
+|Map<String, MediaRequestObject>
+|Key is the string presentation of the bearer and value the MediaRequestObject.
+
+|requestId
+|String?
+|Request id or null
+|Request id that got sent to the backend or null if not available.
+
+|===
+
+*Return*
+
+None
+
+*Exceptions*
+
+None
+
+=== SendToMedia.error(logInfo: LogInfo?, retryBehavior: RetryBehavior, callback: IRadioStationDataCallback)
+
+Call the onComplete callback with
+
+- CompleteStatus
+* retry = given retry behavior
+* retryDelaySeconds = Current UTC Timestamp + Config.requestConfig.retryDelay
+- expirationDate = null
+
+*Arguments*
+
+|===
+|name|value range |valid values | description
+
+|logInfo
+|LogInfo?
+|LogInfo or null
+|The log info that should be used to write logs or null if not available.
+
+|retryBehavior
+|RetryBehavior
+|RetryBehavior
+|The retry behavior that should be sent to the callback.
+
+|callback
+|IRadioStationDataCallback
+|IRadioStationDataCallback-Instance
+|The callback to whom the data should be given.
+
+|===
+
+*Return*
+
+None
+
+*Exceptions*
+
+None
+
+=== SendToMedia.retryAfterForAll(map: Map<String, MediaRequestObject>, requestId: String?, retryAfter: Long, contentExpiry: Long?)
+
+Call the SendToMedia.retryAfter function for every map entry,
+to do this we have to create new LogInfo object by bearer key and request id.
+
+*Arguments*
+
+|===
+|name|value range |valid values |resolution |unit | description
+
+|map
+|Map<String, MediaRequestObject>
+|Map<String, MediaRequestObject>
+|n/a
+|n/a
+|Key is the string presentation of the bearer and value the MediaRequestObject.
+
+|requestId
+|String?
+|Request id or null
+|n/a
+|n/a
+|Request id that got sent to the backend or null if not available.
+
+|retryAfter
+|Long?
+|1 ore more, null
+|+-1
+|Seconds
+|Retry-After header of the request.
+
+|contentExpiry
+|Long?
+|Long or null
+|The backend preferred content expiry that shall be sent to media.
+|===
+
+*Return*
+
+None
+
+*Exceptions*
+
+None
+
+=== SendToMedia.retryAfter(logInfo: LogInfo?, callback: IRadioStationDataCallback, retryAfter: Long, contentExpiry: Long?)
+
+Call the onComplete function from the callback with retry behavior with these values:
+
+- CompleteStatus is sent with RetryBehavior.DELAYED and the provided retryAfter and contentExpiry
+
+*Arguments*
+
+|===
+|name|value range |valid values |resolution |unit | description
+
+|logInfo
+|LogInfo?
+|LogInfo or null
+|n/a
+|n/a
+|The log info that should be used to write logs or null if not available.
+
+|callback
+|IRadioStationDataCallback
+|IRadioStationDataCallback-Instance
+|n/a
+|n/a
+|The callback to whom the data should be given.
+
+|retryAfter
+|Long?
+|1 ore more, null
+|+-1
+|Seconds
+|Retry-After header of the request.
+
+|contentExpiry
+|Long?
+|Long or null
+|The backend preferred content expiry that shall be sent to media.
+
+|===
+
+*Return*
+
+None
+
+*Exceptions*
+
+None
+
+=== SendToMedia.retryAfterOrBackendPreferencesForAll(map: Map<String, MediaRequestObject>, requestId: String?, retryAfter: Long?, retryBehavior: RetryBehavior, contentExpiry: Long?)
+
+Call the SendToMedia.retryAfterOrBackendPreferences function for every map entry,
+to do this we have to create new LogInfo object by bearer key and request id.
+
+*Arguments*
+
+|===
+|name|value range |valid values |resolution |unit | description
+
+|map
+|Map<String, MediaRequestObject>
+|Map<String, MediaRequestObject>
+|n/a
+|n/a
+|Key is the string presentation of the bearer and value the MediaRequestObject.
+
+|requestId
+|String?
+|Request id or null
+|n/a
+|n/a
+|Request id that got sent to the backend or null if not available.
+
+|retryAfter
+|Long?
+|1 ore more, null
+|+-1
+|Seconds
+|Retry-After header of the request.
+
+|retryBehavior
+|RetryBehavior
+|n/a
+|n/a
+|n/a
+|Backend preferred retry behavior that shall be used if no retryAfter is given.
+
+|contentExpiry
+|Long?
+|Long or null
+|The backend preferred content expiry that shall be sent to media.
+|===
+
+*Return*
+
+None
+
+*Exceptions*
+
+None
+
+=== SendToMedia.retryAfterOrBackendPreferences(logInfo: LogInfo?, callback: IRadioStationDataCallback, retryAfter: Long?, retryBehavior: RetryBehavior, contentExpiry: Long?)
+
+If retryAfter is set, and onComplete is sent with it and RetryBehavior.DELAYED else, an onComplete with Config.requestConfig.retryDelay and the provided retryBehavior is sent.
+
+The contentExpiry parameter is always sent in the onComplete.
+
+Note: retryAfter refers to the retryAfter header of the respective response.
+
+*Arguments*
+
+|===
+|name|value range |valid values |resolution |unit | description
+
+|logInfo
+|LogInfo?
+|LogInfo or null
+|n/a
+|n/a
+|The log info that should be used to write logs or null if not available.
+
+|callback
+|IRadioStationDataCallback
+|IRadioStationDataCallback-Instance
+|n/a
+|n/a
+|The callback to whom the data should be given.
+
+|retryAfter
+|Long?
+|1 ore more, null
+|+-1
+|Seconds
+|Retry-After header of the request.
+
+|retryBehavior
+|RetryBehavior
+|n/a
+|n/a
+|n/a
+|Backend preferred retry behavior that shall be used if no retryAfter is given.
+
+|contentExpiry
+|Long?
+|Long or null
+|The backend preferred content expiry that shall be sent to media.
+
+|===
+
+*Return*
+
+None
+
+*Exceptions*
+
+None
+
+=== SendToMedia.notModifiedForAll(map: Map<String, MediaRequestObject>, requestId: String?, contentExpiry: Long?)
+
+Call the SendToMedia.notModified function for every map entry,
+to do this we have to create new LogInfo object by bearer key and request id.
+
+*Arguments*
+
+|===
+|name|value range |valid values | description
+
+|map
+|Map<String, MediaRequestObject>
+|Map<String, MediaRequestObject>
+|Key is the string presentation of the bearer and value the MediaRequestObject.
+
+|requestId
+|String?
+|Request id or null
+|Request id that got sent to the backend or null if not available.
+
+|contentExpiry
+|Long?
+|Long or null
+|The backend preferred content expiry that shall be sent to media.
+
+|===
+
+*Return*
+
+None
+
+*Exceptions*
+
+None
+
+=== SendToMedia.notModified(logInfo: LogInfo?, callback: IRadioStationDataCallback, contentExpiry: Long?)
+
+Call the onComplete function from the callback with these values:
+
+- CompleteStatus
+* retry = RetryBehavior.NONE
+* retryDelaySeconds = null
+- expirationDate
+* Current UTC time + contentExpiry
+
+*Arguments*
+
+|===
+|name|value range |valid values | description
+
+|logInfo
+|LogInfo?
+|LogInfo or null
+|The log info that should be used to write logs or null if not available.
+
+|callback
+|IRadioStationDataCallback
+|IRadioStationDataCallback-Instance
+|The callback to whom the data should be given.
+
+|contentExpiry
+|Long?
+|Long or null
+|The backend preferred content expiry that shall be sent to media.
+
+|===
+
+*Return*
+
+None
+
+*Exceptions*
+
+None
+
+== Dependencies (Used Units, methods and properties)
+
+This is an overview of the used methods and properties from other units.
+
+|===
+|Destination unit|Destination method/property |comment
+
+|link:unit_IRadioStationDataCallback.adoc[IRadioStationDataCallback]
+|IRadioStationDataCallback.class
+|The callback that should receive the data.
+
+|link:unit_Data.adoc[Data]
+|Config.requestConfig.retryDelay
+|The backend preferred retry delay.
+
+|link:unit_Data.adoc[Data]
+|MediaRequestObject.class
+|The request received from the MetaDataService.
+
+|link:unit_Data.adoc[Data]
+|ProviderIdentifier.createListFromBackendData
+|Create provider info by backend result.
+
+|link:unit_Data.adoc[Data]
+|StationMetadata.createFromBackendData
+|Create station metadata object by backend result.
+
+|link:unit_Data.adoc[Data]
+|WebStream.createListFromBackendData
+|Create WebStream list by backend result.
+
+|link:unit_Data.adoc[Data]
+|IBearer.createListFromBackendData
+|Create bearer list by string list.
+
+|link:unit_Data.adoc[Data]
+|ETagResult.class
+|The ETags of radio station data.
+
+|link:unit_Data.adoc[Data]
+|DataObject.class
+|The metadata of a radio station.
+
+|link:unit_Data.adoc[Data]
+|StationLogo.class
+|The data of a station logo.
+
+|link:unit_Data.adoc[Data]
+|RetryBehavior.class
+|Enum that defines if the MetaDataService should retry the bearer.
+
+|link:unit_Logger.adoc[Logger]
+|LogInfo.class
+|Information that should be added to log maesages.
+|===
+
+== Runtime View
+
+
+[dynamic_sequence=startup,unit=SendToMedia,role=dynamic_sequence]
+=== Startup
+
+No explicit specification required, because no constructor or startup logic exists.
+
+[dynamic_sequence=shutdown,unit=SendToMedia,role=dynamic_sequence]
+=== Shutdown
+
+This class is a kotlin object (Singleton) that will stay in the memory forever, so it can be reused.
+
+[dynamic_sequence=startup_after_s2r,unit=SendToMedia,role=dynamic_sequence]
+=== Suspend
+
+Since this is a kotlin class without deep android references, no suspend state needs to be considered.
+
+[dynamic_sequence=resume,unit=SendToMedia,role=dynamic_sequence]
+=== Resume
+
+Since this is a kotlin class without deep android references, no suspend state needs to be considered.
+
+=== Send metadata
+
+[plantuml, title="metadata()", format="svg", id="metadata"]
+----
+participant "Arbitrary Unit" as caller
+participant "SendToMedia" as sender <<unit>>
+participant "Data" as data <<unit>>
+participant "IRadioStationDataCallback" as callback <<unit>>
+
+caller -> sender: metadata()
+activate sender
+
+sender <-> data: ProviderIdentifier.createListFromBackendData()
+sender <-> data: StationMetadata.createFromBackendData()
+sender -> callback: onMetadata()
+
+alt If the client received a stream list
+sender <-> data: WebStream.createListFromBackendData()
+sender -> callback: onStreams()
+end
+
+alt If the client received a bearer list
+sender <-> data: IBearer.createListFromBackendData()
+sender -> callback: onBearers()
+end
+
+deactivate sender
+----
+
+=== Send valid logo
+
+[plantuml, title="logo()", format="svg", id="logo"]
+----
+participant "Arbitrary Unit" as caller
+participant "SendToMedia" as sender <<unit>>
+participant "IRadioStationDataCallback" as callback <<unit>>
+
+caller -> sender: logo()
+activate sender
+
+sender -> callback: onLogo(etag, logo)
+sender -> callback: onComplete()
+
+deactivate sender
+----
+
+=== Delete current logo
+
+[plantuml, title="deleteLogo()", format="svg", id="deleteLogo"]
+----
+participant "Arbitrary Unit" as caller
+participant "SendToMedia" as sender <<unit>>
+participant "IRadioStationDataCallback" as callback <<unit>>
+
+caller -> sender: deleteLogo()
+activate sender
+
+sender -> callback: onLogo(null, null)
+sender -> callback: onSLogo(null, null)
+sender -> callback: onComplete()
+
+deactivate sender
+----
+
+=== Send no content for all requests
+
+[plantuml, title="noContentForAll()", format="svg", id="noContentForAll"]
+----
+participant "Arbitrary Unit" as caller
+participant "SendToMedia" as sender <<unit>>
+
+caller -> sender: noContentForAll()
+activate sender
+
+loop For every map entry
+sender -> sender: noContent()
+end
+
+deactivate sender
+----
+
+=== Send no content
+
+[plantuml, title="noContent()", format="svg", id="noContent"]
+----
+participant "Arbitrary Unit" as caller
+participant "SendToMedia" as sender <<unit>>
+
+caller -> sender: noContent()
+activate sender
+
+sender -> callback: onMetadata(null, null)
+sender -> callback: onLogo(null, null)
+sender -> callback: onSLogo(null, null)
+sender -> callback: onBearers(null, null)
+sender -> callback: onStreams(null, null)
+sender -> callback: onComplete()
+
+deactivate sender
+----
+
+=== Send error for all requests
+
+[plantuml, title="errorForAll()", format="svg", id="errorForAll"]
+----
+participant "Arbitrary Unit" as caller
+participant "SendToMedia" as sender <<unit>>
+
+caller -> sender: errorForAll()
+activate sender
+
+loop For every map entry
+sender -> sender: error()
+end
+
+deactivate sender
+----
+
+=== Send error
+
+[plantuml, title="error()", format="svg", id="error"]
+----
+participant "Arbitrary Unit" as caller
+participant "SendToMedia" as sender <<unit>>
+
+caller -> sender: error()
+activate sender
+
+sender -> callback: onComplete() with retry behavior
+
+deactivate sender
+----
+
+=== Send retry after for all requests
+
+[plantuml, title="retryAfterOrBackendPreferencesForAll()", format="svg", id="retryAfterOrBackendPreferencesForAll"]
+----
+participant "Arbitrary Unit" as caller
+participant "SendToMedia" as sender <<unit>>
+
+caller -> sender: retryAfterOrBackendPreferencesForAll()
+activate sender
+
+loop For every map entry
+sender -> sender: retryAfterOrBackendPreferences()
+end
+
+deactivate sender
+----
+
+=== Send retry after
+
+[plantuml, title="retryAfterOrBackendPreferences()", format="svg", id="retryAfterOrBackendPreferences"]
+----
+participant "Arbitrary Unit" as caller
+participant "SendToMedia" as sender <<unit>>
+
+caller -> sender: retryAfterOrBackendPreferences()
+activate sender
+
+sender -> callback: onComplete() with retry behavior
+
+deactivate sender
+----
+
+=== Send not modified for all requests
+
+[plantuml, title="notModifiedForAll()", format="svg", id="notModifiedForAll"]
+----
+participant "Arbitrary Unit" as caller
+participant "SendToMedia" as sender <<unit>>
+
+caller -> sender: notModifiedForAll()
+activate sender
+
+loop For every map entry
+sender -> sender: notModified()
+end
+
+deactivate sender
+----
+
+=== Send not modified
+
+[plantuml, title="notModified()", format="svg", id="notModified"]
+----
+participant "Arbitrary Unit" as caller
+participant "SendToMedia" as sender <<unit>>
+
+caller -> sender: notModified()
+activate sender
+
+sender -> callback: onComplete() without retry
+
+deactivate sender
+----
+
+[[section-design-decisions]]
+== Design Decisions
+
+No further design decisions were made for the implementation of this unit other than those already mentioned in link:../../main.{type}[metadataservice_conradlib].
+
+include::../about-arc42.adoc[]

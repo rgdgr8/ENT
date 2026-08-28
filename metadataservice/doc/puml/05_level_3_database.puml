@@ -1,0 +1,18 @@
+@startuml
+
+skinparam componentStyle uml2
+
+component "Database" <<component>> {
+    component "CommonDataStore" <<unit>> as common
+    component "RadioStationDataStore" <<unit>> as radio
+    component "CoverArtDataStore" <<unit>> as cover_art
+
+    radio .up.> common
+    cover_art .up.> common
+}
+
+interface "Local Filesystem" as filesystem
+radio .down.> filesystem
+cover_art .down.> filesystem
+
+@enduml

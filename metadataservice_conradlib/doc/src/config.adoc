@@ -1,0 +1,25 @@
+// asciidoc settings for EN (English)
+// ==================================
+:title-page:
+:toc-title: Table of contents
+:sectnums:
+:sectnumlevels: 5 //this is max
+// enable table-of-contents
+:toc:
+:toclevels: 5 //leave it 2 if possible
+
+// where are images located?
+:imagesdir: ./images
+
+:pumldir: ./../puml
+:data-uri:
+
+:type: html
+
+ifdef::env-idea[]
+:type: adoc
+endif::env-idea[]
+
+ifdef::backend-pdf[]
+:type: pdf
+endif::backend-pdf[]

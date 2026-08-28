@@ -1,0 +1,27 @@
+android_app_import {
+    name: "technology.cariad.entertainment.metadataservice",
+    privileged: true,
+    product_specific: true,
+    certificate: "testkey",
+    uses_libs: [
+        "de.esolutions.fw.android.platform_library",
+        "com.volkswagenag.storagemanager",
+        "de.esolutions.magicadapter"
+    ],
+    arch: {
+        arm64: {
+            apk: "MetadataService-dev-arm64-v8a-release-unsigned.apk",
+        },
+        x86_64: {
+            apk: "MetadataService-dev-x86_64-release-unsigned.apk",
+        },
+    },
+    required: ["privapp-permissions-metadataservice.xml"],
+}
+
+prebuilt_etc {
+    name: "privapp-permissions-metadataservice.xml",
+    src: "privapp-permissions-metadataservice.xml",
+    sub_dir: "permissions",
+    product_specific: true,
+}

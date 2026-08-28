@@ -1,0 +1,24 @@
+{
+  "fm:?.d318.10130": {
+    "status": 200,
+    "data": {
+      "short_name": "ANTBAY",
+      "medium_name": "ANTENNE BAYERN",
+      "long_name": "Antenne Bayern - Nur die besten Musikhitzzz",
+      "description": "Bayerns bester Musikmix",
+      "providers": [
+        {
+          "name": "RadioDNS",
+          "id": "antenne.de_antenne"
+        },
+        {
+          "name": "Radioplayer",
+          "id": "276114"
+        }
+      ]
+    },
+    "etags": {
+      "metadata": "::metadata_etag::"
+    }
+  }
+}

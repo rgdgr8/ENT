@@ -1,0 +1,4 @@
+# Assign a dedicated property_type to magicadapter
+persist.vendor.magicadapter.mock.enabled   u:object_r:vendor_magicadapter_prop:s0 exact bool
+persist.vendor.magicadapter.retry_delay.uint   u:object_r:vendor_magicadapter_prop:s0 exact uint
+persist.vendor.magicadapter.aggregationtimer_msec.uint   u:object_r:vendor_magicadapter_prop:s0 exact uint

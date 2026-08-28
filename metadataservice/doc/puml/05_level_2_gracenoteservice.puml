@@ -1,0 +1,40 @@
+@startuml
+
+skinparam componentStyle uml2
+skinparam linetype ortho
+
+node MetadataService as client
+
+cloud "Gracenote-Backend" as backend
+
+component GracenoteService as service {
+
+    component "GnService" as gnservice
+
+    component "Request" as request
+    
+    gnservice -down-> request
+
+    component "Coverart" <<Request>> as request_coverart
+    component "SongRecognition" <<Request>> as request_song
+    component "RadiostationData" <<Request>> as request_radio
+    
+    request --> request_coverart
+    request_coverart ..> gnservice
+    
+    request --> request_song
+    request_song ..> gnservice
+    
+    request --> request_radio
+    request_radio ..> gnservice
+    
+    client -down-> gnservice: request
+    gnservice .up.> client: response
+    
+    request_coverart <..> backend
+    request_song <..> backend
+    request_radio <..> backend
+
+}
+
+@enduml

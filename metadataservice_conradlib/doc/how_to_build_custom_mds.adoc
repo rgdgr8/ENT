@@ -1,0 +1,13 @@
+= How to build MetaDataService with a custom Connected Radio Client version?
+
+Team Media developed a Jenkins script to build the MetaDataService with a custom Connected Radio Client version.
+
+https://media-jenkins-testing.eso.local:8443/view/HCP3/job/hcp3_metadataservice_conrad/
+
+If you want to start the jenkins script, you can enter a specific library version in the run menu. To download the apk that was built by the jenkins script:
+
+1. Click on the jenkins run number
+2. Go to `Workspaces`
+3. Click on the first link `/ssd/jenkins/workspace/hcp3_metadataservice_conrad`
+4. Open the `CONTAINER_OUTOUT/out/built` folder
+5. Download the apk you need (probably `MetadataService-dev-universal-debug.apk`)

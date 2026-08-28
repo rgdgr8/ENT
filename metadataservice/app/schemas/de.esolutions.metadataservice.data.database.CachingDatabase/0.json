@@ -1,0 +1,549 @@
+{
+  "formatVersion": 1,
+  "database": {
+    "version": 0,
+    "identityHash": "149ffed026adaff632d691d1a921b4d1",
+    "entities": [
+      {
+        "tableName": "genre",
+        "createSql": "CREATE TABLE IF NOT EXISTS `${TABLE_NAME}` (`genre_id` INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL, `name` TEXT NOT NULL)",
+        "fields": [
+          {
+            "fieldPath": "genreId",
+            "columnName": "genre_id",
+            "affinity": "INTEGER",
+            "notNull": true
+          },
+          {
+            "fieldPath": "name",
+            "columnName": "name",
+            "affinity": "TEXT",
+            "notNull": true
+          }
+        ],
+        "primaryKey": {
+          "columnNames": [
+            "genre_id"
+          ],
+          "autoGenerate": true
+        },
+        "indices": [],
+        "foreignKeys": []
+      },
+      {
+        "tableName": "mime_type",
+        "createSql": "CREATE TABLE IF NOT EXISTS `${TABLE_NAME}` (`mime_type_id` INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL, `name` TEXT NOT NULL)",
+        "fields": [
+          {
+            "fieldPath": "mimeTypeId",
+            "columnName": "mime_type_id",
+            "affinity": "INTEGER",
+            "notNull": true
+          },
+          {
+            "fieldPath": "name",
+            "columnName": "name",
+            "affinity": "TEXT",
+            "notNull": true
+          }
+        ],
+        "primaryKey": {
+          "columnNames": [
+            "mime_type_id"
+          ],
+          "autoGenerate": true
+        },
+        "indices": [],
+        "foreignKeys": []
+      },
+      {
+        "tableName": "provider",
+        "createSql": "CREATE TABLE IF NOT EXISTS `${TABLE_NAME}` (`provider_id` INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL, `origin` INTEGER NOT NULL, `external_id` TEXT NOT NULL)",
+        "fields": [
+          {
+            "fieldPath": "providerId",
+            "columnName": "provider_id",
+            "affinity": "INTEGER",
+            "notNull": true
+          },
+          {
+            "fieldPath": "origin",
+            "columnName": "origin",
+            "affinity": "INTEGER",
+            "notNull": true
+          },
+          {
+            "fieldPath": "externalId",
+            "columnName": "external_id",
+            "affinity": "TEXT",
+            "notNull": true
+          }
+        ],
+        "primaryKey": {
+          "columnNames": [
+            "provider_id"
+          ],
+          "autoGenerate": true
+        },
+        "indices": [],
+        "foreignKeys": []
+      },
+      {
+        "tableName": "station",
+        "createSql": "CREATE TABLE IF NOT EXISTS `${TABLE_NAME}` (`station_id` INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL, `provider_id` INTEGER NOT NULL, `short_name` TEXT NOT NULL, `medium_name` TEXT NOT NULL, `long_name` TEXT NOT NULL, `description` TEXT NOT NULL, `last_modified` INTEGER NOT NULL, `valid_until` INTEGER NOT NULL, `next_retry` INTEGER NOT NULL, `last_retry_status` INTEGER NOT NULL, `retry_count` INTEGER NOT NULL, FOREIGN KEY(`provider_id`) REFERENCES `provider`(`provider_id`) ON UPDATE NO ACTION ON DELETE NO ACTION )",
+        "fields": [
+          {
+            "fieldPath": "stationId",
+            "columnName": "station_id",
+            "affinity": "INTEGER",
+            "notNull": true
+          },
+          {
+            "fieldPath": "providerId",
+            "columnName": "provider_id",
+            "affinity": "INTEGER",
+            "notNull": true
+          },
+          {
+            "fieldPath": "shortName",
+            "columnName": "short_name",
+            "affinity": "TEXT",
+            "notNull": true
+          },
+          {
+            "fieldPath": "mediumName",
+            "columnName": "medium_name",
+            "affinity": "TEXT",
+            "notNull": true
+          },
+          {
+            "fieldPath": "longName",
+            "columnName": "long_name",
+            "affinity": "TEXT",
+            "notNull": true
+          },
+          {
+            "fieldPath": "description",
+            "columnName": "description",
+            "affinity": "TEXT",
+            "notNull": true
+          },
+          {
+            "fieldPath": "lastModified",
+            "columnName": "last_modified",
+            "affinity": "INTEGER",
+            "notNull": true
+          },
+          {
+            "fieldPath": "validUntil",
+            "columnName": "valid_until",
+            "affinity": "INTEGER",
+            "notNull": true
+          },
+          {
+            "fieldPath": "nextRetry",
+            "columnName": "next_retry",
+            "affinity": "INTEGER",
+            "notNull": true
+          },
+          {
+            "fieldPath": "lastRetryStatus",
+            "columnName": "last_retry_status",
+            "affinity": "INTEGER",
+            "notNull": true
+          },
+          {
+            "fieldPath": "retryCount",
+            "columnName": "retry_count",
+            "affinity": "INTEGER",
+            "notNull": true
+          }
+        ],
+        "primaryKey": {
+          "columnNames": [
+            "station_id"
+          ],
+          "autoGenerate": true
+        },
+        "indices": [
+          {
+            "name": "index_station_provider_id",
+            "unique": false,
+            "columnNames": [
+              "provider_id"
+            ],
+            "createSql": "CREATE INDEX IF NOT EXISTS `index_station_provider_id` ON `${TABLE_NAME}` (`provider_id`)"
+          }
+        ],
+        "foreignKeys": [
+          {
+            "table": "provider",
+            "onDelete": "NO ACTION",
+            "onUpdate": "NO ACTION",
+            "columns": [
+              "provider_id"
+            ],
+            "referencedColumns": [
+              "provider_id"
+            ]
+          }
+        ]
+      },
+      {
+        "tableName": "bearer",
+        "createSql": "CREATE TABLE IF NOT EXISTS `${TABLE_NAME}` (`bearer_id` INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL, `uri` TEXT NOT NULL, `station_id` INTEGER NOT NULL, FOREIGN KEY(`station_id`) REFERENCES `station`(`station_id`) ON UPDATE CASCADE ON DELETE CASCADE )",
+        "fields": [
+          {
+            "fieldPath": "bearerId",
+            "columnName": "bearer_id",
+            "affinity": "INTEGER",
+            "notNull": true
+          },
+          {
+            "fieldPath": "uri",
+            "columnName": "uri",
+            "affinity": "TEXT",
+            "notNull": true
+          },
+          {
+            "fieldPath": "stationId",
+            "columnName": "station_id",
+            "affinity": "INTEGER",
+            "notNull": true
+          }
+        ],
+        "primaryKey": {
+          "columnNames": [
+            "bearer_id"
+          ],
+          "autoGenerate": true
+        },
+        "indices": [
+          {
+            "name": "index_bearer_station_id",
+            "unique": false,
+            "columnNames": [
+              "station_id"
+            ],
+            "createSql": "CREATE INDEX IF NOT EXISTS `index_bearer_station_id` ON `${TABLE_NAME}` (`station_id`)"
+          }
+        ],
+        "foreignKeys": [
+          {
+            "table": "station",
+            "onDelete": "CASCADE",
+            "onUpdate": "CASCADE",
+            "columns": [
+              "station_id"
+            ],
+            "referencedColumns": [
+              "station_id"
+            ]
+          }
+        ]
+      },
+      {
+        "tableName": "image",
+        "createSql": "CREATE TABLE IF NOT EXISTS `${TABLE_NAME}` (`image_id` INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL, `provider_id` INTEGER NOT NULL, `image_type` INTEGER NOT NULL, `file_name` TEXT NOT NULL, `station_id` INTEGER NOT NULL, `mime_type_id` INTEGER NOT NULL, FOREIGN KEY(`provider_id`) REFERENCES `provider`(`provider_id`) ON UPDATE NO ACTION ON DELETE NO ACTION , FOREIGN KEY(`station_id`) REFERENCES `station`(`station_id`) ON UPDATE CASCADE ON DELETE CASCADE , FOREIGN KEY(`mime_type_id`) REFERENCES `mime_type`(`mime_type_id`) ON UPDATE NO ACTION ON DELETE NO ACTION )",
+        "fields": [
+          {
+            "fieldPath": "imageId",
+            "columnName": "image_id",
+            "affinity": "INTEGER",
+            "notNull": true
+          },
+          {
+            "fieldPath": "providerId",
+            "columnName": "provider_id",
+            "affinity": "INTEGER",
+            "notNull": true
+          },
+          {
+            "fieldPath": "imageType",
+            "columnName": "image_type",
+            "affinity": "INTEGER",
+            "notNull": true
+          },
+          {
+            "fieldPath": "fileName",
+            "columnName": "file_name",
+            "affinity": "TEXT",
+            "notNull": true
+          },
+          {
+            "fieldPath": "stationId",
+            "columnName": "station_id",
+            "affinity": "INTEGER",
+            "notNull": true
+          },
+          {
+            "fieldPath": "mimeType",
+            "columnName": "mime_type_id",
+            "affinity": "INTEGER",
+            "notNull": true
+          }
+        ],
+        "primaryKey": {
+          "columnNames": [
+            "image_id"
+          ],
+          "autoGenerate": true
+        },
+        "indices": [
+          {
+            "name": "index_image_station_id",
+            "unique": false,
+            "columnNames": [
+              "station_id"
+            ],
+            "createSql": "CREATE INDEX IF NOT EXISTS `index_image_station_id` ON `${TABLE_NAME}` (`station_id`)"
+          },
+          {
+            "name": "index_image_provider_id",
+            "unique": false,
+            "columnNames": [
+              "provider_id"
+            ],
+            "createSql": "CREATE INDEX IF NOT EXISTS `index_image_provider_id` ON `${TABLE_NAME}` (`provider_id`)"
+          },
+          {
+            "name": "index_image_mime_type_id",
+            "unique": false,
+            "columnNames": [
+              "mime_type_id"
+            ],
+            "createSql": "CREATE INDEX IF NOT EXISTS `index_image_mime_type_id` ON `${TABLE_NAME}` (`mime_type_id`)"
+          }
+        ],
+        "foreignKeys": [
+          {
+            "table": "provider",
+            "onDelete": "NO ACTION",
+            "onUpdate": "NO ACTION",
+            "columns": [
+              "provider_id"
+            ],
+            "referencedColumns": [
+              "provider_id"
+            ]
+          },
+          {
+            "table": "station",
+            "onDelete": "CASCADE",
+            "onUpdate": "CASCADE",
+            "columns": [
+              "station_id"
+            ],
+            "referencedColumns": [
+              "station_id"
+            ]
+          },
+          {
+            "table": "mime_type",
+            "onDelete": "NO ACTION",
+            "onUpdate": "NO ACTION",
+            "columns": [
+              "mime_type_id"
+            ],
+            "referencedColumns": [
+              "mime_type_id"
+            ]
+          }
+        ]
+      },
+      {
+        "tableName": "station_genre_rank",
+        "createSql": "CREATE TABLE IF NOT EXISTS `${TABLE_NAME}` (`station_id` INTEGER NOT NULL, `genre_id` INTEGER NOT NULL, `position` INTEGER NOT NULL, PRIMARY KEY(`station_id`, `genre_id`), FOREIGN KEY(`genre_id`) REFERENCES `genre`(`genre_id`) ON UPDATE NO ACTION ON DELETE NO ACTION , FOREIGN KEY(`station_id`) REFERENCES `station`(`station_id`) ON UPDATE CASCADE ON DELETE CASCADE )",
+        "fields": [
+          {
+            "fieldPath": "stationId",
+            "columnName": "station_id",
+            "affinity": "INTEGER",
+            "notNull": true
+          },
+          {
+            "fieldPath": "genreId",
+            "columnName": "genre_id",
+            "affinity": "INTEGER",
+            "notNull": true
+          },
+          {
+            "fieldPath": "position",
+            "columnName": "position",
+            "affinity": "INTEGER",
+            "notNull": true
+          }
+        ],
+        "primaryKey": {
+          "columnNames": [
+            "station_id",
+            "genre_id"
+          ],
+          "autoGenerate": false
+        },
+        "indices": [
+          {
+            "name": "index_station_genre_rank_genre_id",
+            "unique": false,
+            "columnNames": [
+              "genre_id"
+            ],
+            "createSql": "CREATE INDEX IF NOT EXISTS `index_station_genre_rank_genre_id` ON `${TABLE_NAME}` (`genre_id`)"
+          },
+          {
+            "name": "index_station_genre_rank_station_id",
+            "unique": false,
+            "columnNames": [
+              "station_id"
+            ],
+            "createSql": "CREATE INDEX IF NOT EXISTS `index_station_genre_rank_station_id` ON `${TABLE_NAME}` (`station_id`)"
+          }
+        ],
+        "foreignKeys": [
+          {
+            "table": "genre",
+            "onDelete": "NO ACTION",
+            "onUpdate": "NO ACTION",
+            "columns": [
+              "genre_id"
+            ],
+            "referencedColumns": [
+              "genre_id"
+            ]
+          },
+          {
+            "table": "station",
+            "onDelete": "CASCADE",
+            "onUpdate": "CASCADE",
+            "columns": [
+              "station_id"
+            ],
+            "referencedColumns": [
+              "station_id"
+            ]
+          }
+        ]
+      },
+      {
+        "tableName": "stream",
+        "createSql": "CREATE TABLE IF NOT EXISTS `${TABLE_NAME}` (`stream_id` INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL, `provider_id` INTEGER NOT NULL, `url` TEXT NOT NULL, `mime_type_id` INTEGER NOT NULL, `bitrate_kbps` INTEGER NOT NULL, `offset_ms` INTEGER NOT NULL, `station_id` INTEGER NOT NULL, FOREIGN KEY(`provider_id`) REFERENCES `provider`(`provider_id`) ON UPDATE NO ACTION ON DELETE NO ACTION , FOREIGN KEY(`mime_type_id`) REFERENCES `mime_type`(`mime_type_id`) ON UPDATE NO ACTION ON DELETE NO ACTION , FOREIGN KEY(`station_id`) REFERENCES `station`(`station_id`) ON UPDATE CASCADE ON DELETE CASCADE )",
+        "fields": [
+          {
+            "fieldPath": "streamId",
+            "columnName": "stream_id",
+            "affinity": "INTEGER",
+            "notNull": true
+          },
+          {
+            "fieldPath": "providerId",
+            "columnName": "provider_id",
+            "affinity": "INTEGER",
+            "notNull": true
+          },
+          {
+            "fieldPath": "url",
+            "columnName": "url",
+            "affinity": "TEXT",
+            "notNull": true
+          },
+          {
+            "fieldPath": "mimeTypeId",
+            "columnName": "mime_type_id",
+            "affinity": "INTEGER",
+            "notNull": true
+          },
+          {
+            "fieldPath": "bitrateKBps",
+            "columnName": "bitrate_kbps",
+            "affinity": "INTEGER",
+            "notNull": true
+          },
+          {
+            "fieldPath": "offsetMs",
+            "columnName": "offset_ms",
+            "affinity": "INTEGER",
+            "notNull": true
+          },
+          {
+            "fieldPath": "stationId",
+            "columnName": "station_id",
+            "affinity": "INTEGER",
+            "notNull": true
+          }
+        ],
+        "primaryKey": {
+          "columnNames": [
+            "stream_id"
+          ],
+          "autoGenerate": true
+        },
+        "indices": [
+          {
+            "name": "index_stream_station_id",
+            "unique": false,
+            "columnNames": [
+              "station_id"
+            ],
+            "createSql": "CREATE INDEX IF NOT EXISTS `index_stream_station_id` ON `${TABLE_NAME}` (`station_id`)"
+          },
+          {
+            "name": "index_stream_provider_id",
+            "unique": false,
+            "columnNames": [
+              "provider_id"
+            ],
+            "createSql": "CREATE INDEX IF NOT EXISTS `index_stream_provider_id` ON `${TABLE_NAME}` (`provider_id`)"
+          },
+          {
+            "name": "index_stream_mime_type_id",
+            "unique": false,
+            "columnNames": [
+              "mime_type_id"
+            ],
+            "createSql": "CREATE INDEX IF NOT EXISTS `index_stream_mime_type_id` ON `${TABLE_NAME}` (`mime_type_id`)"
+          }
+        ],
+        "foreignKeys": [
+          {
+            "table": "provider",
+            "onDelete": "NO ACTION",
+            "onUpdate": "NO ACTION",
+            "columns": [
+              "provider_id"
+            ],
+            "referencedColumns": [
+              "provider_id"
+            ]
+          },
+          {
+            "table": "mime_type",
+            "onDelete": "NO ACTION",
+            "onUpdate": "NO ACTION",
+            "columns": [
+              "mime_type_id"
+            ],
+            "referencedColumns": [
+              "mime_type_id"
+            ]
+          },
+          {
+            "table": "station",
+            "onDelete": "CASCADE",
+            "onUpdate": "CASCADE",
+            "columns": [
+              "station_id"
+            ],
+            "referencedColumns": [
+              "station_id"
+            ]
+          }
+        ]
+      }
+    ],
+    "views": [],
+    "setupQueries": [
+      "CREATE TABLE IF NOT EXISTS room_master_table (id INTEGER PRIMARY KEY,identity_hash TEXT)",
+      "INSERT OR REPLACE INTO room_master_table (id,identity_hash) VALUES(42, '149ffed026adaff632d691d1a921b4d1')"
+    ]
+  }
+}

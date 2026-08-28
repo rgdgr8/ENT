@@ -1,0 +1,173 @@
+﻿include::../config.adoc[]
+//imagesdir must be overwritten, it is already included in the config.adoc
+:imagesdir: ../../images
+:hash: #
+
+= image:ESO_Logo_Colour_positive_RGB.png[eso_icon,350,350,float="right",align="center"] Design metadataservice_conradlib - Unit SystemPropertyReader
+:toc-title: Table of Contents
+
+'''
+
+// numbering from here on
+:numbered:
+:stem: latexmath
+
+
+[unit=SystemPropertyReader, role=unit]
+== <<Unit>> SystemPropertyReader
+This document specifies the design of the unit *SystemPropertyReader*, it is part of the link:../../main.{type}[metadataservice_conradlib].
+
+This class is responsible to read system information from the android.os.SystemProperties, it must use reflections to call the get() function from android to receive the property values.
+
+It should only read system properties once, then it must cache the value internally.
+
+== Provided Interface (public methods and properties)
+
+=== SystemPropertyReader.getBrand(): String
+
+Read the ro.product.brand system property.
+
+*Arguments*
+
+None
+
+*Return*
+
+|===
+|Type|value range |valid values  | default | description
+
+|Response
+|String
+|String not empty
+|"unknown"
+|Read the system property or return "unknown" if not possible.
+|===
+
+*Exceptions*
+
+None
+
+=== SystemPropertyReader.getProduct(): String
+
+Read the ro.build.product system property.
+
+*Arguments*
+
+None
+
+*Return*
+
+|===
+|Type|value range |valid values  | default | description
+
+|Response
+|String
+|String not empty
+|"unknown"
+|Read the system property or return "unknown" if not possible.
+|===
+
+*Exceptions*
+
+None
+
+=== SystemPropertyReader.getCluster(): String
+
+Read the ro.vendor.build.cluster system property.
+
+*Arguments*
+
+None
+
+*Return*
+
+|===
+|Type|value range |valid values  | default | description
+
+|Response
+|String
+|String not empty
+|"unknown"
+|Read the system property or return "unknown" if not possible.
+|===
+
+*Exceptions*
+
+None
+
+== Dependencies (Used Units, methods and properties)
+
+There are no dependencies to other units of this software element.
+
+== Runtime View
+
+[dynamic_sequence=startup, unit=SystemPropertyReader, role=dynamic_sequence]
+=== Startup
+
+No explicit specification required, because no constructor or startup logic exists.
+
+[dynamic_sequence=shutdown, unit=SystemPropertyReader, role=dynamic_sequence]
+=== Shutdown
+
+This class is a kotlin object (Singleton) that will stay in the memory forever, so it can be reused.
+
+[dynamic_sequence=startup_after_s2r, unit=SystemPropertyReader, role=dynamic_sequence]
+=== Suspend
+
+Since this is a kotlin class without deep android references, no suspend state needs to be considered.
+
+[dynamic_sequence=resume, unit=SystemPropertyReader, role=dynamic_sequence]
+=== Resume
+
+Since this is a kotlin class without deep android references, no suspend state needs to be considered.
+
+=== Return brand
+
+[plantuml, title="getBrand()", format="svg", id="get-brand"]
+----
+participant "Arbitrary Unit" as caller
+participant "SystemPropertyReader" as reader <<unit>>
+participant "android.os.SystemProperties" as android
+
+caller -> reader: getBrand()
+activate reader
+reader -> reader: Check if the cache contains the brand
+reader <-> android: Read ro.product.brand property
+caller <- reader: Return property value
+deactivate reader
+
+caller -> reader: getBrand()
+activate reader
+reader -> reader: Check if the cache contains the brand
+caller <- reader: Return property value
+deactivate reader
+----
+
+=== Failed to get brand
+
+[plantuml, title="getBrand() fails", format="svg", id="get-brand"]
+----
+participant "Arbitrary Unit" as caller
+participant "SystemPropertyReader" as reader <<unit>>
+participant "android.os.SystemProperties" as android
+
+caller -> reader: getBrand()
+activate reader
+reader -> reader: Check if the cache contains the brand
+reader <-> android !! : Read ro.product.brand property
+caller <- reader: Return null
+deactivate reader
+
+caller -> reader: getBrand()
+activate reader
+reader -> reader: Check if the cache contains the brand
+caller <- reader: Return null
+deactivate reader
+----
+
+[[section-design-decisions]]
+== Design Decisions
+
+No further design decisions were made for the implementation of this unit other than those already mentioned in link:../../main.{type}[metadataservice_conradlib].
+
+include::../about-arc42.adoc[]

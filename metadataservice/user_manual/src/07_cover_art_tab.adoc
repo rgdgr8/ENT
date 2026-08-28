@@ -1,0 +1,10 @@
+include::config.adoc[]
+
+[[section-cover_art_tab]]
+== Cover Art Tab
+
+This tab is used in order to test cover arts.
+User inserts artist name, album name or song title from the album in order to receive the cover art.
+After Search button is clicked, the result is shown on the UI if one exists.
+
+image:{imgdir}/07_cover_art_tab.png[]

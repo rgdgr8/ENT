@@ -1,0 +1,11 @@
+<paths>
+    <files-path
+        name="gracenote"
+        path="image_cache/gracenote" />
+    <files-path
+        name="gracenote_tmp"
+        path="image_cache/gracenote_tmp" />
+    <files-path
+        name="conrad"
+        path="image_cache/connected_radio" />
+</paths>

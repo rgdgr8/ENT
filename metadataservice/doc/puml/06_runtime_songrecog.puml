@@ -1,0 +1,49 @@
+@startuml
+
+participant MetadataService as client
+participant JNI as jni
+participant GnService as gnservice
+participant GnRequestSongRecognition as request
+participant GNSDK as gnsdk
+participant GracenoteBackend as backend
+
+activate client
+client -> jni: startSongRecognition
+
+activate jni
+jni -> gnservice: startSongRecognition
+
+activate gnservice
+gnservice -> request: create request
+
+loop until stopped
+    activate request
+    request -> request: read audio data
+    request -> gnsdk: write audio data
+    activate gnsdk
+    gnsdk -> gnsdk: create fingerprint
+    gnsdk -> backend: query fingerprint
+    backend --> gnsdk: result title
+    gnsdk --> request: callback title
+    request -> gnsdk: query metadata
+    gnsdk --> request: result metadata
+    request -> gnsdk: query image uri
+    gnsdk -> request: result image uri
+    request -> gnsdk: query image data
+    gnsdk -> backend: query image data
+    backend --> gnsdk: result image data
+    gnsdk --> request: result image data
+    deactivate gnsdk
+
+    request --> gnservice: result metadata & image
+    deactivate request
+    
+
+    gnservice --> client: result metadata & image
+end
+
+deactivate gnservice
+deactivate jni
+deactivate client
+
+@enduml

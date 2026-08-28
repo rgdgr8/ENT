@@ -1,0 +1,22 @@
+@startuml
+
+skinparam componentStyle uml2
+
+component "Repository" <<component>> {
+    component "CommonRepository" <<unit>> as common
+    component "RadioStationDataRepository" <<unit>> as radio
+    component "RadioStationDataAsiaRepository" <<unit>> as radio_asia
+    component "SongInfoRepository" <<unit>> as song_info
+    component "SongLyricsRepository" <<unit>> as song_lyrics
+    component "CoverArtRepository" <<unit>> as cover_art
+    component "MusicMetadataRepository" <<unit>> as music_metadata
+
+    radio .up.> common
+    radio_asia .up.> common
+    song_info .up.> common
+    song_lyrics .up.> common
+    cover_art .up.> common
+    music_metadata .up.> common
+}
+
+@enduml

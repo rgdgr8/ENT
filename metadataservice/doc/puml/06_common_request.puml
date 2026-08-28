@@ -1,0 +1,45 @@
+@startuml
+
+participant IMetadataServiceAidl as aidl
+participant Service as service
+participant Domain as domain
+participant Repository as repo
+participant Data as data
+participant "ConnectedRadioClient/\nGracenoteService" as providers
+
+aidl -> service: AIDL request **[1]**
+service -> domain: forward request **[2]**
+domain -> repo: query **[3]**
+repo -> data: retrieve cached data **[4]**
+data --> repo: cached result **[5]**
+
+opt no data cached\n or outdated
+
+	repo -> data:
+	data -> providers: request data **[6]**
+	providers --> data:
+	data --> repo: back-end result **[7]**
+
+else data cached
+
+	repo --> domain: cached result **[8]**
+	domain --> service: cached result **[9]**
+	service --> aidl: AIDL response **[10]**
+
+	repo -> data:
+	data -> providers: check data status **[11]**
+	providers --> data: back-end result **[12]**
+	data -> repo:
+
+end
+
+opt new back-end data available
+
+	repo -> data: store in cache **[13]**
+	repo --> domain: online result **[14]**
+	domain --> service: online result **[15]**
+	service --> aidl: AIDL response **[16]**
+
+end
+
+@enduml

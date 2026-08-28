@@ -1,0 +1,53 @@
+@startuml
+
+skinparam linetype ortho
+
+component "Account Manager" as acc
+cloud Backend as server
+
+node metadataservice_app {
+    component metadataservice_app as mds
+
+    node metadataservice_conradlib {
+
+        node Api {
+            component GenericMoshiParser
+            component Http
+            component SystemPropertyReader
+        }
+
+        component Data
+
+        component Debug
+
+        node Backend {
+        }
+
+        component TokenHandler
+
+        node Media {
+        }
+
+        component IRC
+        component Logger
+    }
+}
+
+GenericMoshiParser -- IRC
+GenericMoshiParser -- Logger
+
+Http -- Data
+Http -- Logger
+Http -- server
+
+SystemPropertyReader -- IRC
+SystemPropertyReader -- Logger
+
+mds -- Media
+Media -- Backend
+Media -- Debug
+Backend -- Api
+Backend -- TokenHandler
+TokenHandler -- acc
+
+@enduml

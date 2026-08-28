@@ -1,0 +1,3 @@
+# Allows source domain to read the targetproperty.
+# https://android.googlesource.com/platform/system/sepolicy/+/refs/heads/master/public/te_macros#370
+get_prop(appdomain, vendor_magicadapter_prop)

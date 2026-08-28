@@ -1,0 +1,51 @@
+{
+"nodes":{
+    "local": {
+            "transport":  {
+               "tracing" : {
+                 "local": {
+                      "serializer":"BE",
+                     "tcpip": { "address": "127.0.0.1" }
+                 }
+               },
+               "comm" : {
+                 "local": {
+                     "serializer":"BE",
+                     "tcpip": { "address": "127.0.0.1"}
+                 }
+               }
+            }
+        }
+},
+
+"procs":[
+    {
+         "name": "broker","exec":null,"node": "local", "id" : 200,
+         "transport": {
+           "comm" : {
+              "local" : {
+                 "tcpip": {"port": 22200}
+             }
+           }
+        }
+    },
+    {
+        "name":"testclient","exec":null,"node":"local","id":209,
+        "transport":{"comm":{"*":{"tcpip":{"port":22209}}}}
+    },
+    {
+        "name":"testservice","exec":null,"node":"local","id":210,
+        "transport":{"comm":{"*":{"tcpip":{"port":22210}}}}
+    }
+    ],
+
+
+"comm_settings" : {
+    "cpp" : {
+        "factory_path" : "./factories",
+        "agent_connect_retries" : 0,
+        "agent_connect_retry_delay" : 100,
+        "interface_mismatch" : "ignore"
+    }
+}
+}

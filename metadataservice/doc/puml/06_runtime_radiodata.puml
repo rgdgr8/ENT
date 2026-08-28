@@ -1,0 +1,58 @@
+@startuml
+
+participant MetadataService as client
+participant JNI as jni
+participant GnService as gnservice
+participant GnRequestRadioStationData as request
+participant GNSDK as gnsdk
+participant RadioResultDB as resultdb
+participant GracenoteBackend as backend
+
+activate client
+client -> jni: requestRadiostationData
+
+activate jni
+jni -> gnservice: requestRadiostationData
+
+activate gnservice
+opt if resultdb not initialized yet
+    gnservice -> resultdb: init
+end
+gnservice -> request: create request
+
+activate request
+request -> gnsdk: check update
+gnsdk -> resultdb: check update
+resultdb -> backend: check update
+opt update needed
+    backend --> resultdb: update
+end
+request -> gnsdk: request radiostation
+gnsdk -> resultdb: request radiostation
+resultdb --> gnsdk: result radiostation
+gnsdk --> request: result radiostation
+request -> gnsdk: request logo uri
+gnsdk --> request: result logo uri
+request -> gnsdk: request logo
+
+alt logo already cached
+    gnsdk -> resultdb: request logo data
+    resultdb --> gnsdk: result logo data
+else no logo cached
+    gnsdk -> backend: request logo data
+    backend --> gnsdk: result logo data
+    gnsdk -> resultdb: store logo data
+end
+
+gnsdk --> request: result logo data
+deactivate gnsdk
+
+request --> gnservice: result metadata & logo
+deactivate request
+gnservice --> client: result metadata & logo
+
+deactivate gnservice
+deactivate jni
+deactivate client
+
+@enduml

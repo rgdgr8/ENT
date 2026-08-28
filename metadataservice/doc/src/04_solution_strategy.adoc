@@ -1,0 +1,16 @@
+[[section-solution-strategy]]
+== Solution Strategy
+
+Metadata-Service App is offered as Android Service running as a privileged application.
+It is implemented primarily in Kotlin. +
+Towards client applications including Radio and Media apps, an AIDL interface is offered over which requests are issued and the result data is provided in an asynchronous manner.
+For results including large amounts of data - at the moment only images - a URI is passed to the client app.
+This URI can be resolved to a file descriptor pointing to a file located on an dedicated filesystem partition for Metadata-Service App.
+In order to integrate with the Android ContentResolver Framework, the Metadata-Service App offers its own ContentProvider. +
+Most retrieved metadata is also stored persistently in a relational database, implemented and accessed via the Android Room library.
+Lyrics data must not be stored persistently, i.e. it is only kept in RAM.
+Images as implied above are stored on the file system within the dedicated storage partition.
+Access to this partition is managed by the Harman Extended Storage Framework and limited to the Metadata-Service App and its clients. +
+In order to retrieve the actual metadata two different back-ends are integrated.
+On the one hand Gracenote back-end  is used mostly for Media metadata, song recognition and lyrics, on the other hand the e.solutions Hybrid Radio back-end enables hybrid radio functionality and provides additional radio station data.
+In the Asia region the functionality of Gracenote is used to provide additional information for radio stations.

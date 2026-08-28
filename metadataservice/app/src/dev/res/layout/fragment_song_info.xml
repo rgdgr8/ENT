@@ -1,0 +1,283 @@
+<?xml version="1.0" encoding="utf-8"?>
+<ScrollView xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    tools:context="technology.cariad.entertainment.metadataservice.view.DemoActivity">
+
+    <androidx.constraintlayout.widget.ConstraintLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        app:layout_constrainedWidth="true">
+
+        <ToggleButton
+            android:id="@+id/startStopButton"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="16dp"
+            android:layout_marginEnd="16dp"
+            android:textAllCaps="false"
+            android:textOff="@string/start"
+            android:textOn="@string/stop"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintTop_toTopOf="parent" />
+
+        <ImageView
+            android:id="@+id/coverImageView"
+            android:layout_width="300dp"
+            android:layout_height="300dp"
+            android:layout_marginStart="16dp"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toTopOf="@+id/artistLabel"
+            app:srcCompat="@drawable/no_image_available" />
+
+        <TextView
+            android:id="@+id/artistLabel"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginStart="16dp"
+            android:layout_marginTop="32dp"
+            android:text="@string/artist_label"
+            app:layout_constraintStart_toEndOf="@+id/coverImageView"
+            app:layout_constraintTop_toBottomOf="@+id/startStopButton" />
+
+        <TextView
+            android:id="@+id/albumLabel"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="8dp"
+            android:text="@string/album_label"
+            app:layout_constraintStart_toStartOf="@+id/artistLabel"
+            app:layout_constraintTop_toBottomOf="@+id/artistLabel" />
+
+        <TextView
+            android:id="@+id/titleLabel"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="8dp"
+            android:text="@string/title_label"
+            app:layout_constraintStart_toStartOf="@+id/albumLabel"
+            app:layout_constraintTop_toBottomOf="@+id/albumLabel" />
+
+        <TextView
+            android:id="@+id/yearLabel"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="8dp"
+            android:text="@string/year_label"
+            app:layout_constraintStart_toStartOf="@+id/titleLabel"
+            app:layout_constraintTop_toBottomOf="@+id/titleLabel" />
+
+        <TextView
+            android:id="@+id/coverartUriLabel"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="8dp"
+            android:text="@string/coverart_uri"
+            app:layout_constraintStart_toStartOf="@+id/yearLabel"
+            app:layout_constraintTop_toBottomOf="@+id/yearLabel" />
+
+        <TextView
+            android:id="@+id/eraLabel"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="8dp"
+            android:text="@string/era_label"
+            app:layout_constraintStart_toStartOf="@+id/coverartUriLabel"
+            app:layout_constraintTop_toBottomOf="@+id/coverartUriLabel" />
+
+        <TextView
+            android:id="@+id/genreLabel"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="8dp"
+            android:text="@string/genre_title"
+            app:layout_constraintStart_toStartOf="@+id/eraLabel"
+            app:layout_constraintTop_toBottomOf="@+id/eraLabel" />
+
+        <TextView
+            android:id="@+id/moodLabel"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="8dp"
+            android:text="@string/mood_title"
+            app:layout_constraintStart_toStartOf="@+id/genreLabel"
+            app:layout_constraintTop_toBottomOf="@+id/genreLabel" />
+
+        <TextView
+            android:id="@+id/tempoLabel"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="8dp"
+            android:text="@string/tempo_title"
+            app:layout_constraintStart_toStartOf="@+id/moodLabel"
+            app:layout_constraintTop_toBottomOf="@+id/moodLabel" />
+
+        <TextView
+            android:id="@+id/gracenoteIdLabel"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="8dp"
+            android:text="@string/gracenote_id"
+            app:layout_constraintStart_toStartOf="@+id/tempoLabel"
+            app:layout_constraintTop_toBottomOf="@+id/tempoLabel" />
+
+        <TextView
+            android:id="@+id/gracenoteUniqueIdLabel"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="8dp"
+            android:text="@string/gracenote_unique_id"
+            app:layout_constraintStart_toStartOf="@+id/gracenoteIdLabel"
+            app:layout_constraintTop_toBottomOf="@+id/gracenoteIdLabel" />
+
+        <TextView
+            android:id="@+id/externalIdsLabel"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="8dp"
+            android:text="@string/external_ids"
+            app:layout_constraintStart_toStartOf="@+id/gracenoteUniqueIdLabel"
+            app:layout_constraintTop_toBottomOf="@+id/gracenoteUniqueIdLabel" />
+
+        <TextView
+            android:id="@+id/externalAlbumIdsLabel"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="8dp"
+            android:text="@string/external_album_ids"
+            app:layout_constraintStart_toStartOf="@+id/externalIdsLabel"
+            app:layout_constraintTop_toBottomOf="@+id/externalIdsLabel" />
+
+        <TextView
+            android:id="@+id/artistTextView"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginEnd="16dp"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintTop_toTopOf="@+id/artistLabel"
+            tools:text="Queen" />
+
+        <TextView
+            android:id="@+id/albumTextView"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="8dp"
+            android:layout_marginEnd="16dp"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintTop_toBottomOf="@+id/artistTextView"
+            tools:text="A Night at the Opera" />
+
+        <TextView
+            android:id="@+id/titleTextView"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="8dp"
+            android:layout_marginEnd="16dp"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintTop_toBottomOf="@+id/albumTextView"
+            tools:text="Bohemian Rhapsody" />
+
+        <TextView
+            android:id="@+id/yearTextView"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="8dp"
+            android:layout_marginEnd="16dp"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintTop_toBottomOf="@+id/titleTextView"
+            tools:text="1975 " />
+
+        <TextView
+            android:id="@+id/coverartUriTextView"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="8dp"
+            android:layout_marginEnd="16dp"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintTop_toBottomOf="@+id/yearTextView"
+            tools:text="content://imagestore/image.png" />
+
+        <TextView
+            android:id="@+id/eraTextView"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="8dp"
+            android:layout_marginEnd="16dp"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintTop_toBottomOf="@+id/coverartUriLabel"
+            tools:text="sample era" />
+
+        <TextView
+            android:id="@+id/genreTextView"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="8dp"
+            android:layout_marginEnd="16dp"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintTop_toBottomOf="@+id/eraTextView"
+            tools:text="Progressive rock" />
+
+        <TextView
+            android:id="@+id/moodTextView"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="8dp"
+            android:layout_marginEnd="16dp"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintTop_toBottomOf="@+id/genreTextView"
+            tools:text="Mood" />
+
+        <TextView
+            android:id="@+id/tempoTextView"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="8dp"
+            android:layout_marginEnd="16dp"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintTop_toBottomOf="@+id/moodTextView"
+            tools:text="Tempo" />
+
+        <TextView
+            android:id="@+id/gracenoteIdTextView"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="8dp"
+            android:layout_marginEnd="16dp"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintTop_toBottomOf="@+id/tempoTextView"
+            tools:text="#1234" />
+
+        <TextView
+            android:id="@+id/gracenoteUniqueIdTextView"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="8dp"
+            android:layout_marginEnd="16dp"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintTop_toBottomOf="@+id/gracenoteIdTextView"
+            tools:text="#4321" />
+
+        <TextView
+            android:id="@+id/externalIdsTextView"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="8dp"
+            android:layout_marginEnd="16dp"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintTop_toBottomOf="@+id/gracenoteUniqueIdTextView"
+            tools:text="Spotify" />
+
+        <TextView
+            android:id="@+id/externalAlbumIdsTextView"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="8dp"
+            android:layout_marginEnd="16dp"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintTop_toBottomOf="@+id/externalIdsTextView"
+            tools:text="Spotify" />
+
+    </androidx.constraintlayout.widget.ConstraintLayout>
+</ScrollView>

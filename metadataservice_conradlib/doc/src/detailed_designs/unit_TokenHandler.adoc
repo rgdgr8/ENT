@@ -1,0 +1,234 @@
+﻿include::../config.adoc[]
+//imagesdir must be overwritten, it is already included in the config.adoc
+:imagesdir: ../../images
+:hash: #
+
+= image:ESO_Logo_Colour_positive_RGB.png[eso_icon,350,350,float="right",align="center"] Design metadataservice_conradlib - Unit TokenHandler
+:toc-title: Table of Contents
+
+'''
+
+// numbering from here on
+:numbered:
+:stem: latexmath
+
+
+[unit=TokenHandler, role=unit]
+== <<Unit>> TokenHandler
+This document specifies the design of the unit *TokenHandler*, it is part of the link:../../main.{type}[metadataservice_conradlib].
+This class uses the android account manager to receive credentials for backend requests.
+The class also provides the possibility to set a debug token for testing purposes.
+
+== Provided Interface (public methods and properties)
+
+=== TokenHandler.accountManagerConfig
+
+This variable ist static and lateinit, it can hold objects of type AccountManagerConfig.
+The parameters with which the account manager is to be used are saved here.
+
+[,kotlin]
+----
+lateinit var accountManagerConfig: AccountManagerConfig
+----
+
+=== TokenHandler.debugToken
+
+This variable ist static, it can hold Strings or null.
+If the value is null, no debug token should be used and requests to the account manager must be sent.
+The default of this variable should be null.
+
+[,kotlin]
+----
+var debugToken: String? = null
+----
+
+=== TokenHandler.class(context: Context): TokenHandler
+
+The constructor receives the android context and saves it internally for later use.
+
+*Arguments*
+
+|===
+|name|value range |valid values | description
+
+|context
+|android.content.Context
+|android.content.Context
+|The android context used to receive an account manager instance.
+
+|===
+
+=== TokenHandler.getToken(operationId: String): String?
+
+Receive a token for the backend via account manager.
+If the debugToken is set to non-null, it should return this value instead.
+
+When calling AccountManager.getAuthToken, it must add the service id and operation id as option Bundle.
+
+*Arguments*
+
+|===
+|name|value range |valid values| description
+
+|operationId
+|String
+|String not empty
+|The operation is that should be used to receive tokens from the account manager.
+
+|===
+
+*Return*
+
+|===
+|Type|value range |valid values | description
+
+|Response
+|String or null
+|String including Token or null
+|The authentication token or null on error.
+|===
+
+*Exceptions*
+
+It should catch all possible exceptions and just return null in case of an error.
+
+== Dependencies (Used Units, methods and properties)
+
+This is an overview of the used methods and properties from other units.
+
+|===
+|Destination unit|Destination method/property |comment
+
+|link:unit_Data.adoc[Data]
+|AccountManagerConfig.accountType
+|Receive all accounts from account manager by this account type.
+
+|link:unit_Data.adoc[Data]
+|AccountManagerConfig.accountName
+|From the list of accounts choose one with this name.
+
+|link:unit_Data.adoc[Data]
+|AccountManagerConfig.optionServiceId
+|When calling getAuthToken add the service id as option, use this as option key.
+
+|link:unit_Data.adoc[Data]
+|AccountManagerConfig.serviceId
+|When calling getAuthToken add the service id as option, use this as option value.
+
+|link:unit_Data.adoc[Data]
+|AccountManagerConfig.optionOperationId
+|When calling getAuthToken add the operation id as option, use this as option key.
+
+|===
+
+== Runtime View
+
+[dynamic_sequence=startup, unit=TokenHandler, role=dynamic_sequence]
+=== Startup
+
+Receive the android context via the constructor and save it internally in a private variable.
+
+[dynamic_sequence=shutdown, unit=TokenHandler, role=dynamic_sequence]
+=== Shutdown
+
+The calling unit must simply remove all references to this instance,
+which causes the kotlin garbage collector to remove it from the heap.
+
+[dynamic_sequence=startup_after_s2r, unit=TokenHandler, role=dynamic_sequence]
+=== Suspend
+
+Since this is a kotlin class without deep android references, no suspend state needs to be considered.
+
+[dynamic_sequence=resume, unit=TokenHandler, role=dynamic_sequence]
+=== Resume
+
+Since this is a kotlin class without deep android references, no suspend state needs to be considered.
+
+=== Use Debug Token
+
+[plantuml, title="Use Debug Token", format="svg", id="TokenHandler-DebugToken"]
+----
+participant "Arbitrary Unit" as caller
+participant "TokenHandler" as handler <<unit>>
+
+caller -> handler: debugToken = "abc"
+
+caller -> handler: getToken("xyz")
+activate handler
+caller <- handler: "abc"
+deactivate handler
+----
+
+=== Request token from account manager
+
+[plantuml, title="Request token from account manager", format="svg", id="TokenHandler-Account-Manager"]
+----
+participant "Arbitrary Unit" as caller
+participant "TokenHandler" as handler <<unit>>
+participant "AccountManager" as manager
+
+caller -> handler: debugToken = null
+
+caller -> handler: getToken("abc")
+activate handler
+
+handler <-> manager: get(context)
+handler <-> manager: getAccountsByType(accountType)
+handler -> handler: Find account by accountName
+handler <-> manager: getAuthToken(account)
+handler -> handler: Read token bundle by\ngetString(AccountManager.KEY_AUTHTOKEN)
+
+caller <- handler: "token"
+deactivate handler
+----
+
+=== Missing account error
+
+[plantuml, title="Error missing account", format="svg", id="TokenHandler-Error-Account"]
+----
+participant "Arbitrary Unit" as caller
+participant "TokenHandler" as handler <<unit>>
+participant "AccountManager" as manager
+
+caller -> handler: debugToken = null
+
+caller -> handler: getToken("abc")
+activate handler
+
+handler <-> manager: get(context)
+handler <-> manager: getAccountsByType(accountType)
+handler -> handler: No accounts or accountName is missing
+
+caller <- handler: null
+deactivate handler
+----
+
+=== Error in request bundle
+
+[plantuml, title="Error in request bundle", format="svg", id="TokenHandler-Error-Bundle"]
+----
+participant "Arbitrary Unit" as caller
+participant "TokenHandler" as handler <<unit>>
+participant "AccountManager" as manager
+
+caller -> handler: debugToken = null
+
+caller -> handler: getToken("abc")
+activate handler
+
+handler <-> manager: get(context)
+handler <-> manager: getAccountsByType(accountType)
+handler -> handler: Find account by accountName
+handler <-> manager: getAuthToken(account)
+handler -> handler: If error message exists\ngetString(AccountManager.KEY_ERROR_MESSAGE)
+
+caller <- handler: null
+deactivate handler
+----
+
+[[section-design-decisions]]
+== Design Decisions
+
+No further design decisions were made for the implementation of this unit other than those already mentioned in link:../../main.{type}[metadataservice_conradlib].
+
+include::../about-arc42.adoc[]

@@ -1,0 +1,431 @@
+﻿include::../config.adoc[]
+//imagesdir must be overwritten, it is already included in the config.adoc
+:imagesdir: ../../images
+:hash: #
+
+= image:ESO_Logo_Colour_positive_RGB.png[eso_icon,350,350,float="right",align="center"] Design metadataservice_conradlib - Unit ConRadClient
+:toc-title: Table of Contents
+
+'''
+
+// numbering from here on
+:numbered:
+:stem: latexmath
+
+
+[unit=ConRadClient, role=unit]
+== <<Unit>> ConRadClient
+This document specifies the design of the unit *ConRadClient*, it is part of the link:../../main.{type}[metadataservice_conradlib].
+
+The ConRadClient class is the entry point into the library, it must be initialized by the app.
+
+The class should implement a static init counter, so it can log how often this class was initialized by the app.
+
+== Provided Interface (public methods and properties)
+
+=== ConRadClient.class(context: Context, loggerChannelRoot: String?): ConRadClient
+
+The constructor should initialize the Logger and print the version to the IRC,
+also it should log the current client version and how often this class was initialized.
+
+*Arguments*
+
+|===
+|name|value range |valid values | description
+
+|context
+|android.content.Context
+|android.content.Context
+|Android Context that is used by the link:unit_TokenHandler.adoc[TokenHandler].
+
+|loggerChannelRoot
+|String?
+|String or null
+|The root that should be used by the logger.
+|===
+
+=== ConRadClient.getRadioStationData(bearer: IBearer, eTags: ETags, callback: IRadioStationDataCallback)
+
+Request information about a radio bearer at the backend.
+
+*Arguments*
+
+|===
+|name|value range |valid values | description
+
+|bearer
+|IBearer
+|IBearer-Instance
+|The bearer that should be requested at the backend.
+
+|eTags
+|ETags
+|ETags-Instance
+|The ETags received by the last backend request. The ETags should be persisted by the MetaDataService.
+
+|callback
+|IRadioStationDataCallback
+|IRadioStationDataCallback-Instance
+|The callback that should receive the information.
+|===
+
+*Return*
+
+None
+
+*Exceptions*
+
+None
+
+*Special attributes*
+
+** async: The function should do all networking asynchronously.
+
+=== ConRadClient.setNetwork(network: Network?)
+
+Set the network that should be used by the HTTP client.
+It should stop the ExecutorWorker, if the given network is null.
+
+*Arguments*
+
+|===
+|name|value range |valid values | description
+
+|network
+|android.net.Network?
+|android.net.Network-Instance or null
+|The network that should be used by the HTTP client or null to disable networking.
+
+|===
+
+*Return*
+
+None
+
+*Exceptions*
+
+None
+
+=== ConRadClient.setConfig(accountManagerConfig: AccountManagerConfig, endpointConfig: EndpointConfig)
+
+Receive configuration settings from the service list or that should be used to use the android account manager.
+
+*Arguments*
+
+|===
+|name|value range |valid values | description
+
+|accountManagerConfig
+|AccountManagerConfig
+|AccountManagerConfig-Instance
+|Settings that define how the account manager must be used to receive tokens.
+
+|endpointConfig
+|EndpointConfig
+|EndpointConfig-Instance
+|Service List configuration that defines the operation id and domain of the backend service.
+|===
+
+*Return*
+
+None
+
+*Exceptions*
+
+None
+
+=== ConRadClient.setToken(token: String?)
+
+Set a debug token to the TokenHandler.
+Only for testing purposes.
+
+*Arguments*
+
+|===
+|name|value range |valid values | description
+
+|token
+|String
+|JWT Token or null
+|The token that should be used or null to disable the debug mode.
+
+|===
+
+*Return*
+
+None
+
+*Exceptions*
+
+None
+
+=== ConRadClient.setDebugConfig(debugConfig: DebugConfig?)
+
+Enable the debug mode so no backend requests are sent.
+The given configuration defines how to answer requests from the MetaDataService.
+
+*Arguments*
+
+|===
+|name|value range |valid values | description
+
+|debugConfig
+|DebugConfig?
+|DebugConfig-Instance or null
+|The config that defines the debug behavior or null to disable the debug mode.
+
+|===
+
+*Return*
+
+None
+
+*Exceptions*
+
+None
+
+== Dependencies (Used Units, methods and properties)
+
+This is an overview of the used methods and properties from other units.
+
+|===
+|Destination unit|Destination method/property |comment
+
+|link:unit_IRadioStationDataCallback.adoc[IRadioStationDataCallback]
+|IRadioStationDataCallback.class
+|Callback that should be used to return the data.
+
+|link:unit_RequestController.adoc[RequestController]
+|RequestController.class
+|Controller that should be used to process requests.
+
+|link:unit_RequestController.adoc[RequestController]
+|RequestController.getRadioStationData()
+|Request a result from the controller.
+
+|link:unit_TokenHandler.adoc[TokenHandler]
+|TokenHandler.accountManagerConfig
+|Save the account manager config here.
+
+|link:unit_TokenHandler.adoc[TokenHandler]
+|TokenHandler.debugToken
+|Save the debug token here.
+
+|link:unit_ExecutorWorker.adoc[ExecutorWorker]
+|ExecutorWorker.stop()
+|Stop the worker if no network is available.
+
+|link:unit_ExecutorWorker.adoc[ExecutorWorker]
+|ExecutorWorker.start()
+|Start the worker if a network is available.
+
+|link:unit_Http.adoc[Http]
+|Http.setNetwork()
+|set the received network configuration to the Http client.
+
+|link:unit_Logger.adoc[Logger]
+|Logger.init()
+|Initialize the logger by the received logger root.
+
+|link:unit_IRC.adoc[IRC]
+|IRC.printVersionInformation()
+|Write the client version to the IRC.
+
+|link:unit_Debug.adoc[Debug]
+|DebugController.class
+|Controller that should be used for testing purposes.
+
+|link:unit_Debug.adoc[Debug]
+|DebugController.setDebugConfig
+|Set the debug config that should be used by the debug controller.
+
+|link:unit_Debug.adoc[Debug]
+|DebugConfig.class
+|Config that should be used at the debug controller.
+
+|link:unit_Data.adoc[Data]
+|IBearer.class
+|Bearer received from the MetaDataService.
+
+|link:unit_Data.adoc[Data]
+|ETags.class
+|ETags persisted by the MetaDataService.
+
+|link:unit_Data.adoc[Data]
+|MediaRequestObject.class
+|Give the received data to the controller by this DTO.
+
+|link:unit_Data.adoc[Data]
+|AccountManagerConfig.class
+|Config that define how the account manager must be used to receive tokens.
+
+|link:unit_Data.adoc[Data]
+|EndpointConfig.class
+|Service List configuration that defines the operation id and domain of the backend service.
+
+|===
+
+== Runtime View
+
+[dynamic_sequence=startup, unit=ConRadClient, role=dynamic_sequence]
+=== Startup
+
+The constructor should initialize the logger and write version information to the irc.
+
+[plantuml, title="Init sequence", format="svg", id="startup"]
+----
+participant "Arbitrary Unit" as caller
+participant "ConRadClient" as client <<unit>>
+participant "Logger" as logger <<unit>>
+participant "IRC" as irc <<unit>>
+
+caller -> client: Initialize
+activate client
+
+alt Logger channel root is not null
+client -> logger: init()
+end
+
+client -> irc: printVersionInformation()
+deactivate client
+----
+
+[dynamic_sequence=shutdown, unit=ConRadClient, role=dynamic_sequence]
+=== Shutdown
+
+The calling unit must simply remove all references to this instance,
+which causes the kotlin garbage collector to remove it from the heap.
+
+[dynamic_sequence=startup_after_s2r, unit=ConRadClient, role=dynamic_sequence]
+=== Suspend
+
+Since this is a kotlin class without deep android references, no suspend state needs to be considered.
+
+[dynamic_sequence=resume, unit=ConRadClient, role=dynamic_sequence]
+=== Resume
+
+Since this is a kotlin class without deep android references, no suspend state needs to be considered.
+
+=== Request RadioStationData
+
+[plantuml, title="getRadioStationData", format="svg", id="getRadioStationData"]
+----
+participant "Arbitrary Unit" as caller
+participant "ConRadClient" as client <<unit>>
+participant "MediaRequestObject" as dto <<unit>>
+participant "IController" as controller <<unit>>
+
+caller -> client: getRadioStationData()
+activate client
+
+client <-> dto: Initialize DTO
+client -> controller: getRadioStationData()
+
+deactivate client
+----
+
+=== Set Network
+
+[plantuml, title="setNetwork", format="svg", id="setNetwork"]
+----
+participant "Arbitrary Unit" as caller
+participant "ConRadClient" as client <<unit>>
+participant "ExecutorWorker" as worker <<unit>>
+participant "Http" as http <<unit>>
+
+caller -> client: setNetwork()
+activate client
+
+client -> worker: stop()
+
+alt If network is not null
+client -> http: setNetwork()
+client -> worker: start()
+end
+
+deactivate client
+----
+
+=== Set Config
+
+[plantuml, title="setConfig", format="svg", id="setConfig"]
+----
+participant "Arbitrary Unit" as caller
+participant "ConRadClient" as client <<unit>>
+participant "TokenHandler" as handler <<unit>>
+participant "Config" as config <<unit>>
+
+caller -> client: setConfig()
+activate client
+
+client -> handler: Set accountManagerConfig
+client -> config: Set endpointConfig
+
+deactivate client
+----
+
+=== Set Token
+
+[plantuml, title="setToken", format="svg", id="setToken"]
+----
+participant "Arbitrary Unit" as caller
+participant "ConRadClient" as client <<unit>>
+participant "TokenHandler" as handler <<unit>>>
+
+caller -> client: setToken()
+activate client
+
+client -> handler: Set debugToken
+
+deactivate client
+----
+
+=== Set DebugConfig
+
+[plantuml, title="setDebugConfig", format="svg", id="setDebugConfig"]
+----
+participant "Arbitrary Unit" as caller
+participant "ConRadClient" as client <<unit>>
+participant "DebugController" as debug <<unit>>>
+
+caller -> client: setDebugConfig()
+activate client
+
+alt Debug config is null
+client -> client: Use RequestController for requests
+else Debug controller is not null
+client -> client: Use DebugController for requests
+client -> debug: DebugController.setDebugConfig
+end
+
+deactivate client
+----
+
+[[section-design-decisions]]
+== Design Decisions
+=== Returning results vs callback
+A decision had to be made how to deliver the requested bearer information.
+
+==== Option 1: Return
+By returning the information from the calling method, the calling app does not have to implement a callback.
+
+==== Option 2: Callback
+The advantage of the callback is that it can be called async and do not block the caller.
+
+==== Conclusion:
+As we do not know how long it can take to retrieve the information from the backend, we do not want to block the caller and decided to use a callback to provide the bearer information.
+
+=== Request configurations by our self or receive it from metadataservice
+A decision had to be made how we can get the information from the service list like disable reasons or server url or the network information.
+
+==== Option 1: Receive it from metadataservice
+Metadataservice have to read the list either way, and so they can send us all relevant information. Also, the need to know the current network status.
+
+==== Option 2: Read the service list by our self
+We request and evaluate the service list and network status by our self and decide what to do.
+
+==== Conclusion:
+To avoid duplicate code and reduce the work load we decided to receive the relevant information within the service list
+and the network status from metadataservice.
+
+include::../about-arc42.adoc[]

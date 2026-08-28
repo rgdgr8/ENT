@@ -1,0 +1,13 @@
+[[section-glossary]]
+== Glossary
+
+[options="header"]
+|===
+| Term         | Definition
+| UI           | User Interface
+| DEV          | Development
+| PROD         | Production
+| APK          | Android Package
+| APN          | Access Point Name
+
+|===

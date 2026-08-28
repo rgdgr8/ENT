@@ -1,0 +1,25 @@
+@startuml
+
+skinparam componentStyle uml2
+
+component "Data" <<component>> {
+    [Database]
+    [Database] .up.> [Mapper]
+    [Provider] .up.>  [Mapper]
+    [Filesystem]
+}
+
+interface "Local Filesystem" as filesystem
+interface "Audio Device" as audio_device
+interface "GracenoteService" as gracenote
+interface "ConnectedRadioClient" as conrad
+interface "GMDClient" as gmdlib
+
+Filesystem .down..> filesystem
+Provider .down..> audio_device
+Provider .down..> gracenote
+Provider .down..> conrad
+Provider .down..> gmdlib
+Database .down..> filesystem
+
+@enduml

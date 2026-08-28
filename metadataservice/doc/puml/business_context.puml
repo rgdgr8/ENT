@@ -1,0 +1,31 @@
+@startuml
+
+skinparam componentStyle uml2
+
+component MetadataService as service
+
+node "Client Apps" <<extern>> as client_apps {
+}
+
+node "Service Configuration" <<extern>> as config {
+}
+
+node "Vehicle Information" <<extern>> as vehicle {
+}
+
+node "Metadata Providers" <<extern>> as providers {
+}
+
+client_apps -> service : request
+service ..> client_apps : response
+
+service --> config: request
+config .> service: response
+
+service --> vehicle: request
+vehicle .> service: response
+
+service --> providers : request
+providers .> service : response
+
+@enduml

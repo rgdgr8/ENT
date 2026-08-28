@@ -1,0 +1,130 @@
+@startuml
+
+entity ProviderIdentifier {
+    * provider_identifier_id: integer <<generated>>
+    --
+    * origin: integer
+    * external_id: text
+}
+
+entity StationProviderIdentifier {
+    * station_id: integer <<FK>>
+    * provider_identifier_id: integer <<FK>>
+}
+
+entity Bearer {
+    * bearer_id: integer <<generated>>
+    --
+    * station_id: integer <<FK>>
+    * uri: text <<unique>>
+}
+
+entity Genre {
+    * genre_id: integer <<generated>>
+    --
+    * name: text <<unique>>
+}
+
+entity StationImage {
+    * image_id: integer <<FK>>
+    * station_id: integer <<FK>>
+}
+
+entity Artist {
+    * artist_id: integer <<generated>>
+    --
+    * artist_name: text <<unique>>
+}
+
+entity Album {
+    * album_id: integer <<generated>>
+    --
+    * album_name: text <<unique>>
+}
+
+entity CoverArtLookup {
+    * cover_art_lookup_id: integer <<generated>>
+    --
+    * album_id: integer <<FK>>
+    * artist_id: integer <<FK>>
+      track_name: text
+      image_id: integer <<FK>>
+    * life_cycle_data_id: integer <<FK>>
+}
+
+entity LifeCycleData {
+    * life_cycle_data_id: integer <<generated>>
+    --
+    * last_requested: integer
+      last_modified: integer
+      valid_until: integer
+      next_retry: integer
+      last_retry_status: integer
+      retry_count: integer
+      retry_delay
+}
+
+entity Image {
+    * image_id: integer <<generated>>
+    --
+    * image_type: integer
+    * file_name: text
+}
+
+entity Stream {
+    * stream_id: integer <<generated>>
+    --
+    * station_id: integer <<FK>>
+    * position: integer
+    * url: text
+      offset_ms: integer
+      quality: integer
+}
+
+entity StationGenreRank {
+    * station_id: integer <<FK>>
+    * genre_id: integer <<FK>>
+    --
+    * position: integer
+}
+
+entity Station {
+    * station_id: integer <<generated>>
+    --
+    * life_cycle_data_id: integer <<FK>>
+}
+
+entity StationMetadata {
+    * metadata_id: integer <<generated>>
+    --
+    * station_id: integer <<FK>> <<unique>>
+    short_name: text
+    medium_name: text
+    long_name: text
+    description: text
+}
+
+' Radiostation
+Station ||--o|  StationMetadata
+Station ||--|{  Bearer
+Station ||--o{  Stream
+
+Station ||--o{  StationGenreRank
+Genre ||--|{  StationGenreRank
+
+Station ||--o{ StationProviderIdentifier
+ProviderIdentifier ||--|{ StationProviderIdentifier
+
+' Coverart
+CoverArtLookup }|--o| Artist
+CoverArtLookup }|--o| Album
+
+' Shared
+Station |o--|| LifeCycleData
+CoverArtLookup |o--|| LifeCycleData
+
+Station ||--o{ StationImage
+StationImage |o--|| Image
+CoverArtLookup |o--o| Image
+
+@enduml

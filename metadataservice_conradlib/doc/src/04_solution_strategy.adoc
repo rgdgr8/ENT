@@ -1,0 +1,60 @@
+[[section-solution-strategy]]
+== Solutions Strategy
+
+=== ConRadClient Interfaces
+
+The ConRadLib does not use any kind of binder or AIDL interface because it is integrated into MetaDataService as a library.
+
+=== ConRadClient Object
+
+The ConRadClient object is the entry point in the library.
+The class contains the following functions:
+
+|===
+| Method | Description
+
+|setNetwork(network: Network?)
+|Use the given Network for all HTTP operations. It will stop executing requests if the network is set to null.
+
+|fun setConfig(accountManagerConfig: AccountManagerConfig, endpointConfig: EndpointConfig)
+|Save the given configuration objects.
+The AccountManagerConfig contains settings for the android account manager and the EndpointConfig the URL to the Backend and operation id for this URL.
+
+|getRadioStationData(bearer: IBearer, eTags: eTags, callback: IRadioStationDataCallback)
+|Request the given bearer at the ConnectedRadio backend and give the received data to the IRadioStationDataCallback.
+
+|setToken(token: String?)
+|TESTING FEATURE ONLY +
+Uses a specific token for all backend requests.
+It will be disabled again by calling the function with token=null.
+
+|fun setDebugConfig(debugConfig: DebugConfig?)
+|TESTING FEATURE ONLY +
+Activates the debug mode, which will generate fake data without requesting at the backend.
+It will be disabled again by calling the function with debugConfig=null.
+
+|===
+
+Before requesting data with `getRadioStationData` a network and config must be set to the client.
+If the network is not set, it will just do nothing and wait for it.
+
+=== IRadioStationDataCallback
+
+The interface `IRadioStationDataCallback` is used to return the received information from the backend to the integrator of the library.
+
+=== X-Registration-Age Header
+
+The user can configure the time of the devices, which can lead to too many registration requests. If the server sends cookies with absolute timestamps, the cookie could be expired immediately.
+
+We added the X-Registration-Age header to the registration requests, which sends the time between the last registration and now to the server. With this function, we are able to deactivate the session cookie feature for this vehicle if the time is not working correctly.
+
+This function was developed as a precaution, because at the moment there is no problem because of the `Max-Age` parameter in the cookie headers.
+(So cookies will be saved by a relative time value)
+
+=== Server Downtime Handler
+
+If the server sends the status code 429 or 503 with `Retry-After` header, the client will not send any requests until the configured time is over.
+Requests from the MetaDataService will be immediately answered with `onComplete` including retry after delay.
+
+This function is to avoid that the cars are starting denial-of-service attacks on our own server.
+In the past, there were problems because of too much load after rebooting our services, because all running cars want data at the same time.

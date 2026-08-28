@@ -1,0 +1,36 @@
+[[section-glossary]]
+== Glossary
+
+[options="header"]
+|===
+| Term         | Definition
+| AIDL         | Android Interface Definition Language
+| API          | Application Programming Interface 
+| APN          | Access Point Name 
+| ConRad Client| Connected Radio Client
+| DAB          | Digital Audio Broadcasting
+| ESM          | Extended Storage Manager
+| FM           | Frequency Modulation
+| FO           | Function Owner
+| GMD          | Global music data
+| GN           | Gracenote
+| GNSDK        | Gracenote Software Development Kit
+| HCP          | High Computing Platform
+| HMI          | Human Machine Interface
+| HTTP(S)      | Hypertext Transfer Protocol (Secure)
+| OEM          | Original Equipment Manufacturer
+| IBOC         | In-band On-Channel
+| IDE          | Integrated Development Environment
+| IPC          | Inter Process Communication
+| JNI          | Java Native Interface
+| MB           | Megabyte
+| NDK          | Native Development Kit
+| OS           | Operating System
+| PO           | Product Owner
+| RAM          | Random-Access Memory
+| RPC          | Remote Procedure Call
+| SCM          | Source Code Management
+| SDK          | Software Development Kit
+| UML          | Unified Modeling Language
+| URI          | Uniform Resource Identifier
+|===

@@ -1,0 +1,34 @@
+[[Architecture-constraints]]
+== Constraints
+
+This chapter describes the mandatory constraints of the Connected Radio Client software element.
+
+=== Resource consumption use case
+
+Since the Connected Radio Client is designed as a library and only runs in the context of an app, no statement can be made about the resource consumption of the library.
+
+=== Technical constraints
+
+This chapter lists all technical constraints the OnlineCoreFunctions application has to live with.
+
+[cols="30%,70%"]
+|===
+| Constraint | Description
+| Implementation in Kotlin | The programming language of the Connected Radio Client is Kotlin (Version 1.3 or higher)
+| Android | The Connected Radio Client have to be developed in form of an Android Library
+| CleanCode | The principles of 'Clean Code', especially the insights which were gained during the Clean Code Training at e.solutions GmbH have to be applied to the style of development.
+| HTTPS/TLS | To secure the communication between the backend and the OnlineCoreFunctions, HTTPS and TLS Version 1.2 and 1.3 have to be used
+|===
+
+=== Organisational constraints
+
+In this chapter the organisational constraints of the software element are listed. +
+Here the constraints are listed, which do not refer directly to the development but to the process guiding the development.
+
+[cols="30%,70%"]
+|===
+| Usage of Open Source Software | The usage of open source software is allowed in case that the software is also free for commercial use. The legal department of e.solutions GmbH has to check the open source software which is planned to use in cooperation with the TIER1 or OEM.
+| SaFe | The core principles of scaled agile framework have to be adapted during the development process. This includes the alignment of the Connected Radio team and the function owners to a shared mission and vision based on features, which have to be developed for each PI. Apart from that the participation of several scrum ceremonies such as sprint-planning sessions, sprint-review sessions, sprintretrospective sessions and daily-standup meetings- is a prerequisite.
+| Perforce | Perforce has to be used as sourcecode management system.
+| Helix Swarm | A code review request via Helix Swarm has to be verified by another developer before code changes can be checked in Perforce.
+|===

@@ -1,0 +1,20 @@
+{
+  "client" : {
+    "gracenoteservice" : {},
+    "default" : {
+      "enabled" : true,
+      "preset" : {
+        "privacyFlags" : {
+          "channel" : {
+            "*" : "Un"
+          }
+        }
+      },
+      "backends" : {
+        "AndroidBackend": {
+          "enabled": true
+        }
+      }
+    }
+  }
+}

@@ -1,0 +1,41 @@
+@startuml
+
+skinparam componentStyle uml2
+
+component "Provider" <<component>> {
+    component "CommonProvider" <<unit>> as common
+    component "RadioStationDataProvider" <<unit>> as radio
+    component "RadioStationDataAsiaProvider" <<unit>> as radio_asia
+    component "CoverArtProvider" <<unit>> as cover_art
+    component "SongInfoProvider" <<unit>> as song_info
+    component "SongLyricsProvider" <<unit>> as song_lyrics
+    component "MusicMetadataProvider" <<unit>> as music_metadata
+    component "GracenoteService" <<unit>> as gracenote
+    component "TimeProvider" <<unit>> as time
+    component "ConfigurationProvider" <<unit>> as config
+    component "OnlineStateProvider" <<unit>> as online
+}
+
+radio .up.> common
+radio_asia .up.> common
+cover_art .up.> common
+song_info .up.> common
+song_lyrics .up.> common
+music_metadata .up.> common
+
+radio_asia .down.> gracenote
+cover_art .down.> gracenote
+song_info .down.> gracenote
+song_lyrics .down.> gracenote
+
+interface "GracenoteService" as gracenote_native
+interface "ConnectedRadioClient" as conrad
+interface "GMDClient" as gmd
+interface "Audio Device" as audio_device
+
+gracenote ..> gracenote_native
+song_info ...> audio_device
+radio ...> conrad
+music_metadata ...> gmd
+
+@enduml

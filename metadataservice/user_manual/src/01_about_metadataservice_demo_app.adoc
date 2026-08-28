@@ -1,0 +1,17 @@
+[[section-about_metadataservice_demo_app]]
+== About MetadataService Demo Application
+
+Demo Application which includes an activity aims to make developers`, testers` and customer`s life easier during the development process.
+MetadataService Application is a background service and does not have a UI in practice.
+At this point, Demo Application as a separate application with UI makes a big difference to test the service during its development phases.
+Demo application is for demonstration purposes only (DEV variant) and not part of the final product (PROD variant).
+
+=== What can be done via Demo Application?
+
+* Request and display radio station data including logos on the screen
+* Request and display Asia radio station data including logos on the screen
+* Start/stop song recognition and display the result on the screen
+* Request text based cover art lookup and display the cover art on the screen
+* Request permission status of the application via a button and display the missing permissions on the screen
+* Request settings changes and save them (online data enable/disable, radio demo mode enable/disable ..etc) on the screen
+

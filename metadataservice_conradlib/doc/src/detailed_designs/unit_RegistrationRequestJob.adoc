@@ -1,0 +1,380 @@
+include::../config.adoc[]
+//imagesdir must be overwritten, it is already included in the config.adoc
+:imagesdir: ../../images
+:hash: #
+
+= image:ESO_Logo_Colour_positive_RGB.png[eso_icon,350,350,float="right",align="center"] Design metadataservice_conradlib - Unit RegistrationRequestJob
+:toc-title: Table of Contents
+
+'''
+
+// numbering from here on
+:numbered:
+:stem: latexmath
+
+
+[unit=RegistrationRequestJob, role=unit]
+== <<Unit>> RegistrationRequestJob
+This document specifies the design of the unit *RegistrationRequestJob*, it is part of the link:../../main.{type}[metadataservice_conradlib].
+
+This job class is responsible to send and evaluate requests to the registration endpoint.
+The class has to implement the link:unit_IJob.adoc[IJob] interface.
+
+== Provided Interface (public methods and properties)
+
+=== RegistrationRequestJob.successful
+
+This boolean indicates if the job finished successfully, the default value is false.
+
+[,kotlin]
+----
+var successful: Boolean = false
+----
+
+=== RegistrationRequestJob.retryAfterResponse
+
+This long indicates if the registration has to be retried later.
+If not the value is null, the default value is also null.
+
+[,kotlin]
+----
+var retryAfterResponse: Long? = null
+----
+
+=== RegistrationRequestJob.responseCode
+
+This int stores the response code of the last registration attempt.
+The default value is null.
+
+[,kotlin]
+----
+var responseCode: Int? = null
+----
+
+=== RegistrationRequestJob.class(tokenHandler: TokenHandler): RegistrationRequestJob
+
+The constructor has to save the received TokenHandler, so it can use it later.
+
+*Arguments*
+
+|===
+|name|value range |valid values | description
+
+|tokenHandler
+|TokenHandler
+|TokenHandler
+|The TokenHandler that must be used to receive backend tokens.
+|===
+
+=== RegistrationRequestJob.run()
+
+This function runs the primary job logic, it has to do the following:
+
+1. Check if link:unit_HandleRegistration.adoc[HandleRegistration.isCookiePresentAndValid()] is true
+- Then set successful=true
+- Return this function
+2. Check if link:unit_ServerDowntimeHandler.adoc[ServerDowntimeHandler.getRemainingDowntime()] reports downtime
+- Then set retryAfterResponse to the returned value
+- Return this function
+3. Use the link:unit_TokenHandler.adoc[TokenHandler.getToken()] to receive a backend token
+- If it fails then return this function
+4. Build a request body
+- Use link:unit_GenericMoshiParser.adoc[GenericMoshiParser.parseToJson()] for JSON parsing
+- Use RegistrationRequest and ApiRequestObject as data models
+5. Build the request headers
+- Set RequestHeader.accept to "application/json"
+- Set RequestHeader.secondsSinceLastRegistration to the time since the last registration
+* See HandleRegistration.timeLastRegistrationRequest
+6. Start synchronized request to the backend
+- On http status 200
+* Parse the response body by link:unit_GenericMoshiParser.adoc[GenericMoshiParser]
+* Use HandleRegistration.setRegistrationResult to handle the result
+* Set successful=true
+- On http status 429 or 503
+* Check if the response contains a retry after header then
+* Set the retryAfterResponse variable to the given delay
+* Give the retry after delay to link:unit_ServerDowntimeHandler.adoc[ServerDowntimeHandler.setServerDowntime()]
+
+*Arguments*
+
+None
+
+*Return*
+
+None
+
+*Exceptions*
+
+None
+
+== Dependencies (Used Units, methods and properties)
+
+This is an overview of the used methods and properties from other units.
+
+|===
+|Destination unit|Destination method/property |comment
+
+|link:unit_TokenHandler.adoc[TokenHandler]
+|TokenHandler.getToken()
+|Receive a backend token from the account manager.
+
+|link:unit_HandleRegistration.adoc[HandleRegistration]
+|HandleRegistration.isCookiePresentAndValid()
+|Check if the current session cookie is present.
+
+|link:unit_HandleRegistration.adoc[HandleRegistration]
+|HandleRegistration.setRegistrationResult()
+|Set the registration result to the config.
+
+|link:unit_HandleRegistration.adoc[HandleRegistration]
+|HandleRegistration.timeLastRegistrationRequest
+|Timestamp of the last successful registration.
+
+|link:unit_ServerDowntimeHandler.adoc[ServerDowntimeHandler]
+|ServerDowntimeHandler.getRemainingDowntime()
+|Check if the server is currently marked as down.
+
+|link:unit_ServerDowntimeHandler.adoc[ServerDowntimeHandler]
+|ServerDowntimeHandler.setServerDowntime()
+|Set the server as currently down for a specific time.
+
+|link:unit_GenericMoshiParser.adoc[GenericMoshiParser]
+|GenericMoshiParser.parseToJson()
+|Parse the request data to a json, so we can send it to the backend.
+
+|link:unit_GenericMoshiParser.adoc[GenericMoshiParser]
+|GenericMoshiParser.parseFromJson()
+|Parse the response from the backend to objects.
+
+|link:unit_Http.adoc[Http]
+|Http.executePost()
+|Execute a post request to the backend.
+
+|link:unit_Http.adoc[Http]
+|Http.generateRequestID()
+|Generate a request id that should be logged and sent to the backend.
+
+|link:unit_Data.adoc[Data]
+|ApiRequestObject.class, RegistrationRequest.class and RequestHeader.class
+|Data transfer objects to build registration requests.
+|===
+
+== Runtime View
+
+[dynamic_sequence=startup, unit=RegistrationRequestJob, role=dynamic_sequence]
+=== Startup
+
+No explicit specification required, because no startup logic exists.
+The job logic will start by the run() function.
+
+[dynamic_sequence=shutdown, unit=RegistrationRequestJob, role=dynamic_sequence]
+=== Shutdown
+
+The calling unit must simply remove all references to this instance,
+which causes the kotlin garbage collector to remove it from the heap.
+
+[dynamic_sequence=startup_after_s2r, unit=RegistrationRequestJob, role=dynamic_sequence]
+=== Suspend
+
+Since this is a kotlin class without android references, no suspend state needs to be considered.
+
+[dynamic_sequence=resume, unit=RegistrationRequestJob, role=dynamic_sequence]
+=== Resume
+
+Since this is a kotlin class without android references, no suspend state needs to be considered.
+
+=== Handle normal registration
+
+[plantuml, title="run()", format="svg", id="run"]
+----
+
+participant "Arbitrary Unit" as caller
+participant "RegistrationRequestJob" as job <<unit>>
+participant "HandleRegistration" as registration <<unit>>
+participant "ServerDowntimeHandler" as downtime <<unit>>
+participant "TokenHandler" as token <<unit>>
+participant "GenericMoshiParser" as parser <<unit>>
+participant "Http" as http <<unit>>
+
+caller -> job: run()
+activate job
+
+job -> registration: isCookiePresentAndValid()
+activate registration
+job <- registration: false
+deactivate registration
+
+job -> downtime: getRemainingDowntime()
+activate downtime
+job <- downtime: null
+deactivate downtime
+
+job -> token: getToken()
+activate token
+job <- token: String including backend token
+deactivate token
+
+job -> job: Build backend request
+job -> parser: parseToJson()
+activate parser
+job <- parser: String including json data
+deactivate parser
+
+job -> http: executePost()
+activate http
+job <- http: Response
+deactivate
+
+alt Response status code is 200
+job -> parser: parseFromJson()
+activate parser
+job <- parser: Backend response as data transfer objects
+deactivate parser
+job -> registration: setRegistrationResult()
+job -> job: Set job as successful
+
+else Response status code is 420 or 503
+alt Response contains retry after header
+job -> job: Set the retryAfterResponse variable
+job -> downtime: setServerDowntime()
+end
+
+end
+
+deactivate job
+----
+
+=== Start registration with valid cookie
+
+[plantuml, title="run() but cookie is valid", format="svg", id="run-valid-cookie"]
+----
+
+participant "Arbitrary Unit" as caller
+participant "RegistrationRequestJob" as job <<unit>>
+participant "HandleRegistration" as registration <<unit>>
+
+caller -> job: run()
+activate job
+
+job -> registration: isCookiePresentAndValid()
+activate registration
+job <- registration: true
+job -> job: Set job as successful
+deactivate registration
+
+deactivate job
+----
+
+=== Handle server downtime
+
+[plantuml, title="run() but server is in downtime", format="svg", id="run-downtime"]
+----
+
+participant "Arbitrary Unit" as caller
+participant "RegistrationRequestJob" as job <<unit>>
+participant "HandleRegistration" as registration <<unit>>
+participant "ServerDowntimeHandler" as downtime <<unit>>
+participant "TokenHandler" as token <<unit>>
+participant "GenericMoshiParser" as parser <<unit>>
+participant "Http" as http <<unit>>
+
+caller -> job: run()
+activate job
+
+job -> registration: isCookiePresentAndValid()
+activate registration
+job <- registration: false
+deactivate registration
+
+job -> downtime: getRemainingDowntime()
+activate downtime
+job <- downtime: 1 or more
+deactivate downtime
+job -> job: Set retryAfterResponse to the delay
+
+deactivate job
+----
+
+=== Handel token errors
+
+[plantuml, title="run() but token handler fails", format="svg", id="run-token-failure"]
+----
+
+participant "Arbitrary Unit" as caller
+participant "RegistrationRequestJob" as job <<unit>>
+participant "HandleRegistration" as registration <<unit>>
+participant "ServerDowntimeHandler" as downtime <<unit>>
+participant "TokenHandler" as token <<unit>>
+
+caller -> job: run()
+activate job
+
+job -> registration: isCookiePresentAndValid()
+activate registration
+job <- registration: false
+deactivate registration
+
+job -> downtime: getRemainingDowntime()
+activate downtime
+job <- downtime: null
+deactivate downtime
+
+job -> token: getToken()
+activate token
+job <- token !! : null
+deactivate token
+
+deactivate job
+----
+
+=== Handle http request fails
+
+[plantuml, title="run() but http request fails", format="svg", id="run-http-failure"]
+----
+
+participant "Arbitrary Unit" as caller
+participant "RegistrationRequestJob" as job <<unit>>
+participant "HandleRegistration" as registration <<unit>>
+participant "ServerDowntimeHandler" as downtime <<unit>>
+participant "TokenHandler" as token <<unit>>
+participant "GenericMoshiParser" as parser <<unit>>
+participant "Http" as http <<unit>>
+
+caller -> job: run()
+activate job
+
+job -> registration: isCookiePresentAndValid()
+activate registration
+job <- registration: false
+deactivate registration
+
+job -> downtime: getRemainingDowntime()
+activate downtime
+job <- downtime: null
+deactivate downtime
+
+job -> token: getToken()
+activate token
+job <- token: String including backend token
+deactivate token
+
+job -> job: Build backend request
+job -> parser: parseToJson()
+activate parser
+job <- parser: String including json data
+deactivate parser
+
+job -> http: executePost()
+activate http
+job <- http: Throws exception
+deactivate
+
+deactivate job
+----
+
+[[section-design-decisions]]
+== Design Decisions
+
+No further design decisions were made for the implementation of this unit other than those already mentioned in link:../../main.{type}[metadataservice_conradlib].
+
+include::../about-arc42.adoc[]

@@ -1,0 +1,18 @@
+MetadataService - Authors and Contributors
+==========================================
+
+Original Development (2019-2025):
+---------------------------------
+e.solutions GmbH
+- Development team under contract for Cariad SE / Volkswagen Group
+
+Current Maintenance (2026-present):
+-----------------------------------
+Cariad SE / Volkswagen Group
+- Christian Winter (T2-CH) <christian.winter@cariad.technology>
+  - Local build enablement without Artifactory
+  - Framework dependency removal (eso.local/eso.fw)
+  - Stub implementations for ASI Admin and Storage APIs
+  - ConRadLib source module integration
+  - Gracenote SDK dummy key configuration
+  - Install/uninstall deployment scripts

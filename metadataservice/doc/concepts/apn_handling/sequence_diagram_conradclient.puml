@@ -1,0 +1,21 @@
+@startuml
+
+participant MetadataService as mds
+participant CoreServices as cs
+participant ConRadClient as cc
+
+activate mds
+activate cs
+activate cc
+
+mds -> cs: registerServiceListClient(clientId, callback)
+
+loop serviceList changed
+    cs --> mds: updateServiceList(serviceListEntries)
+    mds -> cc: changeNetworkConfig(configData)
+    loop APN unchanged
+        mds -> cc: getRadioStationData(bearer, lastModified, callback)
+    end
+end
+
+@enduml

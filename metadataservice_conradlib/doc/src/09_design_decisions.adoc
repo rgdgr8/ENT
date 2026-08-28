@@ -1,0 +1,94 @@
+[[section-design-decisions]]
+== Design Decisions
+
+=== Existence of this SoftwareElement
+The architecture element exists because we decided to adopt the functionalities from the HCP3 project for the OI project. This decision includes the creation of a new depot to manage the codebase.
+
+* This decision was made collaboratively to ensure better modularization and maintainability of the code.
+* By reusing the existing functionalities from HCP3, we aim to reduce development effort and leverage proven solutions.
+* The new repository will serve as a centralized location for managing the adopted functionalities, ensuring consistency and ease of maintenance.
+
+
+=== Reuse Decision
+==== Goals of this decision
+We want to make a choice, whether to reuse existing code (and how to reuse it) or to make a new development.
+
+==== Decision Criteria
+Please choose one of the following 4 options and provide the reason for the choice:
+
+1. Completely new development
+2. One development for any affected project
+3. Modification of functionality with the help of coding or configuration
+4. Branching for OI@A from HCP3
+
+==== Alternatives
+The following possibilities are available
+
+===== Completely new development
+We do a complete new development of this SWE for this project.
+
+===== One development for all affected projects
+We use exactly the same code for all affected projects while using the same branch in any project without coding or configuration (= no need to differentiate between the projects)
+
+===== Modification of functionality with the help of coding or configuration
+We use exactly the same code for all affected projects while using the same branch in any project, but differentiate the functionality for different projects by code-switches or (build-)configurations
+
+===== Branching for this project from another project.
+We decide which codebase will be used for extension/modification.
+For this choice, the version from the HCP3-branch used as basis has to be mentioned/specified additionally.
+
+==== Decision
+Choice: Option 4 - Branching for this project from another project
+
+Reason: We chose the alternative "Branching for this project from another project" because the functionalities required for this library already exist in the HCP3 project. By using the existing codebase as a foundation, we can extend or modify it to meet the specific requirements of the OI project.
+
+Pro:
+
+* Reduces development effort by leveraging existing, proven functionalities.
+* Ensures consistency and compatibility with the HCP3 project.
+* Allows for faster implementation by reusing a stable codebase.
+
+Con:
+
+* May require additional effort to adapt the existing codebase to the specific needs of the OI project.
+* Potential dependencies on the HCP3 codebase could introduce constraints or limitations.
+
+Technical Risk(s):
+Risks related to adapting the existing codebase should be monitored, including potential compatibility issues or unforeseen dependencies. Additionally, any modifications to the HCP3 codebase must be carefully managed to avoid introducing technical debt or instability.
+
+=== Programming language decision
+
+During the development process of the CoreServices, the decision was made that for newly developed code Kotlin will be used, even the legacy code is mostly developed in JAVA.
+Kotlin is completely compatible with Java, so there was no loss of any code or feature.
+After pondering the advantages of both languages, the decision was made to use Kotlin.
+In the following, a few advantages of the usage of Kotlin instead of Java are listed. These advantages were also part of our decision:
+
+* Kotlin is a modern and developer friendly language
+* Kotlin is more concise than Java
+** easier to read
+** easier to maintain
+** easier to apply changes
+* Kotlin has a smart and safe compiler
+** detects errors at compile time not at runtime
+** performs lots of checks, reducing runtime errors and bugs
+
+=== OkHttp
+
+OkHttp is a free library to handel Http request. It supports the new HTTP/2protocol, which is used by the server.
+It also provides a MockWebServer that can be started locally for the tests to mock the Backend response.
+
+For more information about the OkHttp Client, have a look at https://square.github.io/okhttp/.
+
+As alternative Jetty's HTTPClient could also be used, but we decided to use OkHttp because the developer of our teams had already experiences with this library.
+
+=== Moshi
+
+Moshi is a modern JSON library for Android and Java/Kotlin. It makes it easy to parse JSON into Java/Kotlin objects or the other way around. +
+For more information about Moshi, have a look at https://github.com/square/moshi.
+
+As an alternative, we discussed GSON from Google, but we decided to use Moshi because it is more optimized and so requires fewer resources, also it takes less storage space.
+
+=== Detailed design decisions
+
+There were no detailed design decisions made because several decisions are conformal with the quality decisions.
+The implementation and several design decisions were implemented according to the given requirements by OEM.

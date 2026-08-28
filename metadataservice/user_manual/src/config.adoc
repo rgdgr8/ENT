@@ -1,0 +1,11 @@
+// asciidoc settings for EN (English)
+// ==================================
+:title-page:
+
+:toc-title: Table of Contents
+
+// enable table-of-contents
+:toc:
+
+// where are images located?
+ifndef::imgdir[:imgdir: ./../images]

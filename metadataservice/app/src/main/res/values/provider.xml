@@ -1,0 +1,5 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <!-- Note: Has to be in sync with the provider authority specified in the AndroidManifest.xml. -->
+    <string name="image_provider_authority">technology.cariad.entertainment.metadataservice.contentprovider.MetadataImageProvider</string>
+</resources>

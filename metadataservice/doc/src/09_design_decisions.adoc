@@ -1,0 +1,75 @@
+﻿[[section-design-decisions]]
+== Design Decisions
+
+This chapter lists the major decisions taken during the design of the Metadata-Service App architecture.
+Most items are listed in a table with a few exceptions that require a more in depth description of the decision process.
+
+[options="header",cols="1,3"]
+|===
+|Decision   |Rationale
+//----------------------
+|Kotlin   |The decision to use Kotlin over Java was primarily based on the advice given by Google for Android app development. As key improvements over Java a proper way to handle nullable types is part of the type system. It provides additional syntactical sugar to write more concise code and hopefully speed up the development time. On Android there is good library support for Kotlin. The biggest benefit of Java would have been the wider adoption and therefore better access to developer resources.
+|Room Database Library   |The Android SDK offers two fundamentally different APIs to work with the included SQLite database library. Prior to the Android Jetpack library queries were directly executed on the database via the SQLiteDatabase class. Results were returned via database cursors. This approach has quite a few shortcomings, such as manually converting the data from the cursor to meaningfully objects, no compile time validation of SQL statements, limited support for database migration, and the inherent risk of being vulnerable to SQL injections unless explicit care is taken by the developer. The new Room API solves these issues. It is an object-relational mapper and therefore directly returns objects from the relational database. Due to the way the library is designed, SQL statements can be validated at compile time and SQL injections are mitigated. +Usage of completely different database libraries has not been considered further due to missing integration with the remaining Android SDK components.
+|Dagger2   |This is the only dependency injection framework included in the Android SDK. Other options have not been evaluated as it seems to be good enough for our purpose. In general this enables us to reduce direct dependencies in our application making it both easier to understand and improve testability especially for unit tests. Injected components or modules can easily be replaced by mocks or stubs as needed.
+|ContentProvider   |Sharing large amounts of data privately on Android between apps is an inherently difficult issue, due to the sandboxing employed to ensure the isolation and access restrictions to an app's local data. Sending large blobs over Android's standard interprocess communication interface - the binder device -, can quickly exceed the limitation of 1MB per transaction (per process). Using an internal HTTP/HTTPS server for data distribution adds a lot more complexity to the overall system architecture, specifically from a security perspective. Therefore it has been decided to implement an own ContentProvider offered by the Android SDK. This component is used to grant other apps access to an app's private extended partition, with fine grained control over which files can be read or written. Initially, a standard Android FileProvider was used, which later on proved to not be flexible enough, once switched from storing the data in the app local data folder to the extended storage partition provided by ESM. Besides that, granting URI permissions across user boundaries is not supported by the AndroidSDK, unless an additional Intent is created for each grant.
+|AIDL   |AIDL is the only way to have a structured interface for inter-process communication on Android. VW/Audi/ESO specific communication technologies such as ASI/DSI/ViWi were explicitly excluded for usage in external interfaces. Using the plain binder protocol or the Messenger providing a simple message passing interface on top, does not give us the means to provide a usable API for client apps.
+|ReactiveRPC2AIDL   |This generator adds an abstraction on top of plain AIDL to transform it in to a reactive interface usable together with either RxJava or RxKotlin. This is heavily used by half the known clients, and leaves us the possibility to implement the normal Java stubs generated from the AIDL definitions. It additionally solves some issues of plain AIDL such as handling of multiple clients and AIDL calls being dispatched on threads from a thread pool, therefore either requiring the called code (service calls and client callbacks) to be thread safe or ways to sequentialize the calls internally.
+|JUnit   |JUnit is a simple open source framework and the most common way of implementing unit tests in Kotlin/Java.
+|MockK  |MockK framework is used to create mocks in a convenient and idiomatic way during test implementation.
+|C++   |The decision to use C++ for implementing GracenoteService was primarily based on three considerations: performance in context with the song recognition feature, experiences from former projects where gnsdk was used and the fact that gnsdk provides a sophisticated C++ wrapper library. The basic functionality and necessary sequence of API calls was well known already so there was no major knowledge transfer necessary. However all modules have been implemented from scratch because of the switch from C in former projects to C++ in HCP3.
+|Catch 2  |Catch 2 is a unit testing framework for C\++ and used for implementing unit tests in C++.
+|===
+
+<<<
+
+=== Caching Strategy
+
+A central topic during the initial planning and design phase was the responsibilities regarding data ownership. In the beginning the Cariad concept basically had Metadata-Service App as single owner of everything, only providing temporary access to clients whenever necessary. During further internal discussions it became clear, that clients in certain scenarios require more direct access to some of the data. +
+Hence for the overall persistent caching strategy the following approaches were considered:
+
+. Only Metadata Service App persists StationLogos, CoverArt, Stationdata, Metadata +
+This is basically the original proposal from Cariad. +
+The advantages for this approach are:
+* Efficient flash memory usage – all data is only persisted once
+* Possibility for uniform interfaces for multiple providers (ConRad+GN China Logos)
+* (Logos are persisted over app data reset/re-installation of Radio App)
+
++
+Disadvantages include:
+
+* Additional overhead of requesting any data, especially logos, due to IPC (AIDL+ContentProvider) and background processing in service.
+* Asynchronous IPC communication with service.
+
+. Same as 1. but Radio App additionally persists all data required during startup scenarios. +
+This approach mitigates disadvantage 1a at the cost of doubling the memory footprint for the affected data (logos (small+big) and station data of stations). +
+The advantages apart from 1a still apply.
+
+. Metadata-Service App only persist metadata required for request/retry handling +
+With this approach Metadata-Service App would no longer store any StationLogos. +
+It would only store the associated metadata (e-tags), request time, status of the last request (…) in order to ensure logos are being refreshed only as often as absolutely necessary. +
+StationData would be persisted on its side. Potentially on HMI side if deemed necessary. +
+This brings the memory footprint back down, not quite towards 1a, but reasonably close. +
+For the disadvantage mainly the increased complexity on the communication between Radio App and Metadata-Service App is seen. +
+How should be communicated, whether logos should be refreshed or newly retrieved? If caches are not in sync, different entries at different times might be evicted.
+
+. RadioA pp uses ConRad-Client library directly: +
+In this case Metadata-Service App only provides CoverArt/metadata for Media and StationLogos/StationData in China +
+Advantages:
+* Lightweight, eliminating all IPC (ex. China)
+* Most data is available to Radio App as fast as possible in startup scenarios
+
++
+Disadvantages:
+* Increased complexity for Radio App due to refresh and retry handling.
+* Dispatching between ConRad, and Gracenote for China via Metadata-Service App is done by Radio App
+
+The aspect of adding or removing a back-end provider has been left out of the assessment so far, as to me this seemed to be mostly a theoretical consideration.
+With the exception of (maybe) approach 1 this would require changes on client side (Radio App) as well.
+
+Weighting the options and after lengthy discussions, the second option has been chosen as the preferred approach by all involved parties and suggested to Cariad. +
+Both the third and fourth option add additional complexity either on Metadata-Service App or on client side.
+The first option is not able to fulfill startup requirements for clients, stating that logos and covers that were shown in the last bus cycle should be available "immediately" again. From a client's implementation perspective this is only achievable when having direct and synchronous access to them. The interprocess communication involved in retrieving them via Metadata-Service App prevents this from being a viable approach.
+
+=== Caching and Update Strategy for radiostation data
+
+One main topic, which used to be a bit problematic in the past was the update strategy for cached radiostation metadata and logos. This was basically solved within GNSDK itself. The used result database knows if data is outdated and will update the data when necessary so that the end user will always be presented latest valid data and logos. The GracenoteService uses the built in Result DB functionality provided by GNSDK.

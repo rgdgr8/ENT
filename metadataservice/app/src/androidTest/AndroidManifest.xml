@@ -1,0 +1,18 @@
+<manifest xmlns:android="http://schemas.android.com/apk/res/android"
+    package="technology.cariad.entertainment.metadataservice.test">
+
+    <application android:label="MetadataServiceTest">
+
+        <service
+            android:name="technology.cariad.entertainment.metadataservice.common.serviceresolver.stub.ServiceResolverServiceStub"
+            android:exported="true"
+            android:process=":privateTestProcess">
+
+            <intent-filter>
+                <action android:name="ServiceResolverServiceStub" />
+            </intent-filter>
+        </service>
+
+    </application>
+</manifest>
+

@@ -1,0 +1,15 @@
+@startuml
+
+skinparam componentStyle uml2
+
+interface "IMetadataServiceAidl" as metadata_service_aidl
+
+component "Service" <<component>> {
+    component "MetadataService" <<unit>> as metadata_service
+    component "MetadataServiceDI" <<unit>> as metadata_service_di
+
+    metadata_service .up.> metadata_service_aidl
+    metadata_service .> metadata_service_di
+}
+
+@enduml

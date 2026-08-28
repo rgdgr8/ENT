@@ -1,0 +1,30 @@
+OIG-2780 : C1INF-8379 : Link against MAGIC Client API /Library
+OIG-2787 : C1INF-8382 : Error Handling & Retry mechanism for ServiceList/Disable Reasons
+OIG-31087 : C1INF-11344 : Sample App implement getToken from MAGIC service
+OIG-31088 : C1INF-11345 : Create Build Flavors with different Manifests
+OIG-31089 : C1INF-11348 : Create test coverage report
+OIG-31091 : C1INF-11350 : Create interface tests for OI@A
+OIG-31093 : C1INF-12802 : Impl. Mapping Sheet MAGIC Client API <-> Stable API for ServiceList/DisableReasons
+OIG-34299 : C1INF-22048 : Create and deliver artifact for unit testing stapi jar
+OIG-34302 : C1INF-22308 : Define Stable API for MQTT/PubSub that can be used in HCP3 and OI@A
+OIG-34303 : C1INF-22309 : Impl. Mapping Sheet MAGIC Client API <-> Stable API for MQTT/PubSub
+OIG-34305 : C1INF-22311 : Create and define configuration for MQTT/PubSub Operations
+OIG-34311 : C1INF-22331 : Create common API jar for HCP3 and OI@A
+OIG-34516 : C1INF-22763 : Sample App - Implement pub/sub from MAGIC service
+OIG-46445 : C1INF-44747 : Robust Data Sequence for fetching data via MAGIC Client API
+OIG-47622 : C1INF-47708 : [OI][MAGIC Adapter] Create Application Interface for TPT
+OIG-50347 : C1INF-50028 : [OI][MAGIC Adapter] Interface update due to changes of MAGIC Client API
+OIG-50347 : C1INF-50028 : [OI][MAGIC Adapter] Interface update due to changes of MAGIC Client API
+OIG-5274 : C1INF-11346 : Define Stable API that can be used in HCP3 and OI@A
+OIG-5275 : C1INF-11347 : Documentation of Stable API (JavaDoc and HowTo)
+OIG-5277 : C1INF-11353 : Create Jenkins Pipeline for Android Build
+OIG-5279 : C1INF-11355 : Create module for OI@A (build.gradle)
+OIG-5280 : C1INF-11356 : Create build pipeline for OI@A MAGIC Adapter API (Stable API)
+OIG-5281 : C1INF-11357 : Create build pipeline for OI@A MAGIC Adapter library
+OIG-5284 : C1INF-11491 : Create delivery pipeline for MAGIC Adapter API (Stable API)
+OIG-5285 : C1INF-11492 : Create delivery pipeline for MAGIC Adapter library
+OIG-67189 : C1INF-62264 : Implementation Esim State mapping for DisableReasons
+OIG-69070 : C1INF-71113 : Sample App implement dynamic getToken and mqtt subscription from MAGIC service
+OIG-69071 : C1INF-72508 : Provide empty Service List if info cannot be fetched via MAGIC Client API
+OIG-69383 : C1INF-74169 : Impl. Mapping Sheet MAGIC Client API <-> Stable API for DisabledReason FleetAdmin
+OIG-92018 : C1INF-101479 : [OI][MAGIC Adapter] OSD implementation CL53T

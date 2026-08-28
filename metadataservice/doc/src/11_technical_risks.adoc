@@ -1,0 +1,10 @@
+[[section-technical-risks]]
+== Risks and Technical Debts
+
+* Clients not closing file descriptors returned from the custom ContentProvider in a timely manner (immediately after use!), thereby exceeding the OS limit of max open file descriptors per process
+* After the initial demo phase, there is no time allocated explicitly for architecture evolvement or potential refactorings/cleanups of code smells. As all changes have to be associated with a feature, this poses a major risk of gradual degradation in the long term!
+* Further risks are described on the official Cariad Confluence Metadata-Service App project page.
+* Harman ESM must be available during the initialization of Metadata-Service App and must provide a file storage location. Otherwise Metadata-Service App can not provide any functionality at all.
+* GracenoteService is using GNSDK for Auto from Gracenote, which is an off-the-shelf product from Gracenote. In the past there were some major problems found, such as memory leaks or race conditions within the GNSDK. As this is an external library the project will have to wait until a bugfix for any problems within gnsdk will be available.
+
+There are no technical debts yet as the project is developed from scratch.

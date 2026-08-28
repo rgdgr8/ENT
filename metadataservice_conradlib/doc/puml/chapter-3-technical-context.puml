@@ -1,0 +1,23 @@
+@startuml
+skinparam componentStyle uml2
+
+node "Vehicle" as vehicle {
+    component "CoreServices" as crs #fff
+    component "Magic" as magic #fff
+    component "Android Account Manager" as am #fff
+
+    node "metadataservice_app" as media {
+        component "metadataservice_conradlib" as crc
+    }
+}
+
+cloud "ConnectedRadio_Backend" <<Server>> as crb #fff {
+}
+
+crc <.right.> crb : http/2
+crc <..> am : android api call
+
+am <.right.> crs : android api call
+am <.right.> magic : android api call
+
+@enduml

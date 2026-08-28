@@ -1,0 +1,117 @@
+include::config.adoc[]
+
+[[section-runtime-view]]
+== Runtime View
+
+=== Startup
+
+We are a part of the metadataservice app which is a system app. These app start if some other app have a description to them.
+Our lib is initiate from the metadataservice during her startup. After initiation, we start a request to the backend to update our default config values.
+
+[plantuml, chapter-6-registration, png]
+----
+include::{pumldir}/chapter-6-registration.puml[]
+----
+
+=== Shutdown
+
+The metadataservice will be shutdown from the system if nobody use the service. We do nothing for the shutdown.
+
+=== Suspend
+
+We do not react to Suspend2Ram.
+
+=== Resume
+
+We do nothing special after resume from Suspend2Ram. If we notice during our first backend request that the cookie is expired we start a new registration request identical to the startup request.
+
+=== Sequence diagrams
+
+Some diagrams about the workflow of the application in different situations.
+
+==== Full Data
+
+* Request a new Bearer which is not already in the cache
+* Send complete data from the backend to the client
+
+[plantuml, chapter-6-fullData, png]
+----
+include::{pumldir}/chapter-6-fullData.puml[]
+----
+
+==== Not Modified
+
+* Bearer is already in the MetaDataService cache
+* No new data on the backend server
+* Send onComplete with new ExpiryDate
+
+[plantuml, chapter-6-notModified, png]
+----
+include::{pumldir}/chapter-6-notModified.puml[]
+----
+
+==== No Content
+
+* No Content on the backend server for this bearer
+* Send `null` on every data callback to tell media to delete stored data
+
+[plantuml, chapter-6-noContent, png]
+----
+include::{pumldir}/chapter-6-noContent.puml[]
+----
+
+==== Partial Data
+
+* Bearer is already in the MetaDataService cache
+* Only some data is updated at the backend
+* Send only the updated data to the client (in this example `Metadata` and `Bearers`)
+
+[plantuml, chapter-6-partialData, png]
+----
+include::{pumldir}/chapter-6-partialData.puml[]
+----
+
+==== Error case
+
+* Receive an error from the server
+* Tell the client to repeat the request after some time
+
+[plantuml, chapter-6-errorCase, png]
+----
+include::{pumldir}/chapter-6-errorCase.puml[]
+----
+
+[[Async]]
+=== Asynchronous calls
+
+When the Method `getRadioStationData` is called, the requested bearer is sent to the RequestController.
+If the limit is reached or no other bearer request is received in the configured time, the request job will be created and send to the worker queue.
+The worker takes the first element in the queue, checks the registration and starts the request to the backend.
+The received data from the backend will be parsed and sent to media using the given callback instance.
+If required, a logo request will be made to receive the radio station image.
+At the end the `onComplete` callback function is called and the coroutine ends.
+
+[plantuml, chapter-6-getRadioStation-Workflow, png]
+----
+include::{pumldir}/chapter-6-getRadioStation-Workflow.puml[]
+----
+
+[plantuml, chapter-6-Lookup-Workflow, png]
+----
+include::{pumldir}/chapter-6-lookup-workflow.puml[]
+----
+
+[plantuml, chapter-6-Logo-Workflow, png]
+----
+include::{pumldir}/chapter-6-logo-workflow.puml[]
+----
+
+[[Token]]
+=== Receive OAuthToken
+
+To get a token from the Android AccountManager, we use the account information received from the MetaDataService via the `setConfig` function.
+
+[plantuml, chapter-6-getToken, png]
+----
+include::{pumldir}/chapter-6-getToken.puml[]
+----

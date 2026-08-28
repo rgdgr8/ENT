@@ -1,0 +1,12 @@
+include::config.adoc[]
+
+[[section-radio_asia_tab]]
+== Radio Asia Tab
+
+This tab is used in order to test radio station data and logos for Asia.
+Necessary data can be inserted and REQUEST button can be clicked. Therefore function is triggered, Asia radio station logo and metadata (Name, Provider ID) are received.
+
+In order to test this functionality, necessary permission should be granted (ACCESS_FINE_LOCATION/ACCESS_BACKGROUND_LOCATION) and the location should be inserted via Settings tab.
+
+image:{imgdir}/06_radio_asia_tab.png[]
+

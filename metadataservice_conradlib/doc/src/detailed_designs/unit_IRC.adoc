@@ -1,0 +1,284 @@
+﻿include::../config.adoc[]
+//imagesdir must be overwritten, it is already included in the config.adoc
+:imagesdir: ../../images
+:hash: #
+
+= image:ESO_Logo_Colour_positive_RGB.png[eso_icon,350,350,float="right",align="center"] Design metadataservice_conradlib - Unit IRC
+:toc-title: Table of Contents
+
+'''
+
+// numbering from here on
+:numbered:
+:stem: latexmath
+
+
+[unit=IRC, role=unit]
+== <<Unit>> IRC
+This document specifies the design of the unit *IRC*, it is part of the link:../../main.{type}[metadataservice_conradlib].
+
+The IRC is responsible to record errors and important information in production cars.
+If there is an RuntimeException while writing messages, it should write a log to the link:unit_Logger.adoc[Logger].
+The IRC class should be a kotlin object (Singleton).
+
+== Provided Interface (public methods and properties)
+
+=== IRC.printVersionInformation()
+
+Should write the client version from the BuildConfig into the IRCEntry.VERSION channel.
+Use IRC.getIRC().logUsage() from the eso framework to write this message.
+
+*Arguments*
+
+None
+
+*Return*
+
+None
+
+*Exceptions*
+
+None
+
+=== IRC.error(entry: IRCEntry, message: IRCMessage)
+
+Should convert the message id to a string and call the error function that accepts strings
+
+*Arguments*
+
+|===
+|name|value range |valid values | description
+
+|entry
+|IRCEntry
+|IRCEntry
+|The irc channel that should receive the message.
+
+|message
+|IRCMessage
+|IRCMessage
+|The message that should be written to the irc.
+|===
+
+*Return*
+
+None
+
+*Exceptions*
+
+None
+
+=== IRC.error(entry: IRCEntry, httpCode: Int)
+
+Should convert the status code to a string and call the error function that accepts strings.
+
+*Arguments*
+
+|===
+|name|value range |valid values | resolution | description
+
+|entry
+|IRCEntry
+|IRCEntry
+|n/a
+|The irc channel that should receive the message.
+
+|httpCode
+|int
+|HTTP status codes
+|+-1
+|The error http status code that should be written to the irc.
+|===
+
+*Return*
+
+None
+
+*Exceptions*
+
+None
+
+=== IRC.error(entry: IRCEntry, message: String)
+
+Write the first 128 characters from the message to the given irc channel.
+Use IRC.getIRC().logSystem() from the eso framework to write this message.
+
+*Arguments*
+
+|===
+|name|value range |valid values | description
+
+|entry
+|IRCEntry
+|IRCEntry
+|The irc channel that should receive the message.
+
+|message
+|String
+|String with max 128 characters
+|The message that should be written to the irc channel.
+|===
+
+*Return*
+
+None
+
+*Exceptions*
+
+None
+
+=== IRCEntry.class(val entry: String)
+
+This enum class defines the configured irc channels.
+
+*Arguments*
+
+|===
+|name|value range |valid values | description
+
+|entry
+|String
+|String
+|The name of the irc channel that is configured in the framework.
+|===
+
+*Enums*
+
+|===
+|name|entry
+
+|VERSION
+|ConRadLibVersion
+
+|EXCEPTIONS
+|ConRadLibExceptions
+
+|LOGO
+|ConRadLibErrorLogo
+
+|LOOKUP
+|ConRadLibErrorLookup
+
+|REGISTRATION
+|ConRadLibErrorRegistration
+|===
+
+=== IRCMessage.class(val id: Int)
+
+This enum class defines some error status code for specific use cases.
+
+*Arguments*
+
+|===
+|name|value range |valid values | description
+
+|id
+|Int
+|Int
+|The error code that should be written to the irc channel.
+|===
+
+*Enums*
+
+|===
+|name|id
+
+|UNKNOWN
+|0
+
+|TOKEN
+|1
+
+|EMPTY_BODY
+|2
+
+|INVALID_RESPONSE
+|3
+|===
+
+== Dependencies (Used Units, methods and properties)
+
+This is an overview of the used methods and properties from other units.
+
+|===
+|Destination unit|Destination method/property |comment
+
+|link:unit_Logger.adoc[Logger]
+|Logger.ex()
+|If writing of the irc message fails, log a exception to the logger.
+|===
+
+== Runtime View
+
+[dynamic_sequence=startup, unit=IRC, role=dynamic_sequence]
+=== Startup
+
+No explicit specification required, because no constructor or startup logic exists.
+
+[dynamic_sequence=shutdown, unit=IRC, role=dynamic_sequence]
+=== Shutdown
+
+This class is a kotlin object (Singleton) that will stay in the memory forever, so it can be reused.
+
+[dynamic_sequence=startup_after_s2r, unit=IRC, role=dynamic_sequence]
+=== Suspend
+
+Since this is a kotlin class without deep android references, no suspend state needs to be considered.
+
+[dynamic_sequence=resume, unit=IRC, role=dynamic_sequence]
+=== Resume
+
+Since this is a kotlin class without deep android references, no suspend state needs to be considered.
+
+=== Print version information
+
+[plantuml, title="printVersionInformation()", format="svg", id="print-version"]
+----
+participant "Arbitrary Unit" as caller
+participant "IRC" as irc <<unit>>
+participant "Framework" as fw
+
+caller -> irc: printVersionInformation()
+activate irc
+irc -> fw: logUsage()
+deactivate irc
+----
+
+=== Print error information
+
+[plantuml, title="error()", format="svg", id="print-error"]
+----
+participant "Arbitrary Unit" as caller
+participant "IRC" as irc <<unit>>
+participant "Framework" as fw
+
+caller -> irc: error()
+activate irc
+irc -> irc: Limit message length to 128
+irc -> fw: logSystem()
+deactivate irc
+----
+
+=== Fallback for printing error information's
+
+[plantuml, title="error() function failed", format="svg", id="print-error-failed"]
+----
+participant "Arbitrary Unit" as caller
+participant "IRC" as irc <<unit>>
+participant "Framework" as fw
+participant "Logger" as logger
+
+caller -> irc: error()
+activate irc
+irc -> irc: Limit message length to 128
+irc -> fw !! : logSystem()
+irc -> logger: Logger.ex()
+deactivate irc
+----
+
+[[section-design-decisions]]
+== Design Decisions
+
+No further design decisions were made for the implementation of this unit other than those already mentioned in link:../../main.{type}[metadataservice_conradlib].
+
+include::../about-arc42.adoc[]

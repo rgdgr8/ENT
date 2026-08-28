@@ -1,0 +1,87 @@
+<?xml version="1.0" encoding="utf-8"?>
+<androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:scrollbars="none"
+    tools:context="technology.cariad.entertainment.metadataservice.view.DemoActivity">
+
+    <LinearLayout
+        android:id="@+id/inputLinearLayout"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginStart="16dp"
+        android:orientation="vertical"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="@+id/lyricsTextScrollView">
+
+        <Spinner
+            android:id="@+id/lyricsTypeSpinner"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:entries="@array/lyrics_types" />
+
+        <Switch
+            android:id="@+id/familyFriendlySwitch"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="16dp"
+            android:text="Family Friendly"
+            app:layout_constraintTop_toBottomOf="@+id/lyricsTypeSpinner" />
+
+        <ToggleButton
+            android:id="@+id/startStopButton"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_gravity="center"
+            android:layout_marginTop="16dp"
+            android:textAllCaps="false"
+            android:textOff="@string/start"
+            android:textOn="@string/stop"
+            app:layout_constraintTop_toBottomOf="@+id/familyFriendlySwitch" />
+
+    </LinearLayout>
+
+
+    <TextView
+        android:id="@+id/playPositionLabelTextView"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="32dp"
+        android:text="@string/play_position_ms"
+        app:layout_constraintStart_toStartOf="@+id/lyricsTextScrollView"
+        app:layout_constraintTop_toTopOf="parent" />
+
+    <TextView
+        android:id="@+id/playPositionTextView"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="32dp"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toEndOf="@+id/playPositionLabelTextView"
+        app:layout_constraintTop_toTopOf="parent"
+        tools:text="00:00:00" />
+
+    <ScrollView
+        android:id="@+id/lyricsTextScrollView"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="8dp"
+        android:scrollbars="vertical"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toEndOf="@+id/inputLinearLayout"
+        app:layout_constraintTop_toBottomOf="@+id/playPositionTextView">
+
+        <TextView
+            android:id="@+id/lyricsTextView"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_gravity="top|start"
+            android:layout_marginStart="32dp"
+            android:layout_marginTop="16dp"
+            android:layout_marginEnd="32dp"
+            tools:text="{lyrics json}\n\n\n\n\n\n\n" />
+    </ScrollView>
+</androidx.constraintlayout.widget.ConstraintLayout>
+

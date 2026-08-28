@@ -1,0 +1,36 @@
+@startuml
+title Receive token from Account Manager
+
+skinparam maxMessageSize 200
+
+participant "metadataservice_app" as mds
+participant "metadataservice_conradlib" as crc
+participant "Android Account Manager" as acc
+participant "Token Provider" as token
+
+acc <- token : Register account
+
+mds -> crc : setConfig with account manager settings
+mds -> crc : Request bearer information
+activate crc
+crc -> crc : Run request jobs
+
+activate crc
+crc -> acc : Request account
+activate acc
+crc <- acc : Receive account
+deactivate acc
+
+crc -> acc : Request token by operationId and serviceId
+activate acc
+
+acc -> token : Validate operationId and serviceId
+activate token
+token -> acc : Send token to the account manager
+deactivate token
+
+acc -> crc : Send token to the client
+deactivate acc
+deactivate crc
+deactivate crc
+@enduml

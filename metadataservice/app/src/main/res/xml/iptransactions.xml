@@ -1,0 +1,7 @@
+<?xml version="1.0" encoding="utf-8"?>
+<iptransactions>
+    <transaction>TTENT-connectedradio_v2</transaction>
+    <transaction>TTENT-gracenote_v1</transaction>
+    <transaction>TTENT-gracenotelyrics_v1</transaction>
+    <transaction>TTENT-hybridradiodata_v3</transaction>
+</iptransactions>

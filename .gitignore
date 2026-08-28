@@ -1,0 +1,42 @@
+# Test logs and data
+testing/
+
+# Auth tokens
+token/
+testtoken.env
+
+# IDE
+.idea/
+*.iml
+.vscode/
+
+# macOS
+.DS_Store
+
+# Build artifacts
+*.apk
+*.aab
+local.properties
+**/.gradle/
+**/build/
+**/dist/
+dist/
+
+# Local backups
+backup_original_mds/
+
+# DB export (no longer needed)
+db_export/
+
+# Historical review exports
+reviews/
+
+# Local output artifacts
+output/
+out/
+
+# Temporary standalone mds probe package
+mds_probe_demo.zip
+
+# Vendor SDK bundle
+gnsdk-auto-2.6.19.14264-20250729/
